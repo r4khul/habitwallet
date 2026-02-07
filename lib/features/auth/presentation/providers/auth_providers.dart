@@ -11,9 +11,11 @@ part 'auth_providers.g.dart';
 class AuthController extends _$AuthController {
   @override
   FutureOr<AuthSession?> build() async {
+    // Auth Lifecycle: Read Flow (App Startup)
+    // 1. Injects AuthRepository
+    // 2. Attempts to recover session from secure storage
+    // 3. Emits authenticated (Session) or unauthenticated (null) state
     final repository = ref.watch(authRepositoryProvider);
-    // Explicitly using AsyncValue.guard implicitly in ref.watch(futureProvider)
-    // but building here to handle initial load error explicitly if needed.
     return repository.getSession();
   }
 
@@ -24,6 +26,9 @@ class AuthController extends _$AuthController {
 
   /// Transitions the app to an unauthenticated state.
   Future<void> logout() async {
+    // Auth Lifecycle: Clear Flow
+    // 1. Removes session from secure storage via repository
+    // 2. Resets local state to unauthenticated
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(authRepositoryProvider).clearSession();
@@ -37,6 +42,9 @@ class AuthController extends _$AuthController {
     required String pin,
     required bool rememberMe,
   }) async {
+    // Auth Lifecycle: Write Flow
+    // 1. Triggers repository login (validation + persistence)
+    // 2. Updates global state with the new session
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       return ref

@@ -42,12 +42,20 @@ class AuthRepositoryImpl implements AuthRepository {
     required String pin,
     required bool rememberMe,
   }) async {
-    // Auth Stub Logic: Accepts any PIN that is '1234'
+    // Auth Lifecycle: Write Flow
+    // 1. Validate credentials (stub)
+    // 2. Clear stale session records
+    // 3. Persist new session if requested
     if (pin == '1234') {
       final session = AuthSession(email: email, rememberMe: rememberMe);
+
       if (rememberMe) {
         await saveSession(session);
+      } else {
+        // If not rememberMe, ensure storage is clean of previous sessions
+        await clearSession();
       }
+
       return session;
     } else {
       throw const AuthFailure('Invalid PIN. Please try again.');
