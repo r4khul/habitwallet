@@ -14,7 +14,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TransactionEntity {
 
- String get id; double get amount; String get category; DateTime get timestamp; String? get note; bool get editedLocally;
+/// Unique stable identifier. Invariant: Stable and immutable.
+ String get id;/// Monetary amount. Sign determines income (+) vs expense (-).
+ double get amount;/// User-editable classification for the transaction.
+ String get category;/// Authoritative timestamp of when the transaction occurred.
+ DateTime get timestamp;/// Optional user-provided description or context.
+ String? get note;/// Internal flag representing local state vs remote persistence.
+ bool get editedLocally;
 /// Create a copy of TransactionEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -214,11 +220,17 @@ class _TransactionEntity extends TransactionEntity {
   const _TransactionEntity({required this.id, required this.amount, required this.category, required this.timestamp, this.note, this.editedLocally = false}): super._();
   
 
+/// Unique stable identifier. Invariant: Stable and immutable.
 @override final  String id;
+/// Monetary amount. Sign determines income (+) vs expense (-).
 @override final  double amount;
+/// User-editable classification for the transaction.
 @override final  String category;
+/// Authoritative timestamp of when the transaction occurred.
 @override final  DateTime timestamp;
+/// Optional user-provided description or context.
 @override final  String? note;
+/// Internal flag representing local state vs remote persistence.
 @override@JsonKey() final  bool editedLocally;
 
 /// Create a copy of TransactionEntity

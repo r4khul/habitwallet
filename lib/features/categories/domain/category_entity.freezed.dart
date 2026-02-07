@@ -14,6 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CategoryEntity {
 
+/// The display name and unique identifier for this category.
  String get name;
 /// Create a copy of CategoryEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -209,6 +210,7 @@ class _CategoryEntity implements CategoryEntity {
   const _CategoryEntity({required this.name});
   
 
+/// The display name and unique identifier for this category.
 @override final  String name;
 
 /// Create a copy of CategoryEntity
