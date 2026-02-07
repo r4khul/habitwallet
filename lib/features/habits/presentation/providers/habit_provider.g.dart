@@ -9,17 +9,23 @@ part of 'habit_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Presentation Provider: Manages the state for the Habit UI.
-/// Interacts with the Domain layer (Repositories/Entities).
+/// Boundary Rules:
+/// - Interacts with the Domain layer (Repositories/Entities) only.
+/// - NEVER accesses Data layer models, DAOs, or databases directly.
 
 @ProviderFor(HabitList)
 final habitListProvider = HabitListProvider._();
 
 /// Presentation Provider: Manages the state for the Habit UI.
-/// Interacts with the Domain layer (Repositories/Entities).
+/// Boundary Rules:
+/// - Interacts with the Domain layer (Repositories/Entities) only.
+/// - NEVER accesses Data layer models, DAOs, or databases directly.
 final class HabitListProvider
     extends $AsyncNotifierProvider<HabitList, List<Habit>> {
   /// Presentation Provider: Manages the state for the Habit UI.
-  /// Interacts with the Domain layer (Repositories/Entities).
+  /// Boundary Rules:
+  /// - Interacts with the Domain layer (Repositories/Entities) only.
+  /// - NEVER accesses Data layer models, DAOs, or databases directly.
   HabitListProvider._()
     : super(
         from: null,
@@ -42,7 +48,9 @@ final class HabitListProvider
 String _$habitListHash() => r'3da2d4c9e3fc8979a84f7fe943895d33221dbc0f';
 
 /// Presentation Provider: Manages the state for the Habit UI.
-/// Interacts with the Domain layer (Repositories/Entities).
+/// Boundary Rules:
+/// - Interacts with the Domain layer (Repositories/Entities) only.
+/// - NEVER accesses Data layer models, DAOs, or databases directly.
 
 abstract class _$HabitList extends $AsyncNotifier<List<Habit>> {
   FutureOr<List<Habit>> build();

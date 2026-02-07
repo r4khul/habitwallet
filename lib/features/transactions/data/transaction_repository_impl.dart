@@ -1,4 +1,4 @@
-import '../domain/transaction.dart';
+import '../domain/transaction_entity.dart';
 import '../domain/transaction_repository.dart';
 
 /// Transactions Feature Data: Implementation of TransactionRepository.
@@ -7,8 +7,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
   TransactionRepositoryImpl();
 
   @override
-  Future<List<Transaction>> getTransactions() async => [];
+  Future<List<TransactionEntity>> getTransactions() async => [];
 
   @override
-  Future<void> addTransaction(Transaction transaction) async {}
+  Future<void> addTransaction(TransactionEntity transaction) async {}
 }
