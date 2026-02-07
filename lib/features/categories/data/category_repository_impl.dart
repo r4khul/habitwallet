@@ -1,6 +1,11 @@
 import '../domain/category_entity.dart';
+import '../domain/category_repository.dart';
 
 /// Categories Feature Data: Implementation of category management.
-class CategoryRepositoryImpl {
-  Future<List<CategoryEntity>> getCategories() async => [];
+class CategoryRepositoryImpl implements CategoryRepository {
+  @override
+  Future<void> init() async {}
+
+  @override
+  Future<List<CategoryEntity>> getAll() async => [];
 }

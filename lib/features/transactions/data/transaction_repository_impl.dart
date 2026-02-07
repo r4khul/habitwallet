@@ -7,8 +7,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   TransactionRepositoryImpl();
 
   @override
-  Future<List<TransactionEntity>> getTransactions() async => [];
+  Future<List<TransactionEntity>> getAll() async => [];
 
   @override
-  Future<void> addTransaction(TransactionEntity transaction) async {}
+  Future<TransactionEntity?> getById(String id) async => null;
+
+  @override
+  Future<void> upsert(TransactionEntity transaction) async {}
+
+  @override
+  Future<void> delete(String id) async {}
 }
