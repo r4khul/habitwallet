@@ -1,10 +1,11 @@
 import '../../../core/database/daos/transaction_dao.dart';
 import '../../../core/database/database.dart';
+import '../../../core/error/failures.dart';
 import '../domain/transaction_entity.dart';
 import '../domain/transaction_repository.dart';
 
 /// Transactions Feature Data: Implementation of TransactionRepository.
-/// Orchestrates data flow between local and remote sources with explicit mapping.
+/// Orchestrates data flow with explicit error handling for local persistence.
 class TransactionRepositoryImpl implements TransactionRepository {
   TransactionRepositoryImpl(this._transactionDao);
 
@@ -12,24 +13,42 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<List<TransactionEntity>> getAll() async {
-    final rows = await _transactionDao.getAll();
-    return rows.map(_toEntity).toList();
+    try {
+      final rows = await _transactionDao.getAll();
+      return rows.map(_toEntity).toList();
+    } on Object catch (_) {
+      throw const DatabaseFailure(
+        'Failed to fetch transactions from local storage.',
+      );
+    }
   }
 
   @override
   Future<TransactionEntity?> getById(String id) async {
-    final row = await _transactionDao.getById(id);
-    return row != null ? _toEntity(row) : null;
+    try {
+      final row = await _transactionDao.getById(id);
+      return row != null ? _toEntity(row) : null;
+    } on Object catch (_) {
+      throw const DatabaseFailure('Failed to retrieve transaction details.');
+    }
   }
 
   @override
   Future<void> upsert(TransactionEntity transaction) async {
-    await _transactionDao.upsert(_toRow(transaction));
+    try {
+      await _transactionDao.upsert(_toRow(transaction));
+    } on Object catch (_) {
+      throw const DatabaseFailure('Failed to save transaction locally.');
+    }
   }
 
   @override
   Future<void> delete(String id) async {
-    await _transactionDao.deleteById(id);
+    try {
+      await _transactionDao.deleteById(id);
+    } on Object catch (_) {
+      throw const DatabaseFailure('Failed to remove transaction.');
+    }
   }
 
   /// Maps Database Row to Domain Entity.

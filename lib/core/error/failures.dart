@@ -2,15 +2,31 @@
 /// Boundary Rules:
 /// - Pure Dart only.
 /// - Does not depend on any features or external frameworks.
-abstract class Failure {
+abstract class Failure implements Exception {
   const Failure(this.message);
   final String message;
+
+  @override
+  String toString() => message;
 }
 
+/// Represents failures occurring in the remote data source.
 class ServerFailure extends Failure {
-  const ServerFailure([super.message = 'Server Failure']);
+  const ServerFailure([
+    super.message = 'External service error. Please try again.',
+  ]);
 }
 
-class CacheFailure extends Failure {
-  const CacheFailure([super.message = 'Cache Failure']);
+/// Represents failures occurring in the local persistence layer.
+class DatabaseFailure extends Failure {
+  const DatabaseFailure([
+    super.message = 'Local storage error. Please restart the app.',
+  ]);
+}
+
+/// Represents failures related to authentication.
+class AuthFailure extends Failure {
+  const AuthFailure([
+    super.message = 'Authentication failed. Please log in again.',
+  ]);
 }

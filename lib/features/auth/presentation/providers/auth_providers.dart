@@ -10,9 +10,16 @@ part 'auth_providers.g.dart';
 @Riverpod(keepAlive: true)
 class AuthController extends _$AuthController {
   @override
-  FutureOr<AuthSession?> build() {
+  FutureOr<AuthSession?> build() async {
     final repository = ref.watch(authRepositoryProvider);
+    // Explicitly using AsyncValue.guard implicitly in ref.watch(futureProvider)
+    // but building here to handle initial load error explicitly if needed.
     return repository.getSession();
+  }
+
+  /// Retries loading the session if it failed.
+  void retry() {
+    ref.invalidateSelf();
   }
 
   /// Transitions the app to an unauthenticated state.

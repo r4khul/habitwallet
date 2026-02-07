@@ -8,24 +8,21 @@ part of 'habit_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Presentation Provider: Manages the state for the Habit UI.
-/// Boundary Rules:
-/// - Interacts with the Domain layer (Repositories/Entities) only.
-/// - NEVER accesses Data layer models, DAOs, or databases directly.
+/// Feature State: Manages the collection of habits.
+/// Responsibility: Provides an observable list of habits and handles habit logic.
+/// Ownership: Feature logic; calls repository only.
 
 @ProviderFor(HabitList)
 final habitListProvider = HabitListProvider._();
 
-/// Presentation Provider: Manages the state for the Habit UI.
-/// Boundary Rules:
-/// - Interacts with the Domain layer (Repositories/Entities) only.
-/// - NEVER accesses Data layer models, DAOs, or databases directly.
+/// Feature State: Manages the collection of habits.
+/// Responsibility: Provides an observable list of habits and handles habit logic.
+/// Ownership: Feature logic; calls repository only.
 final class HabitListProvider
     extends $AsyncNotifierProvider<HabitList, List<Habit>> {
-  /// Presentation Provider: Manages the state for the Habit UI.
-  /// Boundary Rules:
-  /// - Interacts with the Domain layer (Repositories/Entities) only.
-  /// - NEVER accesses Data layer models, DAOs, or databases directly.
+  /// Feature State: Manages the collection of habits.
+  /// Responsibility: Provides an observable list of habits and handles habit logic.
+  /// Ownership: Feature logic; calls repository only.
   HabitListProvider._()
     : super(
         from: null,
@@ -47,10 +44,9 @@ final class HabitListProvider
 
 String _$habitListHash() => r'3da2d4c9e3fc8979a84f7fe943895d33221dbc0f';
 
-/// Presentation Provider: Manages the state for the Habit UI.
-/// Boundary Rules:
-/// - Interacts with the Domain layer (Repositories/Entities) only.
-/// - NEVER accesses Data layer models, DAOs, or databases directly.
+/// Feature State: Manages the collection of habits.
+/// Responsibility: Provides an observable list of habits and handles habit logic.
+/// Ownership: Feature logic; calls repository only.
 
 abstract class _$HabitList extends $AsyncNotifier<List<Habit>> {
   FutureOr<List<Habit>> build();

@@ -42,7 +42,7 @@ final class AuthControllerProvider
   AuthController create() => AuthController();
 }
 
-String _$authControllerHash() => r'd33104366a2ce5d543471fa36ba70c35a53bff9b';
+String _$authControllerHash() => r'7cf8c2cfb7dd964779ba221f674fe51920ed00c2';
 
 /// Application State: Manages the global authentication session.
 /// Responsibility: Exposes the current session and handles session transitions.

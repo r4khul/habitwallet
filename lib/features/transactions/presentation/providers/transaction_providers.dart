@@ -15,6 +15,11 @@ class TransactionController extends _$TransactionController {
     return repository.getAll();
   }
 
+  /// Retries loading transactions.
+  void refresh() {
+    ref.invalidateSelf();
+  }
+
   /// Adds or updates a transaction and refreshes the state.
   Future<void> upsertTransaction(TransactionEntity transaction) async {
     state = const AsyncValue.loading();

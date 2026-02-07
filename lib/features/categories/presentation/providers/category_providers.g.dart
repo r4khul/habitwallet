@@ -43,7 +43,7 @@ final class CategoryControllerProvider
 }
 
 String _$categoryControllerHash() =>
-    r'a40b5d6372685d396ee42ea257d739fa35dd7472';
+    r'8db86742d631ba20e5eff7a18088a947ef21483a';
 
 /// Feature State: Manages the collection of categories.
 /// Responsibility: Provides an observable list of categories.

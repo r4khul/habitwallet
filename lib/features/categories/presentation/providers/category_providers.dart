@@ -15,5 +15,10 @@ class CategoryController extends _$CategoryController {
     return repository.getAll();
   }
 
+  /// Retries loading categories.
+  void refresh() {
+    ref.invalidateSelf();
+  }
+
   // Future<void> addCategory(String name) async { ... }
 }
