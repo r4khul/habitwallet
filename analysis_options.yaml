@@ -1,31 +1,56 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
-
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
   plugins:
     - custom_lint
 
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    unused_import: error
+    unused_local_variable: error
+    dead_code: error
+    avoid_dynamic_calls: error
+    invalid_annotation_target: ignore
+
 linter:
   rules:
     - always_declare_return_types
+    - require_trailing_commas
+    - directives_ordering
+    - type_annotate_public_apis
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - prefer_single_quotes
+    - one_member_abstracts
+
+    - avoid_dynamic_calls
+    - avoid_type_to_string
+    - avoid_void_async
     - cancel_subscriptions
     - close_sinks
     - comment_references
-    - one_member_abstracts
+    - literal_only_boolean_expressions
+    - no_adjacent_strings_in_list
+    - no_duplicate_case_values
+    - test_types_in_equals
+    - throw_in_finally
+    - unawaited_futures
+    - unnecessary_statements
+    - unsafe_html
+
+    - avoid_catches_without_on_clauses
     - only_throw_errors
+    - avoid_redundant_argument_values
+    - avoid_unused_constructor_parameters
+    - omit_local_variable_types
+    - prefer_final_fields
     - prefer_final_locals
     - prefer_interpolation_to_compose_strings
-    - unawaited_futures
     - use_super_parameters
-    - require_trailing_commas
-
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+    - unnecessary_await_in_return
+    - unnecessary_lambdas
+    - unnecessary_parenthesis
