@@ -3,43 +3,67 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/habits/presentation/pages/habits_page.dart';
+import '../features/transactions/presentation/transaction_details_page.dart';
 
 part 'app_router.g.dart';
 
-/// App Router Provider: Rebuilds when authentication state changes.
-/// Responsibility: Handles redirection logic based on session presence.
+/// App Router Provider: Integrated with Authentication State.
+/// Responsibility:
+/// - Rebuilds the router whenever the [authControllerProvider] state evolves.
+/// - Handles deterministic redirection (Guard) for protected routes.
+/// - Preserves deep-link intentions during authentication transitions.
 @riverpod
 GoRouter router(Ref ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/home',
+    // Refresh the router when auth state changes (loading -> data/error)
     refreshListenable: authState.when(
       data: (_) => null,
       error: (e, s) => null,
       loading: () => null,
     ),
     redirect: (context, state) {
+      // Deterministic Startup: Wait for the initial session check to complete.
       if (authState.isLoading || authState.hasError) return null;
 
       final session = authState.value;
       final isLoggingIn = state.matchedLocation == '/login';
 
+      // Accessing path to preserve deep links
+      final fromLocation = state.uri.toString();
+
       if (session == null) {
-        // Not logged in -> force login
-        return isLoggingIn ? null : '/login';
+        // Auth Redirection: Protected -> Login
+        // Avoid infinite loop if already at /login
+        if (isLoggingIn) return null;
+
+        // Preserve original intent for post-login redirection
+        return '/login?from=$fromLocation';
       }
 
+      // Auth Redirection: Authenticated -> Home (or preserved intent)
       if (isLoggingIn) {
-        // Logged in -> redirect away from login
-        return '/';
+        final destination = state.uri.queryParameters['from'] ?? '/home';
+        // Ensure we don't redirect to /login again if 'from' was corrupted
+        return destination == '/login' ? '/home' : destination;
       }
 
+      // Allow access to protected routes
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const HabitsPage()),
+      GoRoute(path: '/', redirect: (context, state) => '/home'),
+      GoRoute(path: '/home', builder: (context, state) => const HabitsPage()),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/tx/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return TransactionDetailsPage(id: id);
+        },
+      ),
     ],
   );
 }

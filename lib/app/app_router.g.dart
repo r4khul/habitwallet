@@ -8,20 +8,29 @@ part of 'app_router.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// App Router Provider: Rebuilds when authentication state changes.
-/// Responsibility: Handles redirection logic based on session presence.
+/// App Router Provider: Integrated with Authentication State.
+/// Responsibility:
+/// - Rebuilds the router whenever the [authControllerProvider] state evolves.
+/// - Handles deterministic redirection (Guard) for protected routes.
+/// - Preserves deep-link intentions during authentication transitions.
 
 @ProviderFor(router)
 final routerProvider = RouterProvider._();
 
-/// App Router Provider: Rebuilds when authentication state changes.
-/// Responsibility: Handles redirection logic based on session presence.
+/// App Router Provider: Integrated with Authentication State.
+/// Responsibility:
+/// - Rebuilds the router whenever the [authControllerProvider] state evolves.
+/// - Handles deterministic redirection (Guard) for protected routes.
+/// - Preserves deep-link intentions during authentication transitions.
 
 final class RouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// App Router Provider: Rebuilds when authentication state changes.
-  /// Responsibility: Handles redirection logic based on session presence.
+  /// App Router Provider: Integrated with Authentication State.
+  /// Responsibility:
+  /// - Rebuilds the router whenever the [authControllerProvider] state evolves.
+  /// - Handles deterministic redirection (Guard) for protected routes.
+  /// - Preserves deep-link intentions during authentication transitions.
   RouterProvider._()
     : super(
         from: null,
@@ -55,4 +64,4 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'358fa5ccc963250ba0c92382a28b674a14063708';
+String _$routerHash() => r'b27041511b09ffeb661dd3defd2da88aa948f531';
