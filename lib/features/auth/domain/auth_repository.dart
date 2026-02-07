@@ -9,6 +9,13 @@ abstract class AuthRepository {
   /// Persists a new or updated [session].
   Future<void> saveSession(AuthSession session);
 
+  /// Authenticates a user with [email] and [pin].
+  Future<AuthSession> login({
+    required String email,
+    required String pin,
+    required bool rememberMe,
+  });
+
   /// Removes the current active session.
   Future<void> clearSession();
 }

@@ -30,4 +30,18 @@ class AuthController extends _$AuthController {
       return null;
     });
   }
+
+  /// Attempts to authenticate the user and updates the app state.
+  Future<void> login({
+    required String email,
+    required String pin,
+    required bool rememberMe,
+  }) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return ref
+          .read(authRepositoryProvider)
+          .login(email: email, pin: pin, rememberMe: rememberMe);
+    });
+  }
 }

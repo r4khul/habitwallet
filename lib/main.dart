@@ -6,15 +6,17 @@ void main() {
   runApp(const ProviderScope(child: HabitWalletApp()));
 }
 
-class HabitWalletApp extends StatelessWidget {
+class HabitWalletApp extends ConsumerWidget {
   const HabitWalletApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final routerConfig = ref.watch(routerProvider);
+
     return MaterialApp.router(
       title: 'Habit Wallet',
       debugShowCheckedModeBanner: false,
-      routerConfig: router,
+      routerConfig: routerConfig,
     );
   }
 }
