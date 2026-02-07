@@ -8,48 +8,67 @@ part of 'category_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// State Provider for the list of categories.
+/// Feature State: Manages the collection of categories.
+/// Responsibility: Provides an observable list of categories.
+/// Ownership: Feature state; calls repository only.
 
-@ProviderFor(categories)
-final categoriesProvider = CategoriesProvider._();
+@ProviderFor(CategoryController)
+final categoryControllerProvider = CategoryControllerProvider._();
 
-/// State Provider for the list of categories.
-
-final class CategoriesProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<CategoryEntity>>,
-          List<CategoryEntity>,
-          FutureOr<List<CategoryEntity>>
-        >
-    with
-        $FutureModifier<List<CategoryEntity>>,
-        $FutureProvider<List<CategoryEntity>> {
-  /// State Provider for the list of categories.
-  CategoriesProvider._()
+/// Feature State: Manages the collection of categories.
+/// Responsibility: Provides an observable list of categories.
+/// Ownership: Feature state; calls repository only.
+final class CategoryControllerProvider
+    extends $AsyncNotifierProvider<CategoryController, List<CategoryEntity>> {
+  /// Feature State: Manages the collection of categories.
+  /// Responsibility: Provides an observable list of categories.
+  /// Ownership: Feature state; calls repository only.
+  CategoryControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'categoriesProvider',
+        name: r'categoryControllerProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$categoriesHash();
+  String debugGetCreateSourceHash() => _$categoryControllerHash();
 
   @$internal
   @override
-  $FutureProviderElement<List<CategoryEntity>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<CategoryEntity>> create(Ref ref) {
-    return categories(ref);
-  }
+  CategoryController create() => CategoryController();
 }
 
-String _$categoriesHash() => r'3600c3af19eda0e1efbf90cdfff46985107b2ca7';
+String _$categoryControllerHash() =>
+    r'a40b5d6372685d396ee42ea257d739fa35dd7472';
+
+/// Feature State: Manages the collection of categories.
+/// Responsibility: Provides an observable list of categories.
+/// Ownership: Feature state; calls repository only.
+
+abstract class _$CategoryController
+    extends $AsyncNotifier<List<CategoryEntity>> {
+  FutureOr<List<CategoryEntity>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<List<CategoryEntity>>, List<CategoryEntity>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<CategoryEntity>>,
+                List<CategoryEntity>
+              >,
+              AsyncValue<List<CategoryEntity>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

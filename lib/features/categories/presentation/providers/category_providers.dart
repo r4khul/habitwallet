@@ -4,9 +4,16 @@ import '../../domain/category_entity.dart';
 
 part 'category_providers.g.dart';
 
-/// State Provider for the list of categories.
+/// Feature State: Manages the collection of categories.
+/// Responsibility: Provides an observable list of categories.
+/// Ownership: Feature state; calls repository only.
 @riverpod
-Future<List<CategoryEntity>> categories(Ref ref) {
-  final repository = ref.watch(categoryRepositoryProvider);
-  return repository.getAll();
+class CategoryController extends _$CategoryController {
+  @override
+  FutureOr<List<CategoryEntity>> build() {
+    final repository = ref.watch(categoryRepositoryProvider);
+    return repository.getAll();
+  }
+
+  // Future<void> addCategory(String name) async { ... }
 }

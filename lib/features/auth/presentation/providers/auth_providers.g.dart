@@ -8,46 +8,60 @@ part of 'auth_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// State Provider for the current active authentication session.
+/// Application State: Manages the global authentication session.
+/// Responsibility: Exposes the current session and handles session transitions.
+/// Lifecycle: App-wide (keepAlive: true).
 
-@ProviderFor(authSession)
-final authSessionProvider = AuthSessionProvider._();
+@ProviderFor(AuthController)
+final authControllerProvider = AuthControllerProvider._();
 
-/// State Provider for the current active authentication session.
-
-final class AuthSessionProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<AuthSession?>,
-          AuthSession?,
-          FutureOr<AuthSession?>
-        >
-    with $FutureModifier<AuthSession?>, $FutureProvider<AuthSession?> {
-  /// State Provider for the current active authentication session.
-  AuthSessionProvider._()
+/// Application State: Manages the global authentication session.
+/// Responsibility: Exposes the current session and handles session transitions.
+/// Lifecycle: App-wide (keepAlive: true).
+final class AuthControllerProvider
+    extends $AsyncNotifierProvider<AuthController, AuthSession?> {
+  /// Application State: Manages the global authentication session.
+  /// Responsibility: Exposes the current session and handles session transitions.
+  /// Lifecycle: App-wide (keepAlive: true).
+  AuthControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'authSessionProvider',
-        isAutoDispose: true,
+        name: r'authControllerProvider',
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$authSessionHash();
+  String debugGetCreateSourceHash() => _$authControllerHash();
 
   @$internal
   @override
-  $FutureProviderElement<AuthSession?> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<AuthSession?> create(Ref ref) {
-    return authSession(ref);
-  }
+  AuthController create() => AuthController();
 }
 
-String _$authSessionHash() => r'6b0825181771baa6191ba0b2ca5ae45f79e4257d';
+String _$authControllerHash() => r'd33104366a2ce5d543471fa36ba70c35a53bff9b';
+
+/// Application State: Manages the global authentication session.
+/// Responsibility: Exposes the current session and handles session transitions.
+/// Lifecycle: App-wide (keepAlive: true).
+
+abstract class _$AuthController extends $AsyncNotifier<AuthSession?> {
+  FutureOr<AuthSession?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<AuthSession?>, AuthSession?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<AuthSession?>, AuthSession?>,
+              AsyncValue<AuthSession?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

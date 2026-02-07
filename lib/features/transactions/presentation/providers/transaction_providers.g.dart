@@ -8,61 +8,81 @@ part of 'transaction_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// State Provider for the list of all transactions.
-/// Responsibility: Observes the TransactionRepository and exposes the current transaction state.
+/// Feature State: Manages the collection of transactions.
+/// Responsibility: Provides an observable list of transactions and handles mutative actions.
+/// Ownership: Owns the transaction logic; calls repository only.
 
-@ProviderFor(transactions)
-final transactionsProvider = TransactionsProvider._();
+@ProviderFor(TransactionController)
+final transactionControllerProvider = TransactionControllerProvider._();
 
-/// State Provider for the list of all transactions.
-/// Responsibility: Observes the TransactionRepository and exposes the current transaction state.
-
-final class TransactionsProvider
+/// Feature State: Manages the collection of transactions.
+/// Responsibility: Provides an observable list of transactions and handles mutative actions.
+/// Ownership: Owns the transaction logic; calls repository only.
+final class TransactionControllerProvider
     extends
-        $FunctionalProvider<
-          AsyncValue<List<TransactionEntity>>,
-          List<TransactionEntity>,
-          FutureOr<List<TransactionEntity>>
-        >
-    with
-        $FutureModifier<List<TransactionEntity>>,
-        $FutureProvider<List<TransactionEntity>> {
-  /// State Provider for the list of all transactions.
-  /// Responsibility: Observes the TransactionRepository and exposes the current transaction state.
-  TransactionsProvider._()
+        $AsyncNotifierProvider<TransactionController, List<TransactionEntity>> {
+  /// Feature State: Manages the collection of transactions.
+  /// Responsibility: Provides an observable list of transactions and handles mutative actions.
+  /// Ownership: Owns the transaction logic; calls repository only.
+  TransactionControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'transactionsProvider',
+        name: r'transactionControllerProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$transactionsHash();
+  String debugGetCreateSourceHash() => _$transactionControllerHash();
 
   @$internal
   @override
-  $FutureProviderElement<List<TransactionEntity>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  TransactionController create() => TransactionController();
+}
 
+String _$transactionControllerHash() =>
+    r'89286cff5aea3dc1e8571ba683df2a056c5fbffe';
+
+/// Feature State: Manages the collection of transactions.
+/// Responsibility: Provides an observable list of transactions and handles mutative actions.
+/// Ownership: Owns the transaction logic; calls repository only.
+
+abstract class _$TransactionController
+    extends $AsyncNotifier<List<TransactionEntity>> {
+  FutureOr<List<TransactionEntity>> build();
+  @$mustCallSuper
   @override
-  FutureOr<List<TransactionEntity>> create(Ref ref) {
-    return transactions(ref);
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<TransactionEntity>>,
+              List<TransactionEntity>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<TransactionEntity>>,
+                List<TransactionEntity>
+              >,
+              AsyncValue<List<TransactionEntity>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
   }
 }
 
-String _$transactionsHash() => r'6e075317a41253cd9e21040519e0f61db8e8b976';
-
-/// State Provider for a specific transaction by its ID.
+/// Feature State: Exposes a single transaction by its ID.
 
 @ProviderFor(transactionById)
 final transactionByIdProvider = TransactionByIdFamily._();
 
-/// State Provider for a specific transaction by its ID.
+/// Feature State: Exposes a single transaction by its ID.
 
 final class TransactionByIdProvider
     extends
@@ -74,7 +94,7 @@ final class TransactionByIdProvider
     with
         $FutureModifier<TransactionEntity?>,
         $FutureProvider<TransactionEntity?> {
-  /// State Provider for a specific transaction by its ID.
+  /// Feature State: Exposes a single transaction by its ID.
   TransactionByIdProvider._({
     required TransactionByIdFamily super.from,
     required String super.argument,
@@ -121,7 +141,7 @@ final class TransactionByIdProvider
 
 String _$transactionByIdHash() => r'0bfa7374a3961efb7b94fa30b48ed52573fcb3f0';
 
-/// State Provider for a specific transaction by its ID.
+/// Feature State: Exposes a single transaction by its ID.
 
 final class TransactionByIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<TransactionEntity?>, String> {
@@ -134,7 +154,7 @@ final class TransactionByIdFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// State Provider for a specific transaction by its ID.
+  /// Feature State: Exposes a single transaction by its ID.
 
   TransactionByIdProvider call(String id) =>
       TransactionByIdProvider._(argument: id, from: this);
