@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/router/router.dart';
+import 'app/app_router.dart';
 
 void main() {
   runApp(const ProviderScope(child: HabitWalletApp()));

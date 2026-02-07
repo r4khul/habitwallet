@@ -4,7 +4,9 @@ import '../../domain/entities/habit.dart';
 part 'habit_provider.g.dart';
 
 /// Presentation Provider: Manages the state for the Habit UI.
-/// Interacts with the Domain layer (Repositories/Entities).
+/// Boundary Rules:
+/// - Interacts with the Domain layer (Repositories/Entities) only.
+/// - NEVER accesses Data layer models, DAOs, or databases directly.
 @riverpod
 class HabitList extends _$HabitList {
   @override
