@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/router/router.dart';
 
 void main() {
   runApp(const ProviderScope(child: HabitWalletApp()));
@@ -10,9 +11,10 @@ class HabitWalletApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp.router(
       title: 'Habit Wallet',
       debugShowCheckedModeBanner: false,
+      routerConfig: router,
     );
   }
 }
