@@ -63,9 +63,9 @@ class _CategoryTile extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.darkSurface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.grey900),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -194,9 +194,9 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
         right: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.darkBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.vertical(top: const Radius.circular(32)),
       ),
       child: Form(
         key: _formKey,
@@ -244,7 +244,7 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
                           border: Border.all(
                             color: isSelected
                                 ? AppColors.primary
-                                : AppColors.grey900,
+                                : Theme.of(context).colorScheme.outline,
                             width: 2,
                           ),
                         ),

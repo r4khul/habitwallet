@@ -175,9 +175,11 @@ class _AddEditTransactionPageState
                     vertical: 16,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.darkSurface,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.grey800),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -242,9 +244,9 @@ class _CategorySelector extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.darkSurface,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.grey800),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
         ),
         child: Row(
           children: [
@@ -280,7 +282,7 @@ class _CategorySelector extends StatelessWidget {
   void _showPicker(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -343,7 +345,9 @@ class _TypeButton extends StatelessWidget {
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? color : AppColors.grey800,
+                color: isSelected
+                    ? color
+                    : Theme.of(context).colorScheme.outline,
                 width: 1.5,
               ),
             ),

@@ -7,6 +7,7 @@ import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
+import '../../../core/util/theme_extension.dart';
 
 /// Transaction Details Feature Presentation: Detailed view of a specific transaction.
 /// Implements a sophisticated, read-only view with edit capability.
@@ -96,7 +97,9 @@ class _DetailsView extends ConsumerWidget {
                     width: 96,
                     height: 96,
                     decoration: BoxDecoration(
-                      color: AppColors.grey900,
+                      color: context.isDarkMode
+                          ? AppColors.grey900
+                          : AppColors.grey200,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -236,10 +239,10 @@ class _NotFoundState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.search_off_rounded,
             size: 64,
-            color: AppColors.grey800,
+            color: context.isDarkMode ? AppColors.grey800 : AppColors.grey300,
           ),
           const SizedBox(height: 16),
           Text(

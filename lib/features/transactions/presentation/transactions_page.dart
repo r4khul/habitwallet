@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/providers/theme_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
+import '../../../core/util/theme_extension.dart';
 
 /// Transactions Feature Presentation: List of financial transactions.
 /// Implements a professional fintech-grade list with states.
@@ -120,7 +122,9 @@ class _TransactionTile extends ConsumerWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.grey900,
+                  color: context.isDarkMode
+                      ? AppColors.grey900
+                      : AppColors.grey200,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -139,7 +143,9 @@ class _TransactionTile extends ConsumerWidget {
                     loading: () => Container(
                       height: 20,
                       width: 80,
-                      color: AppColors.grey900,
+                      color: context.isDarkMode
+                          ? AppColors.grey900
+                          : AppColors.grey200,
                     ),
                     error: (error, stack) => const Text('Error'),
                   ),
@@ -259,7 +265,7 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Icons.account_balance_wallet_outlined,
             size: 80,
-            color: AppColors.grey800,
+            color: Theme.of(context).colorScheme.outline,
           ),
           const SizedBox(height: 24),
           Text(
@@ -387,7 +393,8 @@ class _AppDrawer extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 40),
-            const Divider(height: 1, color: AppColors.grey900),
+            const Divider(height: 1),
+            _ThemeToggle(),
 
             // Menu Items
             _DrawerItem(
@@ -425,7 +432,7 @@ class _AppDrawer extends ConsumerWidget {
             const Spacer(),
 
             // Logout
-            const Divider(height: 1, color: AppColors.grey900),
+            const Divider(height: 1),
             _DrawerItem(
               icon: Icons.logout_rounded,
               label: 'Sign Out',
@@ -468,6 +475,37 @@ class _DrawerItem extends StatelessWidget {
           color: color ?? Theme.of(context).textTheme.bodyLarge?.color,
           fontWeight: FontWeight.w500,
         ),
+      ),
+    );
+  }
+}
+
+class _ThemeToggle extends ConsumerWidget {
+  const _ThemeToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeControllerProvider);
+    final isDark = themeMode == ThemeMode.dark;
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      leading: Icon(
+        isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+        color: AppColors.grey500,
+        size: 24,
+      ),
+      title: Text(
+        '${isDark ? 'Dark' : 'Light'} Mode',
+        style: Theme.of(
+          context,
+        ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+      ),
+      trailing: Switch(
+        value: isDark,
+        onChanged: (_) =>
+            ref.read(themeControllerProvider.notifier).toggleTheme(),
+        activeTrackColor: AppColors.primary,
       ),
     );
   }
