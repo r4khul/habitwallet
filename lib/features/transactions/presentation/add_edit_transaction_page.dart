@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../categories/domain/category_entity.dart';
+import '../../categories/presentation/providers/category_providers.dart';
+import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
 
 /// Presentation: UI for adding or editing a transaction.
-/// Reusable component handling form state and submission.
 class AddEditTransactionPage extends ConsumerStatefulWidget {
   final String? transactionId;
 
@@ -23,8 +25,8 @@ class _AddEditTransactionPageState
     extends ConsumerState<AddEditTransactionPage> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
-  final _categoryController = TextEditingController();
   final _noteController = TextEditingController();
+  String? _selectedCategoryId;
   DateTime _selectedDate = DateTime.now();
   bool _isIncome = false;
   bool _isInitialized = false;
@@ -34,12 +36,10 @@ class _AddEditTransactionPageState
     super.didChangeDependencies();
     if (!_isInitialized) {
       if (widget.transactionId != null) {
-        // In a real app, we'd watch the provider.
-        // For simplicity in this UI-focused task, we'll initialize once.
         ref.read(transactionByIdProvider(widget.transactionId!)).whenData((tx) {
           if (tx != null) {
             _amountController.text = tx.absoluteAmount.toString();
-            _categoryController.text = tx.category;
+            _selectedCategoryId = tx.categoryId;
             _noteController.text = tx.note ?? '';
             _selectedDate = tx.timestamp;
             _isIncome = tx.isIncome;
@@ -54,18 +54,24 @@ class _AddEditTransactionPageState
   @override
   void dispose() {
     _amountController.dispose();
-    _categoryController.dispose();
     _noteController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     if (_formKey.currentState?.validate() ?? false) {
+      if (_selectedCategoryId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a category')),
+        );
+        return;
+      }
+
       final amountValue = double.parse(_amountController.text);
       final transaction = TransactionEntity(
         id: widget.transactionId ?? const Uuid().v4(),
         amount: _isIncome ? amountValue : -amountValue,
-        category: _categoryController.text.trim(),
+        categoryId: _selectedCategoryId!,
         timestamp: _selectedDate,
         note: _noteController.text.trim().isEmpty
             ? null
@@ -83,6 +89,7 @@ class _AddEditTransactionPageState
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.transactionId != null;
+    final categoriesAsync = ref.watch(categoryControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +122,6 @@ class _AddEditTransactionPageState
               ),
               const SizedBox(height: 32),
 
-              // Amount Field
               Text('Amount', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
               TextFormField(
@@ -132,31 +138,26 @@ class _AddEditTransactionPageState
                   fontWeight: FontWeight.w700,
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Amount is required';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Enter a valid number';
-                  }
+                  if (value == null || value.isEmpty) return 'Required';
+                  if (double.tryParse(value) == null) return 'Invalid number';
                   return null;
                 },
               ),
               const SizedBox(height: 24),
 
-              // Category Field
               Text('Category', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(hintText: 'e.g. Groceries'),
-                textCapitalization: TextCapitalization.words,
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Category is required'
-                    : null,
+              categoriesAsync.when(
+                data: (categories) => _CategorySelector(
+                  categories: categories,
+                  selectedId: _selectedCategoryId,
+                  onSelected: (id) => setState(() => _selectedCategoryId = id),
+                ),
+                loading: () => const LinearProgressIndicator(),
+                error: (e, s) => Text('Error loading categories: $e'),
               ),
               const SizedBox(height: 24),
 
-              // Date Picker
               Text('Date', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
               InkWell(
@@ -175,9 +176,7 @@ class _AddEditTransactionPageState
                     vertical: 16,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.darkSurface
-                        : AppColors.lightSurface,
+                    color: AppColors.darkSurface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.grey800),
                   ),
@@ -195,7 +194,6 @@ class _AddEditTransactionPageState
               ),
               const SizedBox(height: 24),
 
-              // Note Field
               Text(
                 'Note (Optional)',
                 style: Theme.of(context).textTheme.labelLarge,
@@ -210,7 +208,6 @@ class _AddEditTransactionPageState
               ),
               const SizedBox(height: 48),
 
-              // Save Button
               ElevatedButton(
                 onPressed: _save,
                 child: Text(isEditing ? 'Save Changes' : 'Add Transaction'),
@@ -218,6 +215,95 @@ class _AddEditTransactionPageState
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CategorySelector extends StatelessWidget {
+  final List<CategoryEntity> categories;
+  final String? selectedId;
+  final ValueChanged<String> onSelected;
+
+  const _CategorySelector({
+    required this.categories,
+    required this.selectedId,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = categories.cast<CategoryEntity?>().firstWhere(
+      (c) => c?.id == selectedId,
+      orElse: () => null,
+    );
+
+    return InkWell(
+      onTap: () => _showPicker(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.darkSurface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.grey800),
+        ),
+        child: Row(
+          children: [
+            if (selected != null) ...[
+              Icon(
+                CategoryAssets.icons[selected.icon] ?? Icons.category_rounded,
+                color: Color(selected.color),
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Text(selected.name, style: Theme.of(context).textTheme.bodyLarge),
+            ] else
+              Text(
+                'Select Category',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),
+              ),
+            const Spacer(),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: AppColors.grey500,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.darkBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => ListView.builder(
+        padding: const EdgeInsets.all(24),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final cat = categories[index];
+          return ListTile(
+            onTap: () {
+              onSelected(cat.id);
+              Navigator.pop(context);
+            },
+            leading: Icon(
+              CategoryAssets.icons[cat.icon] ?? Icons.category_rounded,
+              color: Color(cat.color),
+            ),
+            title: Text(cat.name),
+            selected: cat.id == selectedId,
+            selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          );
+        },
       ),
     );
   }

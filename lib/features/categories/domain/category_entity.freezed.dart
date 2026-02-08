@@ -11,31 +11,33 @@ part of 'category_entity.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$CategoryEntity {
 
-/// The display name and unique identifier for this category.
- String get name;
+ String get id; String get name; String get icon; int get color;
 /// Create a copy of CategoryEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $CategoryEntityCopyWith<CategoryEntity> get copyWith => _$CategoryEntityCopyWithImpl<CategoryEntity>(this as CategoryEntity, _$identity);
 
+  /// Serializes this CategoryEntity to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoryEntity&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoryEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.color, color) || other.color == color));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name);
+int get hashCode => Object.hash(runtimeType,id,name,icon,color);
 
 @override
 String toString() {
-  return 'CategoryEntity(name: $name)';
+  return 'CategoryEntity(id: $id, name: $name, icon: $icon, color: $color)';
 }
 
 
@@ -46,7 +48,7 @@ abstract mixin class $CategoryEntityCopyWith<$Res>  {
   factory $CategoryEntityCopyWith(CategoryEntity value, $Res Function(CategoryEntity) _then) = _$CategoryEntityCopyWithImpl;
 @useResult
 $Res call({
- String name
+ String id, String name, String icon, int color
 });
 
 
@@ -63,10 +65,13 @@ class _$CategoryEntityCopyWithImpl<$Res>
 
 /// Create a copy of CategoryEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? icon = null,Object? color = null,}) {
   return _then(_self.copyWith(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -151,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String icon,  int color)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CategoryEntity() when $default != null:
-return $default(_that.name);case _:
+return $default(_that.id,_that.name,_that.icon,_that.color);case _:
   return orElse();
 
 }
@@ -172,10 +177,10 @@ return $default(_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String icon,  int color)  $default,) {final _that = this;
 switch (_that) {
 case _CategoryEntity():
-return $default(_that.name);case _:
+return $default(_that.id,_that.name,_that.icon,_that.color);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +197,10 @@ return $default(_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String icon,  int color)?  $default,) {final _that = this;
 switch (_that) {
 case _CategoryEntity() when $default != null:
-return $default(_that.name);case _:
+return $default(_that.id,_that.name,_that.icon,_that.color);case _:
   return null;
 
 }
@@ -204,14 +209,16 @@ return $default(_that.name);case _:
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _CategoryEntity implements CategoryEntity {
-  const _CategoryEntity({required this.name});
-  
+  const _CategoryEntity({required this.id, required this.name, required this.icon, required this.color});
+  factory _CategoryEntity.fromJson(Map<String, dynamic> json) => _$CategoryEntityFromJson(json);
 
-/// The display name and unique identifier for this category.
+@override final  String id;
 @override final  String name;
+@override final  String icon;
+@override final  int color;
 
 /// Create a copy of CategoryEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -219,20 +226,23 @@ class _CategoryEntity implements CategoryEntity {
 @pragma('vm:prefer-inline')
 _$CategoryEntityCopyWith<_CategoryEntity> get copyWith => __$CategoryEntityCopyWithImpl<_CategoryEntity>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$CategoryEntityToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoryEntity&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoryEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.color, color) || other.color == color));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name);
+int get hashCode => Object.hash(runtimeType,id,name,icon,color);
 
 @override
 String toString() {
-  return 'CategoryEntity(name: $name)';
+  return 'CategoryEntity(id: $id, name: $name, icon: $icon, color: $color)';
 }
 
 
@@ -243,7 +253,7 @@ abstract mixin class _$CategoryEntityCopyWith<$Res> implements $CategoryEntityCo
   factory _$CategoryEntityCopyWith(_CategoryEntity value, $Res Function(_CategoryEntity) _then) = __$CategoryEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String name
+ String id, String name, String icon, int color
 });
 
 
@@ -260,10 +270,13 @@ class __$CategoryEntityCopyWithImpl<$Res>
 
 /// Create a copy of CategoryEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? icon = null,Object? color = null,}) {
   return _then(_CategoryEntity(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

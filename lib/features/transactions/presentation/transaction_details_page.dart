@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../categories/presentation/providers/category_providers.dart';
+import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
 
@@ -42,14 +44,19 @@ class TransactionDetailsPage extends ConsumerWidget {
   }
 }
 
-class _DetailsView extends StatelessWidget {
+class _DetailsView extends ConsumerWidget {
   final TransactionEntity transaction;
 
   const _DetailsView({required this.transaction});
 
   @override
-  Widget build(BuildContext context) {
-    final color = transaction.isIncome ? AppColors.success : AppColors.error;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final amountColor = transaction.isIncome
+        ? AppColors.success
+        : AppColors.error;
+    final categoryAsync = ref.watch(
+      categoryByIdProvider(transaction.categoryId),
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -60,33 +67,56 @@ class _DetailsView extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                categoryAsync.when(
+                  data: (category) {
+                    final iconData =
+                        CategoryAssets.icons[category?.icon] ??
+                        (transaction.isIncome
+                            ? Icons.arrow_downward_rounded
+                            : Icons.arrow_upward_rounded);
+                    final color = category != null
+                        ? Color(category.color)
+                        : amountColor;
+                    return Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(iconData, color: color, size: 48),
+                    );
+                  },
+                  loading: () => Container(
+                    width: 96,
+                    height: 96,
+                    decoration: BoxDecoration(
+                      color: AppColors.grey900,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                  child: Icon(
-                    transaction.isIncome
-                        ? Icons.arrow_downward_rounded
-                        : Icons.arrow_upward_rounded,
-                    color: color,
-                    size: 32,
-                  ),
+                  error: (error, stack) => const Icon(Icons.error_outline),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   '${transaction.isIncome ? '+' : '-'}\$${transaction.absoluteAmount.toStringAsFixed(2)}',
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: color,
+                    color: amountColor,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(
-                  transaction.category,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.headlineSmall?.copyWith(color: AppColors.grey500),
+                categoryAsync.when(
+                  data: (category) => Text(
+                    category?.name ?? 'Unknown',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: AppColors.grey500,
+                    ),
+                  ),
+                  loading: () => Container(
+                    height: 24,
+                    width: 100,
+                    color: AppColors.grey900,
+                  ),
+                  error: (error, stack) => const Text('Error'),
                 ),
               ],
             ),
@@ -111,7 +141,7 @@ class _DetailsView extends StatelessWidget {
                 '${transaction.timestamp.hour.toString().padLeft(2, '0')}:${transaction.timestamp.minute.toString().padLeft(2, '0')}',
             icon: Icons.access_time_rounded,
           ),
-          if (transaction.note != null)
+          if (transaction.note != null && transaction.note!.isNotEmpty)
             _DetailRow(
               label: 'Note',
               value: transaction.note!,
@@ -120,12 +150,17 @@ class _DetailsView extends StatelessWidget {
 
           const SizedBox(height: 40),
 
-          // Delete Action (Simulated)
+          // Delete Action
           SizedBox(
             width: double.infinity,
             child: TextButton.icon(
               onPressed: () {
-                // In a real app, show confirmation dialog
+                // TODO: Implement delete logic
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Delete functionality coming soon'),
+                  ),
+                );
               },
               icon: const Icon(
                 Icons.delete_outline_rounded,
@@ -169,7 +204,13 @@ class _DetailRow extends StatelessWidget {
             ).textTheme.bodyLarge?.copyWith(color: AppColors.grey600),
           ),
           const Spacer(),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
         ],
       ),
     );

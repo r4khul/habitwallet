@@ -57,7 +57,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return TransactionEntity(
       id: row.id,
       amount: row.amount,
-      category: row.category,
+      categoryId: row.categoryId,
       timestamp: DateTime.fromMillisecondsSinceEpoch(row.timestamp),
       note: row.note,
       editedLocally: row.editedLocally,
@@ -71,7 +71,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return Transaction(
       id: entity.id,
       amount: entity.amount,
-      category: entity.category,
+      categoryId: entity.categoryId,
       timestamp: entity.timestamp.millisecondsSinceEpoch,
       note: entity.note,
       editedLocally: true, // Mark as edited locally on save/update

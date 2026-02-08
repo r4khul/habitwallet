@@ -1,17 +1,20 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'category_entity.freezed.dart';
+part 'category_entity.g.dart';
 
-/// Domain Entity: Simple value object representing a budget category.
-///
-/// **Business Rules:**
-/// 1. **User-Editable**: Categories are dynamic classifications created or
-///    modified by the user.
-/// 2. **Value Object**: Equality is based on the [name] of the category.
 @freezed
 abstract class CategoryEntity with _$CategoryEntity {
   const factory CategoryEntity({
-    /// The display name and unique identifier for this category.
+    required String id,
     required String name,
+    required String icon,
+    required int color,
   }) = _CategoryEntity;
+
+  factory CategoryEntity.fromJson(Map<String, dynamic> json) =>
+      _$CategoryEntityFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson();
 }

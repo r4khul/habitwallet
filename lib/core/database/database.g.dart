@@ -27,12 +27,12 @@ class $TransactionsTable extends Transactions
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _categoryMeta = const VerificationMeta(
-    'category',
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
   );
   @override
-  late final GeneratedColumn<String> category = GeneratedColumn<String>(
-    'category',
+  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
+    'category_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -99,7 +99,7 @@ class $TransactionsTable extends Transactions
   List<GeneratedColumn> get $columns => [
     id,
     amount,
-    category,
+    categoryId,
     timestamp,
     note,
     editedLocally,
@@ -131,13 +131,13 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_amountMeta);
     }
-    if (data.containsKey('category')) {
+    if (data.containsKey('category_id')) {
       context.handle(
-        _categoryMeta,
-        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_categoryMeta);
+      context.missing(_categoryIdMeta);
     }
     if (data.containsKey('timestamp')) {
       context.handle(
@@ -195,9 +195,9 @@ class $TransactionsTable extends Transactions
         DriftSqlType.double,
         data['${effectivePrefix}amount'],
       )!,
-      category: attachedDatabase.typeMapping.read(
+      categoryId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}category'],
+        data['${effectivePrefix}category_id'],
       )!,
       timestamp: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -237,9 +237,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   /// Aligned with the TransactionEntity domain invariant.
   final double amount;
 
-  /// The category name associated with this transaction.
-  /// References [Categories.name].
-  final String category;
+  /// The category ID associated with this transaction.
+  /// References [Categories.id].
+  final String categoryId;
 
   /// Authoritative domain timestamp (stored as epoch millis).
   /// Represents when the transaction actually occurred.
@@ -260,7 +260,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   const Transaction({
     required this.id,
     required this.amount,
-    required this.category,
+    required this.categoryId,
     required this.timestamp,
     this.note,
     required this.editedLocally,
@@ -272,7 +272,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['amount'] = Variable<double>(amount);
-    map['category'] = Variable<String>(category);
+    map['category_id'] = Variable<String>(categoryId);
     map['timestamp'] = Variable<int>(timestamp);
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
@@ -287,7 +287,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     return TransactionsCompanion(
       id: Value(id),
       amount: Value(amount),
-      category: Value(category),
+      categoryId: Value(categoryId),
       timestamp: Value(timestamp),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       editedLocally: Value(editedLocally),
@@ -304,7 +304,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     return Transaction(
       id: serializer.fromJson<String>(json['id']),
       amount: serializer.fromJson<double>(json['amount']),
-      category: serializer.fromJson<String>(json['category']),
+      categoryId: serializer.fromJson<String>(json['categoryId']),
       timestamp: serializer.fromJson<int>(json['timestamp']),
       note: serializer.fromJson<String?>(json['note']),
       editedLocally: serializer.fromJson<bool>(json['editedLocally']),
@@ -318,7 +318,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'amount': serializer.toJson<double>(amount),
-      'category': serializer.toJson<String>(category),
+      'categoryId': serializer.toJson<String>(categoryId),
       'timestamp': serializer.toJson<int>(timestamp),
       'note': serializer.toJson<String?>(note),
       'editedLocally': serializer.toJson<bool>(editedLocally),
@@ -330,7 +330,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   Transaction copyWith({
     String? id,
     double? amount,
-    String? category,
+    String? categoryId,
     int? timestamp,
     Value<String?> note = const Value.absent(),
     bool? editedLocally,
@@ -339,7 +339,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   }) => Transaction(
     id: id ?? this.id,
     amount: amount ?? this.amount,
-    category: category ?? this.category,
+    categoryId: categoryId ?? this.categoryId,
     timestamp: timestamp ?? this.timestamp,
     note: note.present ? note.value : this.note,
     editedLocally: editedLocally ?? this.editedLocally,
@@ -350,7 +350,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     return Transaction(
       id: data.id.present ? data.id.value : this.id,
       amount: data.amount.present ? data.amount.value : this.amount,
-      category: data.category.present ? data.category.value : this.category,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
       note: data.note.present ? data.note.value : this.note,
       editedLocally: data.editedLocally.present
@@ -366,7 +368,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     return (StringBuffer('Transaction(')
           ..write('id: $id, ')
           ..write('amount: $amount, ')
-          ..write('category: $category, ')
+          ..write('categoryId: $categoryId, ')
           ..write('timestamp: $timestamp, ')
           ..write('note: $note, ')
           ..write('editedLocally: $editedLocally, ')
@@ -380,7 +382,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   int get hashCode => Object.hash(
     id,
     amount,
-    category,
+    categoryId,
     timestamp,
     note,
     editedLocally,
@@ -393,7 +395,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       (other is Transaction &&
           other.id == this.id &&
           other.amount == this.amount &&
-          other.category == this.category &&
+          other.categoryId == this.categoryId &&
           other.timestamp == this.timestamp &&
           other.note == this.note &&
           other.editedLocally == this.editedLocally &&
@@ -404,7 +406,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String> id;
   final Value<double> amount;
-  final Value<String> category;
+  final Value<String> categoryId;
   final Value<int> timestamp;
   final Value<String?> note;
   final Value<bool> editedLocally;
@@ -414,7 +416,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   const TransactionsCompanion({
     this.id = const Value.absent(),
     this.amount = const Value.absent(),
-    this.category = const Value.absent(),
+    this.categoryId = const Value.absent(),
     this.timestamp = const Value.absent(),
     this.note = const Value.absent(),
     this.editedLocally = const Value.absent(),
@@ -425,7 +427,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   TransactionsCompanion.insert({
     required String id,
     required double amount,
-    required String category,
+    required String categoryId,
     required int timestamp,
     this.note = const Value.absent(),
     this.editedLocally = const Value.absent(),
@@ -434,14 +436,14 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        amount = Value(amount),
-       category = Value(category),
+       categoryId = Value(categoryId),
        timestamp = Value(timestamp),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
   static Insertable<Transaction> custom({
     Expression<String>? id,
     Expression<double>? amount,
-    Expression<String>? category,
+    Expression<String>? categoryId,
     Expression<int>? timestamp,
     Expression<String>? note,
     Expression<bool>? editedLocally,
@@ -452,7 +454,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (amount != null) 'amount': amount,
-      if (category != null) 'category': category,
+      if (categoryId != null) 'category_id': categoryId,
       if (timestamp != null) 'timestamp': timestamp,
       if (note != null) 'note': note,
       if (editedLocally != null) 'edited_locally': editedLocally,
@@ -465,7 +467,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   TransactionsCompanion copyWith({
     Value<String>? id,
     Value<double>? amount,
-    Value<String>? category,
+    Value<String>? categoryId,
     Value<int>? timestamp,
     Value<String?>? note,
     Value<bool>? editedLocally,
@@ -476,7 +478,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     return TransactionsCompanion(
       id: id ?? this.id,
       amount: amount ?? this.amount,
-      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
       timestamp: timestamp ?? this.timestamp,
       note: note ?? this.note,
       editedLocally: editedLocally ?? this.editedLocally,
@@ -495,8 +497,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     if (amount.present) {
       map['amount'] = Variable<double>(amount.value);
     }
-    if (category.present) {
-      map['category'] = Variable<String>(category.value);
+    if (categoryId.present) {
+      map['category_id'] = Variable<String>(categoryId.value);
     }
     if (timestamp.present) {
       map['timestamp'] = Variable<int>(timestamp.value);
@@ -524,7 +526,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     return (StringBuffer('TransactionsCompanion(')
           ..write('id: $id, ')
           ..write('amount: $amount, ')
-          ..write('category: $category, ')
+          ..write('categoryId: $categoryId, ')
           ..write('timestamp: $timestamp, ')
           ..write('note: $note, ')
           ..write('editedLocally: $editedLocally, ')
@@ -542,6 +544,15 @@ class $CategoriesTable extends Categories
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $CategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -551,8 +562,26 @@ class $CategoriesTable extends Categories
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _iconMeta = const VerificationMeta('icon');
   @override
-  List<GeneratedColumn> get $columns => [name];
+  late final GeneratedColumn<String> icon = GeneratedColumn<String>(
+    'icon',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<int> color = GeneratedColumn<int>(
+    'color',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, icon, color];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -565,6 +594,11 @@ class $CategoriesTable extends Categories
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
     if (data.containsKey('name')) {
       context.handle(
         _nameMeta,
@@ -573,18 +607,46 @@ class $CategoriesTable extends Categories
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('icon')) {
+      context.handle(
+        _iconMeta,
+        icon.isAcceptableOrUnknown(data['icon']!, _iconMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_iconMeta);
+    }
+    if (data.containsKey('color')) {
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_colorMeta);
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {name};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Category map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Category(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}name'],
+      )!,
+      icon: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon'],
+      )!,
+      color: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}color'],
       )!,
     );
   }
@@ -596,19 +658,40 @@ class $CategoriesTable extends Categories
 }
 
 class Category extends DataClass implements Insertable<Category> {
-  /// The primary identifier and display name of the category.
-  /// Invariant: Category names are unique.
+  /// Unique stable identifier. Primary Key.
+  final String id;
+
+  /// The display name of the category.
   final String name;
-  const Category({required this.name});
+
+  /// Icon name or code point.
+  final String icon;
+
+  /// Color value (ARGB hex or int).
+  final int color;
+  const Category({
+    required this.id,
+    required this.name,
+    required this.icon,
+    required this.color,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
+    map['icon'] = Variable<String>(icon);
+    map['color'] = Variable<int>(color);
     return map;
   }
 
   CategoriesCompanion toCompanion(bool nullToAbsent) {
-    return CategoriesCompanion(name: Value(name));
+    return CategoriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      icon: Value(icon),
+      color: Value(color),
+    );
   }
 
   factory Category.fromJson(
@@ -616,58 +699,114 @@ class Category extends DataClass implements Insertable<Category> {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Category(name: serializer.fromJson<String>(json['name']));
+    return Category(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      icon: serializer.fromJson<String>(json['icon']),
+      color: serializer.fromJson<int>(json['color']),
+    );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{'name': serializer.toJson<String>(name)};
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'icon': serializer.toJson<String>(icon),
+      'color': serializer.toJson<int>(color),
+    };
   }
 
-  Category copyWith({String? name}) => Category(name: name ?? this.name);
+  Category copyWith({String? id, String? name, String? icon, int? color}) =>
+      Category(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        icon: icon ?? this.icon,
+        color: color ?? this.color,
+      );
   Category copyWithCompanion(CategoriesCompanion data) {
-    return Category(name: data.name.present ? data.name.value : this.name);
+    return Category(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      icon: data.icon.present ? data.icon.value : this.icon,
+      color: data.color.present ? data.color.value : this.color,
+    );
   }
 
   @override
   String toString() {
     return (StringBuffer('Category(')
-          ..write('name: $name')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('icon: $icon, ')
+          ..write('color: $color')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => name.hashCode;
+  int get hashCode => Object.hash(id, name, icon, color);
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is Category && other.name == this.name);
+      identical(this, other) ||
+      (other is Category &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.icon == this.icon &&
+          other.color == this.color);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
+  final Value<String> id;
   final Value<String> name;
+  final Value<String> icon;
+  final Value<int> color;
   final Value<int> rowid;
   const CategoriesCompanion({
+    this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.icon = const Value.absent(),
+    this.color = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CategoriesCompanion.insert({
+    required String id,
     required String name,
+    required String icon,
+    required int color,
     this.rowid = const Value.absent(),
-  }) : name = Value(name);
+  }) : id = Value(id),
+       name = Value(name),
+       icon = Value(icon),
+       color = Value(color);
   static Insertable<Category> custom({
+    Expression<String>? id,
     Expression<String>? name,
+    Expression<String>? icon,
+    Expression<int>? color,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (icon != null) 'icon': icon,
+      if (color != null) 'color': color,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  CategoriesCompanion copyWith({Value<String>? name, Value<int>? rowid}) {
+  CategoriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? icon,
+    Value<int>? color,
+    Value<int>? rowid,
+  }) {
     return CategoriesCompanion(
+      id: id ?? this.id,
       name: name ?? this.name,
+      icon: icon ?? this.icon,
+      color: color ?? this.color,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -675,8 +814,17 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (icon.present) {
+      map['icon'] = Variable<String>(icon.value);
+    }
+    if (color.present) {
+      map['color'] = Variable<int>(color.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -687,7 +835,10 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   @override
   String toString() {
     return (StringBuffer('CategoriesCompanion(')
+          ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('icon: $icon, ')
+          ..write('color: $color, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -717,7 +868,7 @@ typedef $$TransactionsTableCreateCompanionBuilder =
     TransactionsCompanion Function({
       required String id,
       required double amount,
-      required String category,
+      required String categoryId,
       required int timestamp,
       Value<String?> note,
       Value<bool> editedLocally,
@@ -729,7 +880,7 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
     TransactionsCompanion Function({
       Value<String> id,
       Value<double> amount,
-      Value<String> category,
+      Value<String> categoryId,
       Value<int> timestamp,
       Value<String?> note,
       Value<bool> editedLocally,
@@ -757,8 +908,8 @@ class $$TransactionsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get category => $composableBuilder(
-    column: $table.category,
+  ColumnFilters<String> get categoryId => $composableBuilder(
+    column: $table.categoryId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -807,8 +958,8 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get category => $composableBuilder(
-    column: $table.category,
+  ColumnOrderings<String> get categoryId => $composableBuilder(
+    column: $table.categoryId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -853,8 +1004,10 @@ class $$TransactionsTableAnnotationComposer
   GeneratedColumn<double> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
 
-  GeneratedColumn<String> get category =>
-      $composableBuilder(column: $table.category, builder: (column) => column);
+  GeneratedColumn<String> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get timestamp =>
       $composableBuilder(column: $table.timestamp, builder: (column) => column);
@@ -907,7 +1060,7 @@ class $$TransactionsTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<double> amount = const Value.absent(),
-                Value<String> category = const Value.absent(),
+                Value<String> categoryId = const Value.absent(),
                 Value<int> timestamp = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<bool> editedLocally = const Value.absent(),
@@ -917,7 +1070,7 @@ class $$TransactionsTableTableManager
               }) => TransactionsCompanion(
                 id: id,
                 amount: amount,
-                category: category,
+                categoryId: categoryId,
                 timestamp: timestamp,
                 note: note,
                 editedLocally: editedLocally,
@@ -929,7 +1082,7 @@ class $$TransactionsTableTableManager
               ({
                 required String id,
                 required double amount,
-                required String category,
+                required String categoryId,
                 required int timestamp,
                 Value<String?> note = const Value.absent(),
                 Value<bool> editedLocally = const Value.absent(),
@@ -939,7 +1092,7 @@ class $$TransactionsTableTableManager
               }) => TransactionsCompanion.insert(
                 id: id,
                 amount: amount,
-                category: category,
+                categoryId: categoryId,
                 timestamp: timestamp,
                 note: note,
                 editedLocally: editedLocally,
@@ -973,9 +1126,21 @@ typedef $$TransactionsTableProcessedTableManager =
       PrefetchHooks Function()
     >;
 typedef $$CategoriesTableCreateCompanionBuilder =
-    CategoriesCompanion Function({required String name, Value<int> rowid});
+    CategoriesCompanion Function({
+      required String id,
+      required String name,
+      required String icon,
+      required int color,
+      Value<int> rowid,
+    });
 typedef $$CategoriesTableUpdateCompanionBuilder =
-    CategoriesCompanion Function({Value<String> name, Value<int> rowid});
+    CategoriesCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> icon,
+      Value<int> color,
+      Value<int> rowid,
+    });
 
 class $$CategoriesTableFilterComposer
     extends Composer<_$AppDatabase, $CategoriesTable> {
@@ -986,8 +1151,23 @@ class $$CategoriesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get name => $composableBuilder(
     column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get icon => $composableBuilder(
+    column: $table.icon,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get color => $composableBuilder(
+    column: $table.color,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1001,8 +1181,23 @@ class $$CategoriesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get name => $composableBuilder(
     column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get icon => $composableBuilder(
+    column: $table.icon,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get color => $composableBuilder(
+    column: $table.color,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -1016,8 +1211,17 @@ class $$CategoriesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get icon =>
+      $composableBuilder(column: $table.icon, builder: (column) => column);
+
+  GeneratedColumn<int> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
 }
 
 class $$CategoriesTableTableManager
@@ -1048,14 +1252,32 @@ class $$CategoriesTableTableManager
               $$CategoriesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String> icon = const Value.absent(),
+                Value<int> color = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => CategoriesCompanion(name: name, rowid: rowid),
+              }) => CategoriesCompanion(
+                id: id,
+                name: name,
+                icon: icon,
+                color: color,
+                rowid: rowid,
+              ),
           createCompanionCallback:
               ({
+                required String id,
                 required String name,
+                required String icon,
+                required int color,
                 Value<int> rowid = const Value.absent(),
-              }) => CategoriesCompanion.insert(name: name, rowid: rowid),
+              }) => CategoriesCompanion.insert(
+                id: id,
+                name: name,
+                icon: icon,
+                color: color,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),

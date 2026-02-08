@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../categories/presentation/providers/category_providers.dart';
+import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
 
@@ -63,22 +65,25 @@ class TransactionsPage extends ConsumerWidget {
   }
 
   void _openAddTransaction(BuildContext context) {
-    context.push('/add-tx'); // I'll add this route to the router later
+    context.push('/add-tx');
   }
 }
 
-class _TransactionTile extends StatelessWidget {
+class _TransactionTile extends ConsumerWidget {
   final TransactionEntity transaction;
 
   const _TransactionTile({required this.transaction});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currencyFormat = '\$${transaction.absoluteAmount.toStringAsFixed(2)}';
-    final color = transaction.isIncome ? AppColors.success : AppColors.error;
-    final icon = transaction.isIncome
-        ? Icons.arrow_downward_rounded
-        : Icons.arrow_upward_rounded;
+    final amountColor = transaction.isIncome
+        ? AppColors.success
+        : AppColors.error;
+
+    final categoryAsync = ref.watch(
+      categoryByIdProvider(transaction.categoryId),
+    );
 
     return InkWell(
       onTap: () => context.push('/tx/${transaction.id}'),
@@ -86,22 +91,49 @@ class _TransactionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+            categoryAsync.when(
+              data: (category) {
+                final iconData =
+                    CategoryAssets.icons[category?.icon] ??
+                    Icons.category_rounded;
+                final color = category != null
+                    ? Color(category.color)
+                    : AppColors.grey500;
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(iconData, color: color, size: 24),
+                );
+              },
+              loading: () => Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.grey900,
+                  shape: BoxShape.circle,
+                ),
               ),
-              child: Icon(icon, color: color, size: 20),
+              error: (error, stack) => const Icon(Icons.error_outline),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    transaction.category,
-                    style: Theme.of(context).textTheme.titleLarge,
+                  categoryAsync.when(
+                    data: (category) => Text(
+                      category?.name ?? 'Unknown',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    loading: () => Container(
+                      height: 20,
+                      width: 80,
+                      color: AppColors.grey900,
+                    ),
+                    error: (error, stack) => const Text('Error'),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -142,7 +174,7 @@ class _TransactionTile extends StatelessWidget {
             Text(
               '${transaction.isIncome ? '+' : '-'}$currencyFormat',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: color,
+                color: amountColor,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -367,6 +399,14 @@ class _AppDrawer extends ConsumerWidget {
             const Divider(height: 1, color: AppColors.grey900),
 
             // Menu Items
+            _DrawerItem(
+              icon: Icons.category_outlined,
+              label: 'Categories',
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                context.push('/categories');
+              },
+            ),
             _DrawerItem(
               icon: Icons.refresh_rounded,
               label: 'Sync Data',

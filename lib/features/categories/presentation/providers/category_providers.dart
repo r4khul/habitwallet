@@ -4,21 +4,88 @@ import '../../domain/category_entity.dart';
 
 part 'category_providers.g.dart';
 
-/// Feature State: Manages the collection of categories.
-/// Responsibility: Provides an observable list of categories.
-/// Ownership: Feature state; calls repository only.
 @riverpod
 class CategoryController extends _$CategoryController {
   @override
-  FutureOr<List<CategoryEntity>> build() {
+  FutureOr<List<CategoryEntity>> build() async {
     final repository = ref.watch(categoryRepositoryProvider);
-    return repository.getAll();
+    final categories = await repository.getAll();
+
+    if (categories.isEmpty) {
+      // Seed default categories
+      final defaults = [
+        CategoryEntity(
+          id: 'food',
+          name: 'Food',
+          icon: 'food',
+          color: 0xFFF44336,
+        ), // Red
+        CategoryEntity(
+          id: 'transport',
+          name: 'Transport',
+          icon: 'transport',
+          color: 0xFF2196F3,
+        ), // Blue
+        CategoryEntity(
+          id: 'shopping',
+          name: 'Shopping',
+          icon: 'shopping',
+          color: 0xFF9C27B0,
+        ), // Purple
+        CategoryEntity(
+          id: 'entertainment',
+          name: 'Entertainment',
+          icon: 'entertainment',
+          color: 0xFFFF9800,
+        ), // Orange
+        CategoryEntity(
+          id: 'health',
+          name: 'Health',
+          icon: 'health',
+          color: 0xFF4CAF50,
+        ), // Green
+        CategoryEntity(
+          id: 'salary',
+          name: 'Salary',
+          icon: 'salary',
+          color: 0xFF00BCD4,
+        ), // Cyan
+      ];
+
+      for (final cat in defaults) {
+        await repository.upsert(cat);
+      }
+      return repository.getAll();
+    }
+
+    return categories;
   }
 
-  /// Retries loading categories.
-  void refresh() {
-    ref.invalidateSelf();
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () => ref.read(categoryRepositoryProvider).getAll(),
+    );
   }
 
-  // Future<void> addCategory(String name) async { ... }
+  Future<void> upsertCategory(CategoryEntity category) async {
+    await ref.read(categoryRepositoryProvider).upsert(category);
+    await refresh();
+  }
+
+  Future<void> deleteCategory(String id) async {
+    final isUsed = await ref
+        .read(categoryRepositoryProvider)
+        .isCategoryUsed(id);
+    if (isUsed) {
+      throw Exception('This category is in use and cannot be deleted.');
+    }
+    await ref.read(categoryRepositoryProvider).delete(id);
+    await refresh();
+  }
+}
+
+@riverpod
+Future<CategoryEntity?> categoryById(Ref ref, String id) {
+  return ref.watch(categoryRepositoryProvider).getById(id);
 }

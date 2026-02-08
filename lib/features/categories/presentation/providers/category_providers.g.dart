@@ -8,21 +8,12 @@ part of 'category_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Feature State: Manages the collection of categories.
-/// Responsibility: Provides an observable list of categories.
-/// Ownership: Feature state; calls repository only.
 
 @ProviderFor(CategoryController)
 final categoryControllerProvider = CategoryControllerProvider._();
 
-/// Feature State: Manages the collection of categories.
-/// Responsibility: Provides an observable list of categories.
-/// Ownership: Feature state; calls repository only.
 final class CategoryControllerProvider
     extends $AsyncNotifierProvider<CategoryController, List<CategoryEntity>> {
-  /// Feature State: Manages the collection of categories.
-  /// Responsibility: Provides an observable list of categories.
-  /// Ownership: Feature state; calls repository only.
   CategoryControllerProvider._()
     : super(
         from: null,
@@ -43,11 +34,7 @@ final class CategoryControllerProvider
 }
 
 String _$categoryControllerHash() =>
-    r'8db86742d631ba20e5eff7a18088a947ef21483a';
-
-/// Feature State: Manages the collection of categories.
-/// Responsibility: Provides an observable list of categories.
-/// Ownership: Feature state; calls repository only.
+    r'e26910ab0b861b9bc0ca9edb06e5d61f04210c9e';
 
 abstract class _$CategoryController
     extends $AsyncNotifier<List<CategoryEntity>> {
@@ -71,4 +58,79 @@ abstract class _$CategoryController
             >;
     element.handleCreate(ref, build);
   }
+}
+
+@ProviderFor(categoryById)
+final categoryByIdProvider = CategoryByIdFamily._();
+
+final class CategoryByIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<CategoryEntity?>,
+          CategoryEntity?,
+          FutureOr<CategoryEntity?>
+        >
+    with $FutureModifier<CategoryEntity?>, $FutureProvider<CategoryEntity?> {
+  CategoryByIdProvider._({
+    required CategoryByIdFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'categoryByIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$categoryByIdHash();
+
+  @override
+  String toString() {
+    return r'categoryByIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<CategoryEntity?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<CategoryEntity?> create(Ref ref) {
+    final argument = this.argument as String;
+    return categoryById(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CategoryByIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$categoryByIdHash() => r'2b730e42f221678b6075dcd673e1a79c56bd8132';
+
+final class CategoryByIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<CategoryEntity?>, String> {
+  CategoryByIdFamily._()
+    : super(
+        retry: null,
+        name: r'categoryByIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  CategoryByIdProvider call(String id) =>
+      CategoryByIdProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'categoryByIdProvider';
 }

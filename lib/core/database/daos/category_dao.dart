@@ -16,8 +16,29 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     return select(categories).get();
   }
 
+  /// Fetches a specific category row by its [id].
+  Future<Category?> getById(String id) {
+    return (select(
+      categories,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
   /// Upserts a category row.
   Future<void> upsert(Category row) {
     return into(categories).insertOnConflictUpdate(row);
+  }
+
+  /// Deletes a category row by its [id].
+  Future<int> deleteById(String id) {
+    return (delete(categories)..where((t) => t.id.equals(id))).go();
+  }
+
+  /// Checks if a category is used in any transactions.
+  Future<bool> isUsed(String id) async {
+    final query = select(db.transactions)
+      ..where((t) => t.categoryId.equals(id))
+      ..limit(1);
+    final result = await query.getSingleOrNull();
+    return result != null;
   }
 }

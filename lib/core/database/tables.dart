@@ -3,12 +3,20 @@ import 'package:drift/drift.dart';
 /// Categories table schema.
 /// Unique classifications for transactions, acting as a lookup for the Transactions table.
 class Categories extends Table {
-  /// The primary identifier and display name of the category.
-  /// Invariant: Category names are unique.
+  /// Unique stable identifier. Primary Key.
+  TextColumn get id => text()();
+
+  /// The display name of the category.
   TextColumn get name => text()();
 
+  /// Icon name or code point.
+  TextColumn get icon => text()();
+
+  /// Color value (ARGB hex or int).
+  IntColumn get color => integer()();
+
   @override
-  Set<Column> get primaryKey => {name};
+  Set<Column> get primaryKey => {id};
 }
 
 /// Transactions table schema.
@@ -22,9 +30,9 @@ class Transactions extends Table {
   /// Aligned with the TransactionEntity domain invariant.
   RealColumn get amount => real()();
 
-  /// The category name associated with this transaction.
-  /// References [Categories.name].
-  TextColumn get category => text()();
+  /// The category ID associated with this transaction.
+  /// References [Categories.id].
+  TextColumn get categoryId => text()();
 
   /// Authoritative domain timestamp (stored as epoch millis).
   /// Represents when the transaction actually occurred.

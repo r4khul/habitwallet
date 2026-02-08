@@ -12,4 +12,7 @@ abstract class AuthSession with _$AuthSession {
 
   factory AuthSession.fromJson(Map<String, dynamic> json) =>
       _$AuthSessionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson();
 }

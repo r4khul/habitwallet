@@ -11,11 +11,6 @@ class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryDao _categoryDao;
 
   @override
-  Future<void> init() async {
-    // Initialization logic for categories if needed.
-  }
-
-  @override
   Future<List<CategoryEntity>> getAll() async {
     try {
       final rows = await _categoryDao.getAll();
@@ -27,8 +22,62 @@ class CategoryRepositoryImpl implements CategoryRepository {
     }
   }
 
+  @override
+  Future<CategoryEntity?> getById(String id) async {
+    try {
+      final row = await _categoryDao.getById(id);
+      return row != null ? _toEntity(row) : null;
+    } on Object catch (_) {
+      throw const DatabaseFailure('Failed to retrieve category details.');
+    }
+  }
+
+  @override
+  Future<void> upsert(CategoryEntity category) async {
+    try {
+      await _categoryDao.upsert(_toRow(category));
+    } on Object catch (_) {
+      throw const DatabaseFailure('Failed to save category.');
+    }
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    try {
+      // Logic for strict deletion: check usage first (handled at service/controller level usually,
+      // but let's implement the base delete here).
+      await _categoryDao.deleteById(id);
+    } on Object catch (_) {
+      throw const DatabaseFailure('Failed to remove category.');
+    }
+  }
+
+  @override
+  Future<bool> isCategoryUsed(String id) async {
+    try {
+      return await _categoryDao.isUsed(id);
+    } on Object catch (_) {
+      return true; // Conservative approach on error
+    }
+  }
+
   /// Maps Database Row to Domain Entity.
   CategoryEntity _toEntity(Category row) {
-    return CategoryEntity(name: row.name);
+    return CategoryEntity(
+      id: row.id,
+      name: row.name,
+      icon: row.icon,
+      color: row.color,
+    );
+  }
+
+  /// Maps Domain Entity to Database Row.
+  Category _toRow(CategoryEntity entity) {
+    return Category(
+      id: entity.id,
+      name: entity.name,
+      icon: entity.icon,
+      color: entity.color,
+    );
   }
 }

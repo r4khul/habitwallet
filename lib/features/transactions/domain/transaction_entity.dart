@@ -24,8 +24,8 @@ abstract class TransactionEntity with _$TransactionEntity {
     /// Monetary amount. Sign determines income (+) vs expense (-).
     required double amount,
 
-    /// User-editable classification for the transaction.
-    required String category,
+    /// The unique identifier of the associated category.
+    required String categoryId,
 
     /// Authoritative timestamp of when the transaction occurred.
     required DateTime timestamp,
