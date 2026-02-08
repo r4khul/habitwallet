@@ -19,13 +19,16 @@ class TransactionsPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('HabitWallet.'),
         actions: [
-          IconButton(
-            onPressed: () =>
-                ref.read(transactionControllerProvider.notifier).refresh(),
-            icon: const Icon(Icons.refresh_rounded),
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              icon: const Icon(Icons.menu_rounded),
+              tooltip: 'Menu',
+            ),
           ),
         ],
       ),
+      endDrawer: const _AppDrawer(),
       body: transactionsAsync.when(
         data: (transactions) {
           if (transactions.isEmpty) {
@@ -302,6 +305,137 @@ class _ErrorState extends StatelessWidget {
               child: const Text('Try Again'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppDrawer extends ConsumerWidget {
+  const _AppDrawer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      color: AppColors.primary,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'User',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          'Premium Plan',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+            const Divider(height: 1, color: AppColors.grey900),
+
+            // Menu Items
+            _DrawerItem(
+              icon: Icons.refresh_rounded,
+              label: 'Sync Data',
+              onTap: () {
+                ref.read(transactionControllerProvider.notifier).refresh();
+                Navigator.pop(context);
+              },
+            ),
+            _DrawerItem(
+              icon: Icons.settings_outlined,
+              label: 'Settings',
+              onTap: () {},
+            ),
+            _DrawerItem(
+              icon: Icons.shield_outlined,
+              label: 'Security',
+              onTap: () {},
+            ),
+            _DrawerItem(
+              icon: Icons.info_outline_rounded,
+              label: 'About HabitWallet',
+              onTap: () {},
+            ),
+
+            const Spacer(),
+
+            // Logout
+            const Divider(height: 1, color: AppColors.grey900),
+            _DrawerItem(
+              icon: Icons.logout_rounded,
+              label: 'Sign Out',
+              color: AppColors.error,
+              onTap: () {
+                // Implement logout logic via authController if needed
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _DrawerItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      leading: Icon(icon, color: color ?? AppColors.grey500, size: 24),
+      title: Text(
+        label,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: color ?? Theme.of(context).textTheme.bodyLarge?.color,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
