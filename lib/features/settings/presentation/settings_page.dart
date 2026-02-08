@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/util/theme_extension.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
+import 'package:habitwallet/features/settings/presentation/providers/notification_provider.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -11,6 +12,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currencyAsync = ref.watch(currencyControllerProvider);
+    final notificationSettings = ref.watch(notificationControllerProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -86,6 +88,30 @@ class SettingsPage extends ConsumerWidget {
                 ),
                 builder: (context) => const CurrencySelectorSheet(),
               );
+            },
+          ),
+
+          const SizedBox(height: 24),
+          const _SectionHeader(title: 'Notifications'),
+          const SizedBox(height: 8),
+
+          // Notification Toggle
+          _SettingsTile(
+            icon: Icons.notifications_active_rounded,
+            iconColor: AppColors.accent,
+            title: 'Daily Reminder',
+            subtitle: 'Notify if no transactions logged',
+            trailing: Switch.adaptive(
+              value: notificationSettings.isEnabled,
+              activeColor: AppColors.primary,
+              onChanged: (value) => ref
+                  .read(notificationControllerProvider.notifier)
+                  .toggleEnabled(value),
+            ),
+            onTap: () {
+              ref
+                  .read(notificationControllerProvider.notifier)
+                  .toggleEnabled(!notificationSettings.isEnabled);
             },
           ),
 

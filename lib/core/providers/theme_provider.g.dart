@@ -53,7 +53,7 @@ final class ThemeControllerProvider
   }
 }
 
-String _$themeControllerHash() => r'563ddcd0f7a085c14663020e8a9c9c6347f8f1b8';
+String _$themeControllerHash() => r'ba94892748b5c1941f7dc8956222cd0ea9ae5308';
 
 /// Theme Controller: Manages the application's overall theme mode.
 /// Responsibility:

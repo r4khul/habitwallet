@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -122,21 +123,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   controller: _pinController,
                   decoration: const InputDecoration(
                     hintText: 'Enter your 4-digit PIN',
+                    counterText: '', // Hide default counter
                   ),
                   obscureText: true,
                   keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   style: Theme.of(context).textTheme.bodyLarge,
+
                   enabled: !isLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'PIN is required';
                     }
-                    if (value.length < 4) {
-                      return 'PIN must be at least 4 digits';
+                    if (value.length != 4) {
+                      return 'PIN must be exactly 4 digits';
                     }
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
 
                 // Remember Me
@@ -190,14 +196,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Footer
-                Center(
-                  child: TextButton(
-                    onPressed: isLoading ? null : () {},
-                    child: const Text('Forgot PIN?'),
-                  ),
-                ),
               ],
             ),
           ),

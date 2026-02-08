@@ -12,6 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   final FlutterSecureStorage _storage;
   static const _sessionKey = 'auth_session';
+  static const _registryKey = 'user_registry';
 
   @override
   Future<AuthSession?> getSession() async {
@@ -42,23 +43,41 @@ class AuthRepositoryImpl implements AuthRepository {
     required String pin,
     required bool rememberMe,
   }) async {
-    // Auth Lifecycle: Write Flow
-    // 1. Validate credentials (stub)
-    // 2. Clear stale session records
-    // 3. Persist new session if requested
-    if (pin == '1234') {
+    try {
+      // 1. Get user registry
+      final registryJson = await _storage.read(key: _registryKey);
+      Map<String, String> registry = {};
+      if (registryJson != null) {
+        registry = Map<String, String>.from(
+          jsonDecode(registryJson) as Map<dynamic, dynamic>,
+        );
+      }
+
+      // 2. Check if user exists and validate/register
+      if (registry.containsKey(email)) {
+        if (registry[email] != pin) {
+          throw const AuthFailure('Invalid PIN for this email.');
+        }
+      } else {
+        // Register new user
+        registry[email] = pin;
+        await _storage.write(key: _registryKey, value: jsonEncode(registry));
+      }
+
+      // 3. Create and persist session
       final session = AuthSession(email: email, rememberMe: rememberMe);
 
       if (rememberMe) {
         await saveSession(session);
       } else {
-        // If not rememberMe, ensure storage is clean of previous sessions
         await clearSession();
       }
 
       return session;
-    } else {
-      throw const AuthFailure('Invalid PIN. Please try again.');
+    } on AuthFailure {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthFailure('Authentication error: ${e.toString()}');
     }
   }
 
