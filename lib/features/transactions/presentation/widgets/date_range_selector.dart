@@ -22,14 +22,6 @@ class DateRangeSelector extends ConsumerWidget {
           _buildFilterChip(
             context,
             ref,
-            label: 'All Time',
-            isSelected: currentFilter.label == 'All Time',
-            onTap: () =>
-                ref.read(dateFilterControllerProvider.notifier).setAllTime(),
-          ),
-          _buildFilterChip(
-            context,
-            ref,
             label: 'Today',
             isSelected: currentFilter.label == 'Today',
             onTap: () =>
@@ -58,6 +50,14 @@ class DateRangeSelector extends ConsumerWidget {
             isSelected: currentFilter.label == 'This Year',
             onTap: () =>
                 ref.read(dateFilterControllerProvider.notifier).setThisYear(),
+          ),
+          _buildFilterChip(
+            context,
+            ref,
+            label: 'All Time',
+            isSelected: currentFilter.label == 'All Time',
+            onTap: () =>
+                ref.read(dateFilterControllerProvider.notifier).setAllTime(),
           ),
           _buildCustomChip(context, ref, currentFilter),
         ],

@@ -99,7 +99,7 @@ class SettingsPage extends ConsumerWidget {
           _SettingsTile(
             icon: Icons.notifications_active_rounded,
             iconColor: AppColors.accent,
-            title: 'Daily Reminder',
+            title: 'Daily Reminder (8 PM)',
             subtitle: 'Notify if no transactions logged',
             trailing: Switch.adaptive(
               value: notificationSettings.isEnabled,

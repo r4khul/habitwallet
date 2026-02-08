@@ -18,7 +18,7 @@ abstract class DateRangeFilter with _$DateRangeFilter {
 class DateFilterController extends _$DateFilterController {
   @override
   DateRangeFilter build() {
-    return _allTime();
+    return _today();
   }
 
   DateRangeFilter _allTime() {
@@ -29,16 +29,18 @@ class DateFilterController extends _$DateFilterController {
     );
   }
 
-  void setAllTime() => state = _allTime();
-
-  void setToday() {
+  DateRangeFilter _today() {
     final now = DateTime.now();
-    state = DateRangeFilter(
+    return DateRangeFilter(
       start: DateTime(now.year, now.month, now.day),
       end: DateTime(now.year, now.month, now.day, 23, 59, 59),
       label: 'Today',
     );
   }
+
+  void setAllTime() => state = _allTime();
+
+  void setToday() => state = _today();
 
   void setThisWeek() {
     final now = DateTime.now();
