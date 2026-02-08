@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -10,6 +11,7 @@ import '../features/settings/presentation/settings_page.dart';
 import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
 import '../features/transactions/presentation/transactions_page.dart';
+import '../features/auth/presentation/splash_page.dart';
 
 part 'app_router.g.dart';
 
@@ -21,42 +23,63 @@ part 'app_router.g.dart';
 @riverpod
 GoRouter router(Ref ref) {
   final authState = ref.watch(authControllerProvider);
+  final isNewUserAsync = ref.watch(isNewUserProvider);
 
   return GoRouter(
-    initialLocation: '/home',
-    // Refresh the router when auth state changes (loading -> data/error)
-    refreshListenable: authState.when(
-      data: (_) => null,
-      error: (e, s) => null,
-      loading: () => null,
-    ),
+    initialLocation: '/',
+    // Refresh the router when auth or new user status changes
+    refreshListenable: Listenable.merge([
+      authState.when(
+        data: (_) => ValueNotifier(0),
+        error: (e, s) => ValueNotifier(0),
+        loading: () => ValueNotifier(0),
+      ),
+      isNewUserAsync.when(
+        data: (_) => ValueNotifier(0),
+        error: (e, s) => ValueNotifier(0),
+        loading: () => ValueNotifier(0),
+      ),
+    ]),
     redirect: (context, state) {
-      // Deterministic Startup: Wait for the initial session check to complete.
-      if (authState.isLoading || authState.hasError) return null;
-
-      final session = authState.value;
-      final isLoggingIn = state.matchedLocation == '/login';
-
-      // Accessing path to preserve deep links
-      final fromLocation = state.uri.toString();
-
-      if (session == null) {
-        // Auth Redirection: Protected -> Login
-        // Avoid infinite loop if already at /login
-        if (isLoggingIn) return null;
-
-        // Preserve original intent for post-login redirection
-        return '/login?from=$fromLocation';
+      // 1. Wait for both initial session and "new user" check to complete.
+      // While loading, we stay at the initial location (Home).
+      // The native splash screen will still be visible if the app is starting.
+      if (authState.isLoading || isNewUserAsync.isLoading) {
+        return state.matchedLocation == '/' ? null : '/';
       }
 
-      // Auth Redirection: Authenticated -> Home (or preserved intent)
+      if (authState.hasError || isNewUserAsync.hasError) return null;
+
+      final session = authState.value;
+      final isNew = isNewUserAsync.value ?? true;
+      final isLoggingIn = state.matchedLocation == '/login';
+
+      // 2. Auth Redirection Logic
+      if (session == null) {
+        // If the user has never registered, force them to Auth (Login/Register)
+        if (isNew) {
+          if (isLoggingIn) return null;
+          return '/login';
+        }
+
+        // If the user is returning but has no active session, allow them to stay at Home
+        // (Local access). If they are at Login, they can browse back to Home.
+        return null;
+      }
+
+      // 3. Authenticated Redirection
+      // Prevent authenticated users from staying at Login
       if (isLoggingIn) {
         final destination = state.uri.queryParameters['from'] ?? '/home';
-        // Ensure we don't redirect to /login again if 'from' was corrupted
         return destination == '/login' ? '/home' : destination;
       }
 
-      // Allow access to protected routes
+      // 4. Final Departure from Splash
+      // If we are still at splash but not loading, go to home
+      if (state.matchedLocation == '/') {
+        return '/home';
+      }
+
       return null;
     },
     routes: [
@@ -64,7 +87,7 @@ GoRouter router(Ref ref) {
         path: '/analytics',
         builder: (context, state) => const FinancialOverviewPage(),
       ),
-      GoRoute(path: '/', redirect: (context, state) => '/home'),
+      GoRoute(path: '/', builder: (context, state) => const SplashPage()),
       GoRoute(
         path: '/home',
         builder: (context, state) => const TransactionsPage(),

@@ -23,6 +23,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   final _syncStatusController = StreamController<SyncStatus>.broadcast();
   SyncStatus _currentStatus = SyncStatus.idle;
+  Completer<void>? _activeSync;
 
   @override
   Stream<SyncStatus> get syncStatus async* {
@@ -137,9 +138,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<void> syncWithRemote() async {
-    // Guaranty: Prevent concurrent syncs to ensure predictability.
-    if (_currentStatus == SyncStatus.syncing) return;
+    if (_activeSync != null) return _activeSync!.future;
 
+    _activeSync = Completer<void>();
     _updateStatus(SyncStatus.syncing);
 
     try {
@@ -154,33 +155,54 @@ class TransactionRepositoryImpl implements TransactionRepository {
       // 2. Pull Phase: Fetch remote state and merge into local.
       final remoteRecords = await _remoteDataSource.fetchAll();
       for (final remote in remoteRecords) {
-        final local = await _transactionDao.getById(remote.id);
+        final localRow = await _transactionDao.getById(remote.id);
 
-        if (local == null) {
+        if (localRow == null) {
           // Rule: Insert remote records not present locally.
           await _transactionDao.upsert(
             _toRow(remote).copyWith(editedLocally: false),
           );
-        } else if (!local.editedLocally) {
-          // Rule: Overwrite local records only if editedLocally == false.
-          await _transactionDao.upsert(
-            _toRow(remote).copyWith(editedLocally: false),
-          );
         } else {
-          // Rule: Skip remote records if local is edited locally (Local edits win).
+          final local = _toEntity(localRow);
+          final localUpdated = local.updatedAt;
+          final remoteUpdated = remote.updatedAt;
+
+          if (!local.editedLocally) {
+            // If local is not dirty, remote wins if it's newer or local has no info
+            if (remoteUpdated != null &&
+                (localUpdated == null || remoteUpdated.isAfter(localUpdated))) {
+              await _transactionDao.upsert(
+                _toRow(remote).copyWith(editedLocally: false),
+              );
+            }
+          } else {
+            // Rule: Preserve locally edited records over remote unless remote is strictly newer.
+            if (remoteUpdated != null &&
+                localUpdated != null &&
+                remoteUpdated.isAfter(localUpdated)) {
+              await _transactionDao.upsert(
+                _toRow(remote).copyWith(editedLocally: false),
+              );
+            }
+          }
         }
       }
 
-      // Sync completed successfully.
       _updateStatus(SyncStatus.idle);
-    } on Failure {
+      _activeSync?.complete();
+    } on Failure catch (e) {
       // Surface domain failures with state update
       _updateStatus(SyncStatus.failed);
+      _activeSync?.completeError(e);
       rethrow;
     } on Object catch (e) {
       // Catch unexpected errors, wrap in SyncFailure, update state
       _updateStatus(SyncStatus.failed);
-      throw SyncFailure('Sync failed due to unexpected error: $e');
+      final failure = SyncFailure('Sync failed due to unexpected error: $e');
+      _activeSync?.completeError(failure);
+      throw failure;
+    } finally {
+      _activeSync = null;
     }
   }
 
@@ -194,6 +216,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       timestamp: DateTime.fromMillisecondsSinceEpoch(row.timestamp),
       note: row.note,
       editedLocally: row.editedLocally,
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
   }
 
@@ -208,7 +231,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       timestamp: entity.timestamp.millisecondsSinceEpoch,
       note: entity.note,
       editedLocally: true, // Mark as edited locally on save/update
-      createdAt: now, // Initial metadata, actual logic may vary in real apps
+      createdAt: entity.updatedAt?.millisecondsSinceEpoch ?? now,
       updatedAt: now,
     );
   }

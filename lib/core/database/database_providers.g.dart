@@ -8,20 +8,62 @@ part of 'database_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Derives the database name from auth state.
+
+@ProviderFor(dbName)
+final dbNameProvider = DbNameProvider._();
+
+/// Derives the database name from auth state.
+
+final class DbNameProvider extends $FunctionalProvider<String, String, String>
+    with $Provider<String> {
+  /// Derives the database name from auth state.
+  DbNameProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dbNameProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$dbNameHash();
+
+  @$internal
+  @override
+  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String create(Ref ref) {
+    return dbName(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$dbNameHash() => r'6f1d068af3352c097032639fd944e237a5fd2e16';
+
 /// Provider for the central database instance.
-/// Responsibility: Singleton access to the Drift database.
 
 @ProviderFor(appDatabase)
 final appDatabaseProvider = AppDatabaseProvider._();
 
 /// Provider for the central database instance.
-/// Responsibility: Singleton access to the Drift database.
 
 final class AppDatabaseProvider
     extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
     with $Provider<AppDatabase> {
   /// Provider for the central database instance.
-  /// Responsibility: Singleton access to the Drift database.
   AppDatabaseProvider._()
     : super(
         from: null,
@@ -55,7 +97,7 @@ final class AppDatabaseProvider
   }
 }
 
-String _$appDatabaseHash() => r'a1ce27ab4b4b5f3480be0bbcb12fee0dbbd21e87';
+String _$appDatabaseHash() => r'c692bf6f1fe1c073091091cd09aaaeb55b346668';
 
 /// Provider for [TransactionDao].
 

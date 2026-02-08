@@ -14,24 +14,28 @@ import '../../features/auth/presentation/providers/auth_providers.dart';
 
 part 'database_providers.g.dart';
 
-/// Provider for the central database instance.
-/// Responsibility: Singleton access to the Drift database.
-@Riverpod(keepAlive: true)
-AppDatabase appDatabase(Ref ref) {
-  // Listen to auth state to determine the database file
+/// Derives the database name from auth state.
+@riverpod
+String dbName(Ref ref) {
   final authState = ref.watch(authControllerProvider);
   final user = authState.asData?.value;
 
-  // Derive a unique database name from the user's email
-  // If not logged in, use 'default' but typically we'd be redirected to login
-  final dbName = user != null
+  return user != null
       ? 'db_${user.email.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.sqlite'
       : 'db_default.sqlite';
+}
 
-  final db = AppDatabase(_openConnection(dbName));
+/// Provider for the central database instance.
+@Riverpod(keepAlive: true)
+AppDatabase appDatabase(Ref ref) {
+  final name = ref.watch(dbNameProvider);
 
-  // Clean up the database when the provider is disposed or the user changes
-  ref.onDispose(db.close);
+  final db = AppDatabase(_openConnection(name));
+
+  // Clean up the database when the provider is disposed or the name changes
+  ref.onDispose(() async {
+    await db.close();
+  });
 
   return db;
 }

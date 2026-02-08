@@ -1,3 +1,4 @@
+import '../../transactions/domain/transaction_repository.dart';
 import '../domain/category_entity.dart';
 
 abstract class CategoryRepository {
@@ -10,4 +11,7 @@ abstract class CategoryRepository {
   Future<bool> isCategoryUsed(String id);
   Future<void> deleteWithTransactions(String id);
   Future<void> reassignAndAndDelete(String oldId, String newId);
+  Future<void> syncWithRemote();
+  Stream<SyncStatus> get syncStatus;
+  void dispose();
 }

@@ -3,15 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitwallet/core/providers/shared_preferences_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'app/app_router.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/util/notification_service.dart';
+import 'package:habitwallet/core/providers/sync_provider.dart';
 import 'features/settings/presentation/providers/notification_provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Parallel initialization for faster startup
   final results = await Future.wait([
@@ -72,6 +75,14 @@ class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
 
     // Initialize notification listener (does not cause rebuild)
     ref.watch(notificationControllerProvider);
+
+    // Trigger background sync on start (does not cause rebuild)
+    ref.watch(syncControllerProvider);
+
+    // Remove splash screen once the initial auth state is ready
+    ref.listen(routerProvider, (_, __) {
+      FlutterNativeSplash.remove();
+    });
 
     // Use cached brightness or get initial value
     _platformBrightness ??=

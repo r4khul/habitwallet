@@ -89,4 +89,16 @@ class AuthRepositoryImpl implements AuthRepository {
       throw const AuthFailure('Failed to clear authentication session.');
     }
   }
+
+  @override
+  Future<bool> isNewUser() async {
+    try {
+      final registryJson = await _storage.read(key: _registryKey);
+      if (registryJson == null) return true;
+      final registry = jsonDecode(registryJson) as Map<dynamic, dynamic>;
+      return registry.isEmpty;
+    } on Object catch (_) {
+      return true;
+    }
+  }
 }

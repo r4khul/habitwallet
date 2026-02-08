@@ -56,7 +56,7 @@ final class TransactionRemoteDataSourceProvider
 }
 
 String _$transactionRemoteDataSourceHash() =>
-    r'3b199254b2b253286b9efa089f5581b71f78eacb';
+    r'92ea3d785392f3921c0895a283fbefe29532c9af';
 
 /// Provider for the TransactionRepository interface.
 /// Dependency: Injects TransactionDao and RemoteDataSource into the implementation.

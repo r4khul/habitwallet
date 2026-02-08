@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'attachment_entity.freezed.dart';
+part 'attachment_entity.g.dart';
 
 /// Domain Entity: Represents a file attached to a transaction.
 ///
@@ -32,4 +33,7 @@ abstract class AttachmentEntity with _$AttachmentEntity {
     /// When the attachment was added.
     required DateTime createdAt,
   }) = _AttachmentEntity;
+
+  factory AttachmentEntity.fromJson(Map<String, dynamic> json) =>
+      _$AttachmentEntityFromJson(json);
 }

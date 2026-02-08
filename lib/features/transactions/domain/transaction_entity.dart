@@ -3,6 +3,7 @@ import 'attachment_entity.dart';
 import '../../../core/util/formatting_utils.dart';
 
 part 'transaction_entity.freezed.dart';
+part 'transaction_entity.g.dart';
 
 /// Domain Entity: Represents a financial transaction.
 ///
@@ -27,20 +28,28 @@ abstract class TransactionEntity with _$TransactionEntity {
     required double amount,
 
     /// The unique identifier of the associated category.
-    required String categoryId,
+    @JsonKey(name: 'category') required String categoryId,
 
     /// Authoritative timestamp of when the transaction occurred.
-    required DateTime timestamp,
+    @JsonKey(name: 'ts') required DateTime timestamp,
 
     /// Optional user-provided description or context.
     String? note,
 
     /// Internal flag representing local state vs remote persistence.
-    @Default(false) bool editedLocally,
+    @JsonKey(includeToJson: false) @Default(false) bool editedLocally,
+
+    /// Metadata: Last modified timestamp.
+    DateTime? updatedAt,
 
     /// List of attached files.
-    @Default([]) List<AttachmentEntity> attachments,
+    @JsonKey(includeToJson: false)
+    @Default([])
+    List<AttachmentEntity> attachments,
   }) = _TransactionEntity;
+
+  factory TransactionEntity.fromJson(Map<String, dynamic> json) =>
+      _$TransactionEntityFromJson(json);
 
   const TransactionEntity._();
 

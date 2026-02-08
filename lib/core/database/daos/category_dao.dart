@@ -53,4 +53,18 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     final result = await query.getSingleOrNull();
     return result != null;
   }
+
+  /// Retrieves all category rows that have been edited locally.
+  Future<List<Category>> getEditedLocally() {
+    return (select(
+      categories,
+    )..where((t) => t.editedLocally.equals(true))).get();
+  }
+
+  /// Clears the editedLocally flag for a specific category.
+  Future<void> clearEditedLocally(String id) {
+    return (update(categories)..where((t) => t.id.equals(id))).write(
+      const CategoriesCompanion(editedLocally: Value(false)),
+    );
+  }
 }

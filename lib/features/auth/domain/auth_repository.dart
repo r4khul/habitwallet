@@ -18,4 +18,7 @@ abstract class AuthRepository {
 
   /// Removes the current active session.
   Future<void> clearSession();
+
+  /// Checks if the app is being run for the first time or if no users are registered.
+  Future<bool> isNewUser();
 }

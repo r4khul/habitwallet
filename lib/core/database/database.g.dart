@@ -580,8 +580,53 @@ class $CategoriesTable extends Categories
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _editedLocallyMeta = const VerificationMeta(
+    'editedLocally',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, icon, color];
+  late final GeneratedColumn<bool> editedLocally = GeneratedColumn<bool>(
+    'edited_locally',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("edited_locally" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    icon,
+    color,
+    editedLocally,
+    createdAt,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -623,6 +668,31 @@ class $CategoriesTable extends Categories
     } else if (isInserting) {
       context.missing(_colorMeta);
     }
+    if (data.containsKey('edited_locally')) {
+      context.handle(
+        _editedLocallyMeta,
+        editedLocally.isAcceptableOrUnknown(
+          data['edited_locally']!,
+          _editedLocallyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
     return context;
   }
 
@@ -648,6 +718,18 @@ class $CategoriesTable extends Categories
         DriftSqlType.int,
         data['${effectivePrefix}color'],
       )!,
+      editedLocally: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}edited_locally'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -669,11 +751,23 @@ class Category extends DataClass implements Insertable<Category> {
 
   /// Color value (ARGB hex or int).
   final int color;
+
+  /// Synchronization state.
+  final bool editedLocally;
+
+  /// Metadata: Timestamp of when the record was first inserted.
+  final int createdAt;
+
+  /// Metadata: Timestamp of when the record was last modified locally.
+  final int updatedAt;
   const Category({
     required this.id,
     required this.name,
     required this.icon,
     required this.color,
+    required this.editedLocally,
+    required this.createdAt,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -682,6 +776,9 @@ class Category extends DataClass implements Insertable<Category> {
     map['name'] = Variable<String>(name);
     map['icon'] = Variable<String>(icon);
     map['color'] = Variable<int>(color);
+    map['edited_locally'] = Variable<bool>(editedLocally);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
     return map;
   }
 
@@ -691,6 +788,9 @@ class Category extends DataClass implements Insertable<Category> {
       name: Value(name),
       icon: Value(icon),
       color: Value(color),
+      editedLocally: Value(editedLocally),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -704,6 +804,9 @@ class Category extends DataClass implements Insertable<Category> {
       name: serializer.fromJson<String>(json['name']),
       icon: serializer.fromJson<String>(json['icon']),
       color: serializer.fromJson<int>(json['color']),
+      editedLocally: serializer.fromJson<bool>(json['editedLocally']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
     );
   }
   @override
@@ -714,22 +817,40 @@ class Category extends DataClass implements Insertable<Category> {
       'name': serializer.toJson<String>(name),
       'icon': serializer.toJson<String>(icon),
       'color': serializer.toJson<int>(color),
+      'editedLocally': serializer.toJson<bool>(editedLocally),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
     };
   }
 
-  Category copyWith({String? id, String? name, String? icon, int? color}) =>
-      Category(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        icon: icon ?? this.icon,
-        color: color ?? this.color,
-      );
+  Category copyWith({
+    String? id,
+    String? name,
+    String? icon,
+    int? color,
+    bool? editedLocally,
+    int? createdAt,
+    int? updatedAt,
+  }) => Category(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    icon: icon ?? this.icon,
+    color: color ?? this.color,
+    editedLocally: editedLocally ?? this.editedLocally,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
   Category copyWithCompanion(CategoriesCompanion data) {
     return Category(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       icon: data.icon.present ? data.icon.value : this.icon,
       color: data.color.present ? data.color.value : this.color,
+      editedLocally: data.editedLocally.present
+          ? data.editedLocally.value
+          : this.editedLocally,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -739,13 +860,17 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('icon: $icon, ')
-          ..write('color: $color')
+          ..write('color: $color, ')
+          ..write('editedLocally: $editedLocally, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, icon, color);
+  int get hashCode =>
+      Object.hash(id, name, icon, color, editedLocally, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -753,7 +878,10 @@ class Category extends DataClass implements Insertable<Category> {
           other.id == this.id &&
           other.name == this.name &&
           other.icon == this.icon &&
-          other.color == this.color);
+          other.color == this.color &&
+          other.editedLocally == this.editedLocally &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
@@ -761,12 +889,18 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<String> name;
   final Value<String> icon;
   final Value<int> color;
+  final Value<bool> editedLocally;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
   final Value<int> rowid;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.icon = const Value.absent(),
     this.color = const Value.absent(),
+    this.editedLocally = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CategoriesCompanion.insert({
@@ -774,16 +908,24 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     required String name,
     required String icon,
     required int color,
+    this.editedLocally = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
        icon = Value(icon),
-       color = Value(color);
+       color = Value(color),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
   static Insertable<Category> custom({
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? icon,
     Expression<int>? color,
+    Expression<bool>? editedLocally,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -791,6 +933,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       if (name != null) 'name': name,
       if (icon != null) 'icon': icon,
       if (color != null) 'color': color,
+      if (editedLocally != null) 'edited_locally': editedLocally,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -800,6 +945,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Value<String>? name,
     Value<String>? icon,
     Value<int>? color,
+    Value<bool>? editedLocally,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
     Value<int>? rowid,
   }) {
     return CategoriesCompanion(
@@ -807,6 +955,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       name: name ?? this.name,
       icon: icon ?? this.icon,
       color: color ?? this.color,
+      editedLocally: editedLocally ?? this.editedLocally,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -826,6 +977,15 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     if (color.present) {
       map['color'] = Variable<int>(color.value);
     }
+    if (editedLocally.present) {
+      map['edited_locally'] = Variable<bool>(editedLocally.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -839,6 +999,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
           ..write('name: $name, ')
           ..write('icon: $icon, ')
           ..write('color: $color, ')
+          ..write('editedLocally: $editedLocally, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1733,6 +1896,9 @@ typedef $$CategoriesTableCreateCompanionBuilder =
       required String name,
       required String icon,
       required int color,
+      Value<bool> editedLocally,
+      required int createdAt,
+      required int updatedAt,
       Value<int> rowid,
     });
 typedef $$CategoriesTableUpdateCompanionBuilder =
@@ -1741,6 +1907,9 @@ typedef $$CategoriesTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> icon,
       Value<int> color,
+      Value<bool> editedLocally,
+      Value<int> createdAt,
+      Value<int> updatedAt,
       Value<int> rowid,
     });
 
@@ -1770,6 +1939,21 @@ class $$CategoriesTableFilterComposer
 
   ColumnFilters<int> get color => $composableBuilder(
     column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get editedLocally => $composableBuilder(
+    column: $table.editedLocally,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1802,6 +1986,21 @@ class $$CategoriesTableOrderingComposer
     column: $table.color,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get editedLocally => $composableBuilder(
+    column: $table.editedLocally,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CategoriesTableAnnotationComposer
@@ -1824,6 +2023,17 @@ class $$CategoriesTableAnnotationComposer
 
   GeneratedColumn<int> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<bool> get editedLocally => $composableBuilder(
+    column: $table.editedLocally,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$CategoriesTableTableManager
@@ -1858,12 +2068,18 @@ class $$CategoriesTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> icon = const Value.absent(),
                 Value<int> color = const Value.absent(),
+                Value<bool> editedLocally = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoriesCompanion(
                 id: id,
                 name: name,
                 icon: icon,
                 color: color,
+                editedLocally: editedLocally,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -1872,12 +2088,18 @@ class $$CategoriesTableTableManager
                 required String name,
                 required String icon,
                 required int color,
+                Value<bool> editedLocally = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => CategoriesCompanion.insert(
                 id: id,
                 name: name,
                 icon: icon,
                 color: color,
+                editedLocally: editedLocally,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

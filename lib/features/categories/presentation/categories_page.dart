@@ -17,14 +17,14 @@ class CategoriesPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Categories')),
       body: categoriesAsync.when(
-        data: (categories) => ListView.builder(
-          padding: const EdgeInsets.all(16),
+        data: (categories) => ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           itemCount: categories.length,
-          itemExtent: 76,
           itemBuilder: (context, index) {
             final category = categories[index];
             return _CategoryTile(category: category);
           },
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
@@ -63,54 +63,84 @@ class _CategoryTile extends ConsumerWidget {
     final color = Color(category.color);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(iconData, color: color, size: 24),
           ),
-          child: Icon(iconData, color: color, size: 24),
-        ),
-        title: Text(
-          category.name,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 20),
-              tooltip: 'Edit Category',
-              onPressed: () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => _CategoryForm(category: category),
-                );
-              },
+          const SizedBox(width: 16),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    category.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (category.editedLocally) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'EDITED',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.primary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline_rounded,
-                size: 20,
-                color: AppColors.error,
-              ),
-              tooltip: 'Delete Category',
-              onPressed: () => _confirmDelete(context, ref),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, size: 20),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Edit Category',
+            onPressed: () {
+              showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => _CategoryForm(category: category),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.delete_outline_rounded,
+              size: 20,
+              color: AppColors.error,
             ),
-          ],
-        ),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Delete Category',
+            onPressed: () => _confirmDelete(context, ref),
+          ),
+        ],
       ),
     );
   }

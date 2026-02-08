@@ -15,6 +15,16 @@ class Categories extends Table {
   /// Color value (ARGB hex or int).
   IntColumn get color => integer()();
 
+  /// Synchronization state.
+  BoolColumn get editedLocally =>
+      boolean().withDefault(const Constant(false))();
+
+  /// Metadata: Timestamp of when the record was first inserted.
+  IntColumn get createdAt => integer()();
+
+  /// Metadata: Timestamp of when the record was last modified locally.
+  IntColumn get updatedAt => integer()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

@@ -8,6 +8,11 @@ part 'auth_providers.g.dart';
 /// Responsibility: Exposes the current session and handles session transitions.
 /// Lifecycle: App-wide (keepAlive: true).
 @Riverpod(keepAlive: true)
+Future<bool> isNewUser(Ref ref) {
+  return ref.watch(authRepositoryProvider).isNewUser();
+}
+
+@Riverpod(keepAlive: true)
 class AuthController extends _$AuthController {
   @override
   FutureOr<AuthSession?> build() async {

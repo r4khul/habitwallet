@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/util/theme_extension.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
+import 'package:habitwallet/core/providers/network_providers.dart';
 import 'package:habitwallet/features/settings/presentation/providers/notification_provider.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
 
@@ -116,6 +117,19 @@ class SettingsPage extends ConsumerWidget {
           ),
 
           const SizedBox(height: 24),
+          const _SectionHeader(title: 'Network'),
+          const SizedBox(height: 8),
+
+          // Base URL Configuration
+          _SettingsTile(
+            icon: Icons.link_rounded,
+            iconColor: Colors.blue,
+            title: 'Backend URL',
+            subtitle: ref.watch(baseUrlControllerProvider),
+            onTap: () => _showBaseUrlDialog(context, ref),
+          ),
+
+          const SizedBox(height: 24),
           const _SectionHeader(title: 'About'),
           const SizedBox(height: 8),
           _SettingsTile(
@@ -124,6 +138,40 @@ class SettingsPage extends ConsumerWidget {
             subtitle: '1.0.0 (Build 1)',
             trailing: const SizedBox.shrink(),
             onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBaseUrlDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController(
+      text: ref.read(baseUrlControllerProvider),
+    );
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Configure Backend URL'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'https://api.example.com',
+            labelText: 'Base URL',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              ref
+                  .read(baseUrlControllerProvider.notifier)
+                  .setUrl(controller.text.trim());
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
           ),
         ],
       ),

@@ -12,10 +12,27 @@ class CategoryController extends _$CategoryController {
   Stream<List<CategoryEntity>> build() async* {
     final repository = ref.watch(categoryRepositoryProvider);
 
-    // Initial check for seeding
-    final categories = await repository.getAll();
-    if (categories.isEmpty) {
-      await _seed(repository);
+    // Check existing state
+    try {
+      final categories = await repository.getAll();
+      if (categories.isEmpty) {
+        // Try to pull from remote first if fresh
+        try {
+          await repository.syncWithRemote();
+        } catch (_) {
+          // If sync fails (e.g. no internet), we'll fallback to seeding
+        }
+
+        // Final check after sync
+        final updatedCategories = await repository.getAll();
+        if (updatedCategories.isEmpty) {
+          await _seed(repository);
+        }
+      }
+    } catch (_) {
+      // If DB is initially unhealthy, seeding might fail too,
+      // but we try to continue to watchAll which might recover
+      // if it was just a transient migration/open error.
     }
 
     yield* repository.watchAll();

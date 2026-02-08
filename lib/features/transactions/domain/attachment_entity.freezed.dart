@@ -11,6 +11,7 @@ part of 'attachment_entity.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$AttachmentEntity {
 
@@ -28,6 +29,8 @@ mixin _$AttachmentEntity {
 @pragma('vm:prefer-inline')
 $AttachmentEntityCopyWith<AttachmentEntity> get copyWith => _$AttachmentEntityCopyWithImpl<AttachmentEntity>(this as AttachmentEntity, _$identity);
 
+  /// Serializes this AttachmentEntity to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -35,7 +38,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is AttachmentEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.filePath, filePath) || other.filePath == filePath)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.sizeBytes, sizeBytes) || other.sizeBytes == sizeBytes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,id,transactionId,fileName,filePath,mimeType,sizeBytes,createdAt);
 
@@ -216,11 +219,11 @@ return $default(_that.id,_that.transactionId,_that.fileName,_that.filePath,_that
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _AttachmentEntity implements AttachmentEntity {
   const _AttachmentEntity({required this.id, required this.transactionId, required this.fileName, required this.filePath, this.mimeType, this.sizeBytes, required this.createdAt});
-  
+  factory _AttachmentEntity.fromJson(Map<String, dynamic> json) => _$AttachmentEntityFromJson(json);
 
 /// Unique identifier for the attachment.
 @override final  String id;
@@ -243,14 +246,17 @@ class _AttachmentEntity implements AttachmentEntity {
 @pragma('vm:prefer-inline')
 _$AttachmentEntityCopyWith<_AttachmentEntity> get copyWith => __$AttachmentEntityCopyWithImpl<_AttachmentEntity>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$AttachmentEntityToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _AttachmentEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.filePath, filePath) || other.filePath == filePath)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.sizeBytes, sizeBytes) || other.sizeBytes == sizeBytes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,id,transactionId,fileName,filePath,mimeType,sizeBytes,createdAt);
 

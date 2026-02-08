@@ -10,6 +10,8 @@ abstract class CategoryEntity with _$CategoryEntity {
     required String name,
     required String icon,
     required int color,
+    @Default(false) bool editedLocally,
+    DateTime? updatedAt,
   }) = _CategoryEntity;
 
   factory CategoryEntity.fromJson(Map<String, dynamic> json) =>

@@ -65,7 +65,7 @@ final class AggregatedChartDataProvider
 }
 
 String _$aggregatedChartDataHash() =>
-    r'ae30a2dfd59002dfe4ad232bad0febebf28e7006';
+    r'9655f70d31cb1bd2bfde85709295d0ee2f2e0621';
 
 final class AggregatedChartDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ChartPoint>>, ChartPeriod> {
