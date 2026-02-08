@@ -3,21 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
+import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
 
 import '../domain/financial_data_models.dart';
 import 'providers/financial_analytics_provider.dart';
-import 'widgets/category_donut_chart.dart';
 import 'widgets/flow_chart.dart';
 import 'widgets/summary_cards.dart';
 import 'widgets/time_range_selector.dart';
+import 'widgets/unified_category_breakdown.dart';
 
 /// The main Financial Overview page.
-///
-/// Displays:
-/// - Time range selector (Day/Week/Month/Year).
-/// - Summary cards (Income, Expense, Net Savings).
-/// - Income vs Expense flow chart (diverging bar chart).
-/// - Category-wise expense breakdown (donut chart).
 class FinancialOverviewPage extends ConsumerWidget {
   const FinancialOverviewPage({super.key});
 
@@ -26,17 +21,21 @@ class FinancialOverviewPage extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedRange = ref.watch(selectedTimeRangeProvider);
     final summaryAsync = ref.watch(financialSummaryProvider);
+    final currencyAsync = ref.watch(currencyControllerProvider);
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.darkBackground : Colors.grey[50],
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // App Bar
           SliverAppBar(
-            expandedHeight: 100,
+            expandedHeight: 120,
             floating: true,
             pinned: true,
-            backgroundColor: isDark ? AppColors.darkBackground : Colors.white,
+            backgroundColor: isDark
+                ? AppColors.darkBackground
+                : Colors.grey[50],
+            elevation: 0,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
               icon: Icon(
@@ -49,18 +48,26 @@ class FinancialOverviewPage extends ConsumerWidget {
               titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
               title: Text(
                 'Financial Overview',
-                style: AppTypography.headlineMedium.copyWith(
+                style: AppTypography.headlineSmall.copyWith(
                   color: isDark ? Colors.white : AppColors.grey900,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ),
-
-          // Content
           SliverToBoxAdapter(
-            child: summaryAsync.when(
-              data: (summary) =>
-                  _buildContent(context, ref, summary, selectedRange),
+            child: currencyAsync.when(
+              data: (currency) => summaryAsync.when(
+                data: (summary) => _buildContent(
+                  context,
+                  ref,
+                  summary,
+                  selectedRange,
+                  currency.symbol,
+                ),
+                loading: () => _buildLoadingState(context),
+                error: (error, stack) => _buildErrorState(context, error),
+              ),
               loading: () => _buildLoadingState(context),
               error: (error, stack) => _buildErrorState(context, error),
             ),
@@ -75,6 +82,7 @@ class FinancialOverviewPage extends ConsumerWidget {
     WidgetRef ref,
     FinancialSummary summary,
     TimeRange selectedRange,
+    String currencySymbol,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -105,6 +113,7 @@ class FinancialOverviewPage extends ConsumerWidget {
             netSavings: summary.netSavings,
             savingsRate: summary.savingsRate,
             isPositive: summary.isPositive,
+            currencySymbol: currencySymbol,
           ),
         ),
 
@@ -118,8 +127,8 @@ class FinancialOverviewPage extends ConsumerWidget {
               Expanded(
                 child: SummaryCard(
                   title: 'Income',
-                  value: '\$${_formatAmount(summary.totalIncome)}',
-                  icon: Icons.arrow_downward_rounded,
+                  value: '$currencySymbol${_formatAmount(summary.totalIncome)}',
+                  icon: Icons.unarchive_rounded,
                   iconColor: const Color(0xFF10B981),
                 ),
               ),
@@ -127,8 +136,9 @@ class FinancialOverviewPage extends ConsumerWidget {
               Expanded(
                 child: SummaryCard(
                   title: 'Expense',
-                  value: '\$${_formatAmount(summary.totalExpense)}',
-                  icon: Icons.arrow_upward_rounded,
+                  value:
+                      '$currencySymbol${_formatAmount(summary.totalExpense)}',
+                  icon: Icons.archive_rounded,
                   iconColor: const Color(0xFFF43F5E),
                 ),
               ),
@@ -142,24 +152,24 @@ class FinancialOverviewPage extends ConsumerWidget {
         _buildSectionHeader(
           context,
           'Money Flow',
-          Icons.show_chart_rounded,
+          Icons.bar_chart_rounded,
           isDark,
         ),
         const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: isDark ? AppColors.darkCard : Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isDark ? AppColors.darkBorder : AppColors.grey200,
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                  blurRadius: 16,
+                  blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -170,15 +180,15 @@ class FinancialOverviewPage extends ConsumerWidget {
                 Row(
                   children: [
                     _buildChartLegend('Income', const Color(0xFF10B981)),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 24),
                     _buildChartLegend('Expense', const Color(0xFFF43F5E)),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 FlowChart(
                   data: summary.flowData,
                   timeRange: selectedRange,
-                  height: 200,
+                  currencySymbol: currencySymbol,
                 ),
               ],
             ),
@@ -192,49 +202,21 @@ class FinancialOverviewPage extends ConsumerWidget {
           _buildSectionHeader(
             context,
             'Where Your Money Goes',
-            Icons.pie_chart_rounded,
+            Icons.donut_large_rounded,
             isDark,
           ),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark ? AppColors.darkBorder : AppColors.grey200,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: CategoryDonutChart(
-                data: summary.categoryBreakdown,
-                totalExpense: summary.totalExpense,
-                size: 180,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Category List (detailed breakdown)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _buildCategoryList(
-              context,
-              summary.categoryBreakdown,
-              isDark,
+            child: UnifiedCategoryBreakdown(
+              data: summary.categoryBreakdown,
+              totalExpense: summary.totalExpense,
+              currencySymbol: currencySymbol,
             ),
           ),
         ],
 
-        const SizedBox(height: 40),
+        const SizedBox(height: 48),
       ],
     );
   }
@@ -250,18 +232,19 @@ class FinancialOverviewPage extends ConsumerWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, size: 18, color: AppColors.primary),
+            child: Icon(icon, size: 20, color: AppColors.primary),
           ),
           const SizedBox(width: 12),
           Text(
             title,
             style: AppTypography.titleLarge.copyWith(
               color: isDark ? Colors.white : AppColors.grey900,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -273,123 +256,19 @@ class FinancialOverviewPage extends ConsumerWidget {
     return Row(
       children: [
         Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Text(
           label,
-          style: AppTypography.labelSmall.copyWith(color: AppColors.grey500),
+          style: AppTypography.labelMedium.copyWith(
+            color: AppColors.grey500,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCategoryList(
-    BuildContext context,
-    List<CategorySpend> categories,
-    bool isDark,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.grey200,
-        ),
-      ),
-      child: Column(
-        children: categories.asMap().entries.map((entry) {
-          final index = entry.key;
-          final cat = entry.value;
-          final isLast = index == categories.length - 1;
-
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              border: isLast
-                  ? null
-                  : Border(
-                      bottom: BorderSide(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.grey200,
-                      ),
-                    ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Color(cat.categoryColor).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    _getCategoryIcon(cat.categoryIcon),
-                    size: 18,
-                    color: Color(cat.categoryColor),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        cat.categoryName,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: isDark ? Colors.white : AppColors.grey900,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Progress bar
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: cat.percentage / 100,
-                          backgroundColor: isDark
-                              ? AppColors.grey800
-                              : AppColors.grey200,
-                          valueColor: AlwaysStoppedAnimation(
-                            Color(cat.categoryColor),
-                          ),
-                          minHeight: 4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '\$${_formatAmount(cat.amount)}',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: isDark ? Colors.white : AppColors.grey900,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '${cat.percentage.toStringAsFixed(1)}%',
-                      style: AppTypography.labelSmall.copyWith(
-                        color: isDark ? AppColors.grey500 : AppColors.grey600,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
     );
   }
 
@@ -402,18 +281,11 @@ class FinancialOverviewPage extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: CircularProgressIndicator(
-              strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation(AppColors.primary),
-            ),
-          ),
-          const SizedBox(height: 16),
+          const CircularProgressIndicator(strokeWidth: 3),
+          const SizedBox(height: 24),
           Text(
             'Analyzing your finances...',
-            style: AppTypography.bodyMedium.copyWith(
+            style: AppTypography.bodyLarge.copyWith(
               color: isDark ? AppColors.grey400 : AppColors.grey600,
             ),
           ),
@@ -453,33 +325,12 @@ class FinancialOverviewPage extends ConsumerWidget {
     );
   }
 
-  IconData _getCategoryIcon(String iconName) {
-    switch (iconName) {
-      case 'food':
-        return Icons.restaurant_rounded;
-      case 'transport':
-        return Icons.directions_car_rounded;
-      case 'shopping':
-        return Icons.shopping_bag_rounded;
-      case 'entertainment':
-        return Icons.movie_rounded;
-      case 'health':
-        return Icons.favorite_rounded;
-      case 'salary':
-        return Icons.account_balance_wallet_rounded;
-      case 'others':
-        return Icons.more_horiz_rounded;
-      default:
-        return Icons.category_rounded;
-    }
-  }
-
   String _formatAmount(double amount) {
     if (amount >= 1000000) {
       return '${(amount / 1000000).toStringAsFixed(1)}M';
     } else if (amount >= 1000) {
       return '${(amount / 1000).toStringAsFixed(1)}K';
     }
-    return amount.toStringAsFixed(2);
+    return amount.toStringAsFixed(0);
   }
 }

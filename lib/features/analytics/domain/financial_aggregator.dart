@@ -72,12 +72,12 @@ class FinancialAggregator {
         break;
       case TimeRange.monthly:
         // This year, all months
-        startDate = DateTime(now.year, 1, 1);
+        startDate = DateTime(now.year);
         endDate = DateTime(now.year, 12, 31, 23, 59, 59);
         break;
       case TimeRange.yearly:
         // Last 5 years
-        startDate = DateTime(now.year - 4, 1, 1);
+        startDate = DateTime(now.year - 4);
         endDate = DateTime(now.year, 12, 31, 23, 59, 59);
         break;
     }
@@ -228,9 +228,9 @@ class FinancialAggregator {
         final weekStart = date.subtract(Duration(days: date.weekday - 1));
         return DateTime(weekStart.year, weekStart.month, weekStart.day);
       case TimeRange.monthly:
-        return DateTime(date.year, date.month, 1);
+        return DateTime(date.year, date.month);
       case TimeRange.yearly:
-        return DateTime(date.year, 1, 1);
+        return DateTime(date.year);
     }
   }
 
@@ -267,7 +267,7 @@ class FinancialAggregator {
       case TimeRange.monthly:
         // All months of current year
         for (var month = 1; month <= 12; month++) {
-          final date = DateTime(now.year, month, 1);
+          final date = DateTime(now.year, month);
           final key = _getGroupKey(date, range);
           final label = DateFormat('MMM').format(date);
           result.add(_KeyEntry(key: key, date: date, label: label));
@@ -277,7 +277,7 @@ class FinancialAggregator {
       case TimeRange.yearly:
         // Last 5 years
         for (var i = 4; i >= 0; i--) {
-          final date = DateTime(now.year - i, 1, 1);
+          final date = DateTime(now.year - i);
           final key = _getGroupKey(date, range);
           final label = date.year.toString();
           result.add(_KeyEntry(key: key, date: date, label: label));

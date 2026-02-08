@@ -8,23 +8,24 @@ import '../../domain/financial_data_models.dart';
 
 /// A modern donut chart showing category-wise expense breakdown.
 ///
-/// Features:
-/// - Animated arc segments with smooth entry animations.
-/// - Center hole with total amount.
-/// - Horizontal legend with percentages.
-/// - Touch interactions for segment selection.
-/// - Dark/light mode adaptive colors.
+/// Refactored to be modular and support binding with external widgets.
 class CategoryDonutChart extends StatefulWidget {
   const CategoryDonutChart({
     super.key,
     required this.data,
     required this.totalExpense,
     this.size = 200,
+    this.selectedIndex,
+    this.onSelectionChanged,
+    this.currencySymbol = r'$',
   });
 
   final List<CategorySpend> data;
   final double totalExpense;
   final double size;
+  final int? selectedIndex;
+  final ValueChanged<int?>? onSelectionChanged;
+  final String currencySymbol;
 
   @override
   State<CategoryDonutChart> createState() => _CategoryDonutChartState();
@@ -34,7 +35,6 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  int? _selectedIndex;
 
   @override
   void initState() {
@@ -55,7 +55,6 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.data.length != widget.data.length ||
         oldWidget.totalExpense != widget.totalExpense) {
-      _selectedIndex = null;
       _controller.forward(from: 0);
     }
   }
@@ -72,7 +71,7 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
 
     if (widget.data.isEmpty) {
       return SizedBox(
-        height: widget.size + 100,
+        height: widget.size,
         child: Center(
           child: Text(
             'No expenses to analyze',
@@ -84,37 +83,28 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
       );
     }
 
-    return Column(
-      children: [
-        // Donut Chart
-        SizedBox(
-          height: widget.size,
-          width: widget.size,
-          child: GestureDetector(
-            onTapDown: (details) => _handleTap(details.localPosition),
-            child: AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) {
-                return CustomPaint(
-                  size: Size(widget.size, widget.size),
-                  painter: _DonutPainter(
-                    data: widget.data,
-                    progress: _animation.value,
-                    selectedIndex: _selectedIndex,
-                    totalExpense: widget.totalExpense,
-                    isDark: isDark,
-                  ),
-                );
-              },
-            ),
-          ),
+    return SizedBox(
+      height: widget.size,
+      width: widget.size,
+      child: GestureDetector(
+        onTapDown: (details) => _handleTap(details.localPosition),
+        child: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return CustomPaint(
+              size: Size(widget.size, widget.size),
+              painter: _DonutPainter(
+                data: widget.data,
+                progress: _animation.value,
+                selectedIndex: widget.selectedIndex,
+                totalExpense: widget.totalExpense,
+                isDark: isDark,
+                currencySymbol: widget.currencySymbol,
+              ),
+            );
+          },
         ),
-
-        const SizedBox(height: 24),
-
-        // Legend
-        _buildLegend(context, isDark),
-      ],
+      ),
     );
   }
 
@@ -123,96 +113,29 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
     final touchVector = position - center;
     final distance = touchVector.distance;
 
-    // Check if tap is within the donut ring
     final outerRadius = widget.size / 2 - 8;
     final innerRadius = outerRadius * 0.6;
 
     if (distance < innerRadius || distance > outerRadius) {
-      setState(() => _selectedIndex = null);
+      widget.onSelectionChanged?.call(null);
       return;
     }
 
-    // Calculate angle
     var angle = math.atan2(touchVector.dy, touchVector.dx);
-    angle = angle + math.pi / 2; // Rotate to start from top
+    angle = angle + math.pi / 2;
     if (angle < 0) angle += 2 * math.pi;
 
-    // Find which segment was tapped
     double currentAngle = 0;
     for (var i = 0; i < widget.data.length; i++) {
       final sweep = (widget.data[i].percentage / 100) * 2 * math.pi;
       if (angle >= currentAngle && angle < currentAngle + sweep) {
-        setState(() {
-          _selectedIndex = _selectedIndex == i ? null : i;
-        });
+        final newIndex = widget.selectedIndex == i ? null : i;
+        widget.onSelectionChanged?.call(newIndex);
         return;
       }
       currentAngle += sweep;
     }
-  }
-
-  Widget _buildLegend(BuildContext context, bool isDark) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 12,
-      alignment: WrapAlignment.center,
-      children: List.generate(widget.data.length, (index) {
-        final item = widget.data[index];
-        final isSelected = _selectedIndex == index;
-
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedIndex = _selectedIndex == index ? null : index;
-            });
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? Color(item.categoryColor).withValues(alpha: 0.15)
-                  : (isDark ? AppColors.darkCard : Colors.white),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelected
-                    ? Color(item.categoryColor)
-                    : (isDark ? AppColors.darkBorder : AppColors.grey200),
-                width: isSelected ? 1.5 : 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: Color(item.categoryColor),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  item.categoryName,
-                  style: AppTypography.labelMedium.copyWith(
-                    color: isDark ? Colors.white : AppColors.grey800,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '${item.percentage.toStringAsFixed(0)}%',
-                  style: AppTypography.labelSmall.copyWith(
-                    color: isDark ? AppColors.grey400 : AppColors.grey500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }),
-    );
+    widget.onSelectionChanged?.call(null);
   }
 }
 
@@ -223,6 +146,7 @@ class _DonutPainter extends CustomPainter {
     required this.selectedIndex,
     required this.totalExpense,
     required this.isDark,
+    required this.currencySymbol,
   });
 
   final List<CategorySpend> data;
@@ -230,6 +154,7 @@ class _DonutPainter extends CustomPainter {
   final int? selectedIndex;
   final double totalExpense;
   final bool isDark;
+  final String currencySymbol;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -238,7 +163,6 @@ class _DonutPainter extends CustomPainter {
     final innerRadius = outerRadius * 0.6;
     final strokeWidth = outerRadius - innerRadius;
 
-    // Draw background ring
     final bgPaint = Paint()
       ..color = isDark
           ? AppColors.grey800.withValues(alpha: 0.3)
@@ -248,8 +172,7 @@ class _DonutPainter extends CustomPainter {
 
     canvas.drawCircle(center, innerRadius + strokeWidth / 2, bgPaint);
 
-    // Draw segments
-    double startAngle = -math.pi / 2; // Start from top
+    var startAngle = -math.pi / 2;
 
     for (var i = 0; i < data.length; i++) {
       final item = data[i];
@@ -261,11 +184,11 @@ class _DonutPainter extends CustomPainter {
           item.categoryColor,
         ).withValues(alpha: selectedIndex != null && !isSelected ? 0.3 : 1.0)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = isSelected ? strokeWidth + 6 : strokeWidth
+        ..strokeWidth = isSelected ? strokeWidth + 8 : strokeWidth
         ..strokeCap = StrokeCap.butt;
 
       final radius = isSelected
-          ? innerRadius + strokeWidth / 2 + 3
+          ? innerRadius + strokeWidth / 2 + 4
           : innerRadius + strokeWidth / 2;
 
       canvas.drawArc(
@@ -279,12 +202,10 @@ class _DonutPainter extends CustomPainter {
       startAngle += sweepAngle;
     }
 
-    // Draw center text
     _drawCenterText(canvas, center, totalExpense);
   }
 
   void _drawCenterText(Canvas canvas, Offset center, double total) {
-    // Label
     final labelPainter = TextPainter(
       text: TextSpan(
         text: 'Total Spent',
@@ -303,11 +224,10 @@ class _DonutPainter extends CustomPainter {
       Offset(center.dx - labelPainter.width / 2, center.dy - 16),
     );
 
-    // Amount
     final formattedAmount = _formatAmount(total);
     final amountPainter = TextPainter(
       text: TextSpan(
-        text: '\$$formattedAmount',
+        text: '$currencySymbol$formattedAmount',
         style: TextStyle(
           fontFamily: AppTypography.fontFamily,
           fontSize: 18,
@@ -338,6 +258,7 @@ class _DonutPainter extends CustomPainter {
     return oldDelegate.progress != progress ||
         oldDelegate.selectedIndex != selectedIndex ||
         oldDelegate.data != data ||
-        oldDelegate.isDark != isDark;
+        oldDelegate.isDark != isDark ||
+        oldDelegate.currencySymbol != currencySymbol;
   }
 }

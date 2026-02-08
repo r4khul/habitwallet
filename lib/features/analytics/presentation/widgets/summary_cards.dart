@@ -127,11 +127,13 @@ class NetSavingsCard extends StatelessWidget {
     required this.netSavings,
     required this.savingsRate,
     required this.isPositive,
+    this.currencySymbol = r'$',
   });
 
   final double netSavings;
   final double savingsRate;
   final bool isPositive;
+  final String currencySymbol;
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +203,7 @@ class NetSavingsCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${isPositive ? '+' : '-'}\$',
+                '${isPositive ? '+' : '-'}$currencySymbol',
                 style: AppTypography.headlineMedium.copyWith(
                   color: primaryColor,
                   fontWeight: FontWeight.w600,

@@ -8,13 +8,6 @@ import 'package:habitwallet/core/theme/app_typography.dart';
 import '../../domain/financial_data_models.dart';
 
 /// A finance-grade diverging bar chart for income/expense visualization.
-///
-/// Features:
-/// - Centered zero baseline with income above and expense below.
-/// - Smooth entry animations with staggered bars.
-/// - Hover/tap interactions with floating tooltips.
-/// - Adaptive bar sizing for different time ranges.
-/// - Dark/light mode support.
 class FlowChart extends StatefulWidget {
   const FlowChart({
     super.key,
@@ -23,6 +16,7 @@ class FlowChart extends StatefulWidget {
     this.height = 220,
     this.incomeColor,
     this.expenseColor,
+    this.currencySymbol = r'$',
   });
 
   final List<FlowDataPoint> data;
@@ -30,6 +24,7 @@ class FlowChart extends StatefulWidget {
   final double height;
   final Color? incomeColor;
   final Color? expenseColor;
+  final String currencySymbol;
 
   @override
   State<FlowChart> createState() => _FlowChartState();
@@ -179,7 +174,6 @@ class _FlowChartState extends State<FlowChart>
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Calculate position
     final xPos =
         (_selectedIndex! * (config.width + config.spacing)) +
         config.spacing +
@@ -227,7 +221,7 @@ class _FlowChartState extends State<FlowChart>
                 if (point.income > 0)
                   _buildTooltipRow(
                     'Income',
-                    '\$${_formatAmount(point.income)}',
+                    '${widget.currencySymbol}${_formatAmount(point.income)}',
                     const Color(0xFF10B981),
                     isDark,
                   ),
@@ -236,7 +230,7 @@ class _FlowChartState extends State<FlowChart>
                 if (point.expense != 0)
                   _buildTooltipRow(
                     'Expense',
-                    '\$${_formatAmount(point.expense.abs())}',
+                    '${widget.currencySymbol}${_formatAmount(point.expense.abs())}',
                     const Color(0xFFF43F5E),
                     isDark,
                   ),
@@ -249,7 +243,7 @@ class _FlowChartState extends State<FlowChart>
                 const SizedBox(height: 8),
                 _buildTooltipRow(
                   'Net',
-                  '${point.netValue >= 0 ? '+' : ''}\$${_formatAmount(point.netValue.abs())}',
+                  '${point.netValue >= 0 ? '+' : ''}${widget.currencySymbol}${_formatAmount(point.netValue.abs())}',
                   point.netValue >= 0
                       ? const Color(0xFF10B981)
                       : const Color(0xFFF43F5E),
@@ -354,7 +348,6 @@ class _FlowChartPainter extends CustomPainter {
     final chartHeight = size.height - labelHeight;
     final baselineY = chartHeight / 2;
 
-    // Calculate max value for scaling
     double maxVal = 0;
     for (var p in data) {
       maxVal = math.max(maxVal, p.income);
@@ -365,10 +358,8 @@ class _FlowChartPainter extends CustomPainter {
     final halfChartHeight = baselineY;
     final valueToPixels = (halfChartHeight - 16) / maxVal;
 
-    // Draw subtle grid
     _drawGrid(canvas, size, chartHeight, baselineY, maxVal, valueToPixels);
 
-    // Draw zero baseline
     final baselinePaint = Paint()
       ..color = isDark ? AppColors.grey700 : AppColors.grey300
       ..strokeWidth = 1.5;
@@ -378,17 +369,14 @@ class _FlowChartPainter extends CustomPainter {
       baselinePaint,
     );
 
-    // Draw bars with staggered animation
     for (var i = 0; i < data.length; i++) {
       final p = data[i];
       final x = i * (config.width + config.spacing) + config.spacing;
 
-      // Staggered progress for each bar
       final staggeredProgress = _staggeredProgress(i, data.length, progress);
       final isOtherSelected = selectedIndex != null && selectedIndex != i;
       final opacity = isOtherSelected ? 0.25 : 1.0;
 
-      // Income bar (up)
       if (p.income > 0) {
         final h = p.income * valueToPixels * staggeredProgress;
         final rect = Rect.fromLTWH(x, baselineY - h, config.width, h);
@@ -398,7 +386,6 @@ class _FlowChartPainter extends CustomPainter {
           topRight: Radius.circular(config.cornerRadius),
         );
 
-        // Gradient fill
         final gradient = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -416,7 +403,6 @@ class _FlowChartPainter extends CustomPainter {
         );
       }
 
-      // Expense bar (down)
       if (p.expense != 0) {
         final h = p.expense.abs() * valueToPixels * staggeredProgress;
         final rect = Rect.fromLTWH(x, baselineY, config.width, h);
@@ -443,7 +429,6 @@ class _FlowChartPainter extends CustomPainter {
         );
       }
 
-      // Draw labels
       if (_shouldShowLabel(i, data.length)) {
         final labelText = p.label ?? '';
         final tp = TextPainter(
@@ -481,7 +466,6 @@ class _FlowChartPainter extends CustomPainter {
       )
       ..strokeWidth = 0.5;
 
-    // Draw 2 lines above and 2 below baseline
     const steps = 2;
     for (var i = -steps; i <= steps; i++) {
       if (i == 0) continue;
@@ -493,7 +477,6 @@ class _FlowChartPainter extends CustomPainter {
   }
 
   double _staggeredProgress(int index, int total, double progress) {
-    // Each bar starts slightly after the previous
     const staggerDelay = 0.03;
     final adjustedProgress = (progress - (index * staggerDelay)).clamp(
       0.0,
