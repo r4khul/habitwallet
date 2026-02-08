@@ -4,7 +4,7 @@ part 'user_profile.freezed.dart';
 part 'user_profile.g.dart';
 
 @freezed
-class UserProfile with _$UserProfile {
+abstract class UserProfile with _$UserProfile {
   const factory UserProfile({
     @Default('User') String name,
     @Default(10000.0) double yearlySavingsGoal,

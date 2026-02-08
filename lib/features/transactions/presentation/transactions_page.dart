@@ -10,6 +10,7 @@ import '../../auth/presentation/providers/auth_providers.dart';
 
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
+import '../../profile/presentation/providers/user_profile_provider.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
 
@@ -358,42 +359,212 @@ class _AppDrawer extends ConsumerWidget {
             // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Row(
-                children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.person_rounded,
-                      color: AppColors.primary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'User',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        Text(
-                          'Premium Plan',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final profileAsync = ref.watch(userProfileControllerProvider);
+                  final savingsAsync = ref.watch(currentYearSavingsProvider);
+                  final currencyAsync = ref.watch(currencyControllerProvider);
+                  final currencySymbol = currencyAsync.value?.symbol ?? '\$';
+
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person_rounded,
+                              color: AppColors.primary,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        profileAsync.value?.name ?? 'User',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        context.push('/profile');
+                                      },
+                                      icon: const Icon(
+                                        Icons.edit_note_rounded,
+                                        color: AppColors.primary,
+                                        size: 22,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      tooltip: 'Edit Profile',
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  'Savings Target',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: AppColors.grey500,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      // Savings Progress Graph (Linear Loader)
+                      if (profileAsync.hasValue && savingsAsync.hasValue) ...[
+                        Builder(
+                          builder: (context) {
+                            final goal =
+                                profileAsync.value?.yearlySavingsGoal ?? 1.0;
+                            final current = savingsAsync.value ?? 0.0;
+                            final isOverTarget = current > goal;
+                            final barProgress = (current / goal)
+                                .clamp(0.0, 1.0)
+                                .toDouble();
+                            final realPercentage = (current / goal * 100)
+                                .toInt();
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '$currencySymbol${current.toStringAsFixed(0)}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: isOverTarget
+                                                    ? AppColors.success
+                                                    : AppColors.primary,
+                                              ),
+                                        ),
+                                        if (isOverTarget)
+                                          Text(
+                                            'Surplus: $currencySymbol${(current - goal).toStringAsFixed(0)}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: AppColors.success,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 10,
+                                                ),
+                                          ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        if (isOverTarget) ...[
+                                          const Icon(
+                                            Icons.stars_rounded,
+                                            color: AppColors.success,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                        ],
+                                        Text(
+                                          '$realPercentage%',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium
+                                              ?.copyWith(
+                                                color: isOverTarget
+                                                    ? AppColors.success
+                                                    : AppColors.grey500,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Stack(
+                                  children: [
+                                    Container(
+                                      height: 8,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                    FractionallySizedBox(
+                                      widthFactor: barProgress,
+                                      child: Container(
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: isOverTarget
+                                                ? [
+                                                    AppColors.success,
+                                                    const Color(0xFF81C784),
+                                                  ]
+                                                : [
+                                                    AppColors.primary,
+                                                    const Color(0xFF64B5F6),
+                                                  ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.3),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Goal: $currencySymbol${goal.toStringAsFixed(0)}',
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(color: AppColors.grey500),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ],
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 40),
@@ -433,17 +604,6 @@ class _AppDrawer extends ConsumerWidget {
                 context.push('/settings');
               },
             ),
-            _DrawerItem(
-              icon: Icons.shield_outlined,
-              label: 'Security',
-              onTap: () {},
-            ),
-            _DrawerItem(
-              icon: Icons.info_outline_rounded,
-              label: 'About HabitWallet',
-              onTap: () {},
-            ),
-
             const Spacer(),
 
             // Logout

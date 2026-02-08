@@ -53,3 +53,37 @@ abstract class _$UserProfileController extends $AsyncNotifier<UserProfile> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(currentYearSavings)
+final currentYearSavingsProvider = CurrentYearSavingsProvider._();
+
+final class CurrentYearSavingsProvider
+    extends $FunctionalProvider<AsyncValue<double>, double, FutureOr<double>>
+    with $FutureModifier<double>, $FutureProvider<double> {
+  CurrentYearSavingsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentYearSavingsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentYearSavingsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<double> create(Ref ref) {
+    return currentYearSavings(ref);
+  }
+}
+
+String _$currentYearSavingsHash() =>
+    r'd03180d4e83857e3326cc002114aefd4d8d5bdcd';
