@@ -29,53 +29,35 @@ GoRouter router(Ref ref) {
     initialLocation: '/',
     // Refresh the router when auth or new user status changes
     refreshListenable: Listenable.merge([
-      authState.when(
-        data: (_) => ValueNotifier(0),
-        error: (e, s) => ValueNotifier(0),
-        loading: () => ValueNotifier(0),
-      ),
-      isNewUserAsync.when(
-        data: (_) => ValueNotifier(0),
-        error: (e, s) => ValueNotifier(0),
-        loading: () => ValueNotifier(0),
-      ),
+      authState.asData != null
+          ? ValueNotifier(authState.value)
+          : ValueNotifier(0),
     ]),
     redirect: (context, state) {
-      // 1. Wait for both initial session and "new user" check to complete.
-      // While loading, we stay at the initial location (Home).
-      // The native splash screen will still be visible if the app is starting.
       if (authState.isLoading || isNewUserAsync.isLoading) {
         return state.matchedLocation == '/' ? null : '/';
       }
 
-      if (authState.hasError || isNewUserAsync.hasError) return null;
-
       final session = authState.value;
-      final isNew = isNewUserAsync.value ?? true;
       final isLoggingIn = state.matchedLocation == '/login';
 
-      // 2. Auth Redirection Logic
+      // 1. Unauthenticated State
       if (session == null) {
-        // If the user has never registered, force them to Auth (Login/Register)
-        if (isNew) {
-          if (isLoggingIn) return null;
+        // If they are on a registration-required flow (or just logged out)
+        // and we are not currently on login, force them there.
+        if (!isLoggingIn) {
           return '/login';
         }
-
-        // If the user is returning but has no active session, allow them to stay at Home
-        // (Local access). If they are at Login, they can browse back to Home.
-        return null;
+        return null; // Stay on login
       }
 
-      // 3. Authenticated Redirection
-      // Prevent authenticated users from staying at Login
+      // 2. Authenticated Redirection
       if (isLoggingIn) {
         final destination = state.uri.queryParameters['from'] ?? '/home';
         return destination == '/login' ? '/home' : destination;
       }
 
-      // 4. Final Departure from Splash
-      // If we are still at splash but not loading, go to home
+      // 3. Exit Splash
       if (state.matchedLocation == '/') {
         return '/home';
       }

@@ -37,6 +37,7 @@ class AuthController extends _$AuthController {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(authRepositoryProvider).clearSession();
+      ref.invalidate(isNewUserProvider);
       return null;
     });
   }
@@ -52,9 +53,11 @@ class AuthController extends _$AuthController {
     // 2. Updates global state with the new session
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return ref
+      final session = await ref
           .read(authRepositoryProvider)
           .login(email: email, pin: pin, rememberMe: rememberMe);
+      ref.invalidate(isNewUserProvider);
+      return session;
     });
   }
 }
