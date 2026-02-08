@@ -210,14 +210,7 @@ class _DetailsView extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             child: TextButton.icon(
-              onPressed: () {
-                // TODO: Implement delete logic
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Delete functionality coming soon'),
-                  ),
-                );
-              },
+              onPressed: () => _showDeleteConfirmation(context, ref),
               icon: const Icon(
                 Icons.delete_outline_rounded,
                 color: AppColors.error,
@@ -233,6 +226,64 @@ class _DetailsView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showDeleteConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Transaction?'),
+        content: const Text(
+          'This action cannot be undone. Are you sure you want to delete this transaction?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        await ref
+            .read(transactionControllerProvider.notifier)
+            .deleteTransaction(transaction.id);
+
+        if (context.mounted) {
+          // Success Feedback
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Transaction deleted successfully'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          // Go back to the transactions list
+          context.pop();
+        }
+      } on Object catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _openAttachment(BuildContext context, String path) async {

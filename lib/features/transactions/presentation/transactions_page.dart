@@ -73,13 +73,41 @@ class TransactionsPage extends ConsumerWidget {
                         itemBuilder: (context, index) {
                           final tx = transactions[index];
                           final category = categoryMap[tx.categoryId];
-                          return _TransactionTile(
-                            transaction: tx,
-                            category: category,
+                          return Dismissible(
+                            key: Key(tx.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: AppColors.error,
+                              ),
+                              child: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                            confirmDismiss: (direction) =>
+                                _showDeleteConfirmation(context, ref, tx),
+                            onDismissed: (direction) {
+                              ref
+                                  .read(transactionControllerProvider.notifier)
+                                  .deleteTransaction(tx.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Transaction deleted'),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            child: _TransactionTile(
+                              transaction: tx,
+                              category: category,
+                            ),
                           );
                         },
-                        addAutomaticKeepAlives: true,
-                        addRepaintBoundaries: true,
                       ),
                     ),
                   ),
@@ -110,6 +138,36 @@ class TransactionsPage extends ConsumerWidget {
 
   void _openAddTransaction(BuildContext context) {
     context.push('/add-tx');
+  }
+
+  Future<bool?> _showDeleteConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+    TransactionEntity transaction,
+  ) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Transaction?'),
+        content: const Text(
+          'This action cannot be undone. Are you sure you want to delete this transaction?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
