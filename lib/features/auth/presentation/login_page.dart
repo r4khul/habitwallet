@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'providers/auth_providers.dart';
+
 import '../../../core/theme/app_colors.dart';
+import 'providers/auth_providers.dart';
 
 /// Auth Feature Presentation: User login screen.
 /// Implements state-driven UI for authentication with Design System compliance.
@@ -139,12 +140,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 const SizedBox(height: 16),
 
                 // Remember Me
-                Row(
-                  children: [
-                    SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: Checkbox(
+                MergeSemantics(
+                  child: Row(
+                    children: [
+                      Checkbox(
                         value: _rememberMe,
                         onChanged: isLoading
                             ? null
@@ -155,20 +154,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: isLoading
-                          ? null
-                          : () => setState(() => _rememberMe = !_rememberMe),
-                      child: Text(
-                        'Remember me on this device',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.grey600,
+                      const SizedBox(
+                        width: 4,
+                      ), // Reduced spacing slightly for tighter grouping
+                      GestureDetector(
+                        onTap: isLoading
+                            ? null
+                            : () => setState(() => _rememberMe = !_rememberMe),
+                        child: Text(
+                          'Remember me on this device',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: AppColors.grey500),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 40),
 

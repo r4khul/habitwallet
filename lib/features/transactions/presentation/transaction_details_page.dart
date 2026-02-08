@@ -28,6 +28,7 @@ class TransactionDetailsPage extends ConsumerWidget {
                     ? IconButton(
                         onPressed: () => context.push('/edit-tx/$id'),
                         icon: const Icon(Icons.edit_outlined),
+                        tooltip: 'Edit Transaction',
                       )
                     : null,
               ) ??
@@ -45,9 +46,9 @@ class TransactionDetailsPage extends ConsumerWidget {
 }
 
 class _DetailsView extends ConsumerWidget {
-  final TransactionEntity transaction;
-
   const _DetailsView({required this.transaction});
+
+  final TransactionEntity transaction;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,7 +84,12 @@ class _DetailsView extends ConsumerWidget {
                         color: color.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(iconData, color: color, size: 48),
+                      child: Icon(
+                        iconData,
+                        color: color,
+                        size: 48,
+                        semanticLabel: category?.name ?? 'Category icon',
+                      ),
                     );
                   },
                   loading: () => Container(
@@ -97,11 +103,15 @@ class _DetailsView extends ConsumerWidget {
                   error: (error, stack) => const Icon(Icons.error_outline),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  '${transaction.isIncome ? '+' : '-'}\$${transaction.absoluteAmount.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: amountColor,
-                    fontWeight: FontWeight.w700,
+                Semantics(
+                  label:
+                      '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}',
+                  child: Text(
+                    '${transaction.displaySign}\$${transaction.formattedAbsoluteAmount}',
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      color: amountColor,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 categoryAsync.when(
@@ -131,14 +141,12 @@ class _DetailsView extends ConsumerWidget {
           ),
           _DetailRow(
             label: 'Date',
-            value:
-                '${transaction.timestamp.day}/${transaction.timestamp.month}/${transaction.timestamp.year}',
+            value: transaction.displayDate,
             icon: Icons.calendar_today_outlined,
           ),
           _DetailRow(
             label: 'Time',
-            value:
-                '${transaction.timestamp.hour.toString().padLeft(2, '0')}:${transaction.timestamp.minute.toString().padLeft(2, '0')}',
+            value: transaction.displayTime,
             icon: Icons.access_time_rounded,
           ),
           if (transaction.note != null && transaction.note!.isNotEmpty)
@@ -166,9 +174,11 @@ class _DetailsView extends ConsumerWidget {
                 Icons.delete_outline_rounded,
                 color: AppColors.error,
               ),
-              label: const Text(
+              label: Text(
                 'Delete Transaction',
-                style: TextStyle(color: AppColors.error),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: AppColors.error),
               ),
             ),
           ),
@@ -179,15 +189,15 @@ class _DetailsView extends ConsumerWidget {
 }
 
 class _DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
   const _DetailRow({
     required this.label,
     required this.value,
     required this.icon,
   });
+
+  final String label;
+  final String value;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -262,9 +272,9 @@ class _LoadingState extends StatelessWidget {
 }
 
 class _ErrorState extends StatelessWidget {
-  final String message;
-
   const _ErrorState({required this.message});
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {

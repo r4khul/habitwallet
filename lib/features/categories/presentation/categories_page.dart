@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
+
+import '../../../core/theme/app_colors.dart';
 import '../domain/category_entity.dart';
 import 'providers/category_providers.dart';
 import 'widgets/category_assets.dart';
-import '../../../core/theme/app_colors.dart';
 
 class CategoriesPage extends ConsumerWidget {
   const CategoriesPage({super.key});
@@ -29,6 +29,7 @@ class CategoriesPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddEditDialog(context, ref),
+        tooltip: 'Add Category',
         child: const Icon(Icons.add_rounded),
       ),
     );
@@ -39,7 +40,7 @@ class CategoriesPage extends ConsumerWidget {
     WidgetRef ref, [
     CategoryEntity? category,
   ]) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -49,9 +50,9 @@ class CategoriesPage extends ConsumerWidget {
 }
 
 class _CategoryTile extends ConsumerWidget {
-  final CategoryEntity category;
-
   const _CategoryTile({required this.category});
+
+  final CategoryEntity category;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,8 +88,9 @@ class _CategoryTile extends ConsumerWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.edit_outlined, size: 20),
+              tooltip: 'Edit Category',
               onPressed: () {
-                showModalBottomSheet(
+                showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
@@ -102,6 +104,7 @@ class _CategoryTile extends ConsumerWidget {
                 size: 20,
                 color: AppColors.error,
               ),
+              tooltip: 'Delete Category',
               onPressed: () => _confirmDelete(context, ref),
             ),
           ],
@@ -137,7 +140,7 @@ class _CategoryTile extends ConsumerWidget {
         await ref
             .read(categoryControllerProvider.notifier)
             .deleteCategory(category.id);
-      } catch (e) {
+      } on Exception catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -152,9 +155,9 @@ class _CategoryTile extends ConsumerWidget {
 }
 
 class _CategoryForm extends ConsumerStatefulWidget {
-  final CategoryEntity? category;
-
   const _CategoryForm({this.category});
+
+  final CategoryEntity? category;
 
   @override
   ConsumerState<_CategoryForm> createState() => _CategoryFormState();
@@ -224,28 +227,33 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
                 scrollDirection: Axis.horizontal,
                 children: CategoryAssets.icons.entries.map((entry) {
                   final isSelected = _selectedIcon == entry.key;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedIcon = entry.key),
-                    child: Container(
-                      width: 50,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : Colors.transparent,
-                        shape: BoxShape.circle,
-                        border: Border.all(
+                  return Semantics(
+                    label: 'Select ${entry.key} icon',
+                    selected: isSelected,
+                    button: true,
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedIcon = entry.key),
+                      child: Container(
+                        width: 50,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary.withValues(alpha: 0.1)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.grey900,
+                            width: 2,
+                          ),
+                        ),
+                        child: Icon(
+                          entry.value,
                           color: isSelected
                               ? AppColors.primary
-                              : AppColors.grey900,
-                          width: 2,
+                              : AppColors.grey500,
                         ),
-                      ),
-                      child: Icon(
-                        entry.value,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.grey500,
                       ),
                     ),
                   );
@@ -261,17 +269,22 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
                 scrollDirection: Axis.horizontal,
                 children: CategoryAssets.palette.map((color) {
                   final isSelected = _selectedColor == color;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedColor = color),
-                    child: Container(
-                      width: 50,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: isSelected
-                            ? Border.all(color: Colors.white, width: 3)
-                            : null,
+                  return Semantics(
+                    label: 'Select color ${color.toString()}',
+                    selected: isSelected,
+                    button: true,
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedColor = color),
+                      child: Container(
+                        width: 50,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(color: Colors.white, width: 3)
+                              : null,
+                        ),
                       ),
                     ),
                   );
@@ -285,7 +298,7 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
                     final category = CategoryEntity(
-                      id: widget.category?.id ?? const Uuid().v4(),
+                      id: widget.category?.id ?? '', // Handled in controller
                       name: _nameController.text.trim(),
                       icon: _selectedIcon,
                       color: _selectedColor.toARGB32(),

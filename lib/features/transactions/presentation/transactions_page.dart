@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../auth/presentation/providers/auth_providers.dart';
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
@@ -59,6 +60,7 @@ class TransactionsPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openAddTransaction(context),
+        tooltip: 'Add Transaction',
         child: const Icon(Icons.add_rounded, size: 28),
       ),
     );
@@ -70,16 +72,17 @@ class TransactionsPage extends ConsumerWidget {
 }
 
 class _TransactionTile extends ConsumerWidget {
-  final TransactionEntity transaction;
-
   const _TransactionTile({required this.transaction});
+
+  final TransactionEntity transaction;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currencyFormat = '\$${transaction.absoluteAmount.toStringAsFixed(2)}';
     final amountColor = transaction.isIncome
         ? AppColors.success
         : AppColors.error;
+    final semanticsLabel =
+        '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}';
 
     final categoryAsync = ref.watch(
       categoryByIdProvider(transaction.categoryId),
@@ -105,7 +108,12 @@ class _TransactionTile extends ConsumerWidget {
                     color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(iconData, color: color, size: 24),
+                  child: Icon(
+                    iconData,
+                    color: color,
+                    size: 24,
+                    semanticLabel: category?.name ?? 'Category icon',
+                  ),
                 );
               },
               loading: () => Container(
@@ -139,7 +147,7 @@ class _TransactionTile extends ConsumerWidget {
                   Row(
                     children: [
                       Text(
-                        _formatDate(transaction.timestamp),
+                        transaction.displayDate,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.grey500,
                         ),
@@ -160,7 +168,9 @@ class _TransactionTile extends ConsumerWidget {
                             style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(
                                   color: AppColors.primary,
-                                  fontSize: 8,
+                                  fontSize: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.fontSize,
                                   fontWeight: FontWeight.w700,
                                 ),
                           ),
@@ -171,39 +181,20 @@ class _TransactionTile extends ConsumerWidget {
                 ],
               ),
             ),
-            Text(
-              '${transaction.isIncome ? '+' : '-'}$currencyFormat',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: amountColor,
-                fontWeight: FontWeight.w700,
+            Semantics(
+              label: semanticsLabel,
+              child: Text(
+                '${transaction.displaySign}\$${transaction.formattedAbsoluteAmount}',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: amountColor,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day} ${_getMonth(date.month)}';
-  }
-
-  String _getMonth(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return months[month - 1];
   }
 }
 
@@ -255,9 +246,9 @@ class _LoadingState extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  final VoidCallback onAction;
-
   const _EmptyState({required this.onAction});
+
+  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -299,10 +290,10 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.message, required this.onRetry});
+
   final String message;
   final VoidCallback onRetry;
-
-  const _ErrorState({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -440,8 +431,8 @@ class _AppDrawer extends ConsumerWidget {
               label: 'Sign Out',
               color: AppColors.error,
               onTap: () {
-                // Implement logout logic via authController if needed
-                Navigator.pop(context);
+                ref.read(authControllerProvider.notifier).logout();
+                Navigator.pop(context); // Close drawer
               },
             ),
             const SizedBox(height: 20),
@@ -453,17 +444,17 @@ class _AppDrawer extends ConsumerWidget {
 }
 
 class _DrawerItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color? color;
-
   const _DrawerItem({
     required this.icon,
     required this.label,
     required this.onTap,
     this.color,
   });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {

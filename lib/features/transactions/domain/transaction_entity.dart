@@ -47,4 +47,34 @@ abstract class TransactionEntity with _$TransactionEntity {
 
   /// Returns the absolute magnitude of the transaction regardless of sign.
   double get absoluteAmount => amount.abs();
+
+  /// Returns the amount formatted for display (e.g., "50.00").
+  /// Constraint: Moved from UI to maintain pure widgets.
+  String get formattedAbsoluteAmount => absoluteAmount.toStringAsFixed(2);
+
+  /// Returns the symbol prefix based on transaction type.
+  String get displaySign => isIncome ? '+' : '-';
+
+  /// Returns a formatted date string (e.g., "8 Feb").
+  String get displayDate {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${timestamp.day} ${months[timestamp.month - 1]}';
+  }
+
+  /// Returns a formatted time string (e.g., "14:30").
+  String get displayTime =>
+      '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
 }

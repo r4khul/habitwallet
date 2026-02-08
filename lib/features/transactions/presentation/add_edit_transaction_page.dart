@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../categories/domain/category_entity.dart';
@@ -12,9 +11,9 @@ import 'providers/transaction_providers.dart';
 
 /// Presentation: UI for adding or editing a transaction.
 class AddEditTransactionPage extends ConsumerStatefulWidget {
-  final String? transactionId;
-
   const AddEditTransactionPage({super.key, this.transactionId});
+
+  final String? transactionId;
 
   @override
   ConsumerState<AddEditTransactionPage> createState() =>
@@ -69,8 +68,8 @@ class _AddEditTransactionPageState
 
       final amountValue = double.parse(_amountController.text);
       final transaction = TransactionEntity(
-        id: widget.transactionId ?? const Uuid().v4(),
-        amount: _isIncome ? amountValue : -amountValue,
+        id: widget.transactionId ?? '', // Handled in controller
+        amount: amountValue, // Sign handled in controller based on isIncome
         categoryId: _selectedCategoryId!,
         timestamp: _selectedDate,
         note: _noteController.text.trim().isEmpty
@@ -81,7 +80,7 @@ class _AddEditTransactionPageState
 
       await ref
           .read(transactionControllerProvider.notifier)
-          .upsertTransaction(transaction);
+          .upsertTransaction(transaction, isIncome: _isIncome);
       if (mounted) context.pop();
     }
   }
@@ -221,15 +220,15 @@ class _AddEditTransactionPageState
 }
 
 class _CategorySelector extends StatelessWidget {
-  final List<CategoryEntity> categories;
-  final String? selectedId;
-  final ValueChanged<String> onSelected;
-
   const _CategorySelector({
     required this.categories,
     required this.selectedId,
     required this.onSelected,
   });
+
+  final List<CategoryEntity> categories;
+  final String? selectedId;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -258,11 +257,14 @@ class _CategorySelector extends StatelessWidget {
               const SizedBox(width: 12),
               Text(selected.name, style: Theme.of(context).textTheme.bodyLarge),
             ] else
-              Text(
-                'Select Category',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),
+              Semantics(
+                label: 'Category selector',
+                child: Text(
+                  'Select Category',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),
+                ),
               ),
             const Spacer(),
             const Icon(
@@ -276,7 +278,7 @@ class _CategorySelector extends StatelessWidget {
   }
 
   void _showPicker(BuildContext context) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.darkBackground,
       shape: const RoundedRectangleBorder(
@@ -310,11 +312,6 @@ class _CategorySelector extends StatelessWidget {
 }
 
 class _TypeButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final Color color;
-  final VoidCallback onTap;
-
   const _TypeButton({
     required this.label,
     required this.isSelected,
@@ -322,31 +319,41 @@ class _TypeButton extends StatelessWidget {
     required this.onTap,
   });
 
+  final String label;
+  final bool isSelected;
+  final Color color;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? color.withValues(alpha: 0.1)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? color : AppColors.grey800,
-              width: 1.5,
+      child: Semantics(
+        selected: isSelected,
+        button: true,
+        label: '$label transaction type',
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? color.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected ? color : AppColors.grey800,
+                width: 1.5,
+              ),
             ),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: isSelected ? color : AppColors.grey500,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: isSelected ? color : AppColors.grey500,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              ),
             ),
           ),
         ),

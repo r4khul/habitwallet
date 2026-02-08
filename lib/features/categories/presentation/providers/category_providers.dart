@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 import '../../data/category_repository_provider.dart';
 import '../../domain/category_entity.dart';
 
@@ -69,7 +70,10 @@ class CategoryController extends _$CategoryController {
   }
 
   Future<void> upsertCategory(CategoryEntity category) async {
-    await ref.read(categoryRepositoryProvider).upsert(category);
+    final categoryToSave = category.id.isEmpty
+        ? category.copyWith(id: const Uuid().v4())
+        : category;
+    await ref.read(categoryRepositoryProvider).upsert(categoryToSave);
     await refresh();
   }
 

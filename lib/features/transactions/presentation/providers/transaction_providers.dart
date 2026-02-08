@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 import '../../data/transaction_repository_provider.dart';
 import '../../domain/transaction_entity.dart';
 
@@ -21,10 +22,24 @@ class TransactionController extends _$TransactionController {
   }
 
   /// Adds or updates a transaction and refreshes the state.
-  Future<void> upsertTransaction(TransactionEntity transaction) async {
+  Future<void> upsertTransaction(
+    TransactionEntity transaction, {
+    required bool isIncome,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(transactionRepositoryProvider).upsert(transaction);
+      var tx = transaction;
+
+      // Handle ID generation if new
+      if (tx.id.isEmpty) {
+        tx = tx.copyWith(id: const Uuid().v4());
+      }
+
+      // Handle amount sign based on business rules
+      final absAmount = tx.amount.abs();
+      tx = tx.copyWith(amount: isIncome ? absAmount : -absAmount);
+
+      await ref.read(transactionRepositoryProvider).upsert(tx);
       // Refresh the list after modification
       return ref.read(transactionRepositoryProvider).getAll();
     });
