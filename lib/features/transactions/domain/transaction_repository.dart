@@ -14,4 +14,8 @@ abstract class TransactionRepository {
 
   /// Deletes a transaction by its [id].
   Future<void> delete(String id);
+
+  /// Synchronizes local transactions with the remote source.
+  /// Implement Push-then-Pull model with deterministic conflict resolution.
+  Future<void> syncWithRemote();
 }

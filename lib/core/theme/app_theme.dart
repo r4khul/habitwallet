@@ -18,7 +18,6 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
-        onPrimary: Colors.white,
         secondary: AppColors.primary,
         surface: AppColors.lightSurface,
         onSurface: AppColors.grey900,
@@ -92,7 +91,6 @@ class AppTheme {
         onPrimary: Colors.white,
         secondary: AppColors.primary,
         surface: AppColors.darkSurface,
-        onSurface: Colors.white,
         error: AppColors.error,
         outline: AppColors.darkBorder,
       ),
@@ -223,12 +221,8 @@ class AppTheme {
   }
 
   static InputDecorationTheme _inputDecorationTheme({required bool isDark}) {
-    final Color borderColor = isDark
-        ? AppColors.darkBorder
-        : AppColors.lightBorder;
-    final Color fillColor = isDark
-        ? AppColors.darkSurface
-        : AppColors.lightSurface;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final fillColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
 
     return InputDecorationTheme(
       filled: true,

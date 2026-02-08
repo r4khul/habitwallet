@@ -41,4 +41,18 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteById(String id) {
     return (delete(transactions)..where((t) => t.id.equals(id))).go();
   }
+
+  /// Retrieves all transaction rows that have been edited locally.
+  Future<List<Transaction>> getEditedLocally() {
+    return (select(
+      transactions,
+    )..where((t) => t.editedLocally.equals(true))).get();
+  }
+
+  /// Clears the editedLocally flag for a specific transaction.
+  Future<void> clearEditedLocally(String id) {
+    return (update(transactions)..where((t) => t.id.equals(id))).write(
+      const TransactionsCompanion(editedLocally: Value(false)),
+    );
+  }
 }

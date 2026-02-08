@@ -44,7 +44,7 @@ final class TransactionControllerProvider
 }
 
 String _$transactionControllerHash() =>
-    r'7daba4c1ea64bf6746a1ebd4982974260178197d';
+    r'c034808cfdb265ba861d90b2298b4a5d9d8ed94a';
 
 /// Feature State: Manages the collection of transactions.
 /// Responsibility: Provides an observable list of transactions and handles mutative actions.

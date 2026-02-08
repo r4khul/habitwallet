@@ -30,3 +30,10 @@ class AuthFailure extends Failure {
     super.message = 'Authentication failed. Please log in again.',
   ]);
 }
+
+/// Represents failures occurring during data synchronization.
+class SyncFailure extends Failure {
+  const SyncFailure([
+    super.message = 'Sync failed. Local data is safe, will retry later.',
+  ]);
+}

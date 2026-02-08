@@ -18,7 +18,7 @@ AppDatabase appDatabase(Ref ref) {
   final db = AppDatabase(_openConnection());
 
   // Clean up the database when the provider is disposed
-  ref.onDispose(() => db.close());
+  ref.onDispose(db.close);
 
   return db;
 }
