@@ -5,13 +5,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../features/analytics/presentation/financial_overview_page.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
+import '../features/auth/presentation/splash_page.dart';
 import '../features/categories/presentation/categories_page.dart';
 import '../features/profile/presentation/profile_edit_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
 import '../features/transactions/presentation/transactions_page.dart';
-import '../features/auth/presentation/splash_page.dart';
 
 part 'app_router.g.dart';
 

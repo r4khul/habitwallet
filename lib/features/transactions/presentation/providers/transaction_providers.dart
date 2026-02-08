@@ -22,7 +22,7 @@ class TransactionController extends _$TransactionController {
       if (transactions.isEmpty) {
         try {
           await repository.syncWithRemote();
-        } catch (_) {
+        } on Object catch (_) {
           // Silent failure for sync, repo handles status updates
         }
 
@@ -32,7 +32,7 @@ class TransactionController extends _$TransactionController {
           await _seed(repository);
         }
       }
-    } catch (_) {
+    } on Object catch (_) {
       // Basic protection against DB init issues
     }
 

@@ -55,7 +55,7 @@ class DateFilterController extends _$DateFilterController {
   void setThisMonth() {
     final now = DateTime.now();
     state = DateRangeFilter(
-      start: DateTime(now.year, now.month, 1),
+      start: DateTime(now.year, now.month),
       end: DateTime(now.year, now.month, now.day, 23, 59, 59),
       label: 'This Month',
     );
@@ -64,7 +64,7 @@ class DateFilterController extends _$DateFilterController {
   void setThisYear() {
     final now = DateTime.now();
     state = DateRangeFilter(
-      start: DateTime(now.year, 1, 1),
+      start: DateTime(now.year),
       end: DateTime(now.year, now.month, now.day, 23, 59, 59),
       label: 'This Year',
     );

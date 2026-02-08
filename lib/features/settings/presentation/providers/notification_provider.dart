@@ -37,7 +37,7 @@ class NotificationController extends _$NotificationController {
 
     // Don't schedule if transactions are still loading initially
     if (transactionsAsync.isLoading && !transactionsAsync.hasValue) return;
-    final Set<DateTime> datesToSkip = {};
+    final datesToSkip = <DateTime>{};
 
     if (transactionsAsync.hasValue) {
       for (final tx in transactionsAsync.value!) {
@@ -56,7 +56,6 @@ class NotificationController extends _$NotificationController {
     await service.scheduleDailyReminder(
       time: settings.reminderTime,
       datesToSkip: datesToSkip,
-      daysAhead: 14,
       isDebug: kDebugMode,
     );
   }
@@ -64,12 +63,12 @@ class NotificationController extends _$NotificationController {
   Future<void> toggleEnabled(bool value) async {
     state = state.copyWith(isEnabled: value);
     await ref.read(notificationRepositoryProvider).saveSettings(state);
-    _updateSchedule(); // Update schedule immediately on toggle
+    await _updateSchedule(); // Update schedule immediately on toggle
   }
 
   Future<void> updateTime(TimeOfDay time) async {
     state = state.copyWith(reminderTimeStr: '${time.hour}:${time.minute}');
     await ref.read(notificationRepositoryProvider).saveSettings(state);
-    _updateSchedule(); // Update schedule immediately on time change
+    await _updateSchedule(); // Update schedule immediately on time change
   }
 }

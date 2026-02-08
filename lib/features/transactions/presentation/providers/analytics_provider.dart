@@ -1,10 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:habitwallet/core/widgets/charts/chart_types.dart';
 import 'package:habitwallet/features/transactions/domain/transaction_entity.dart';
 import 'package:habitwallet/features/transactions/presentation/providers/transaction_providers.dart';
-import 'package:habitwallet/core/widgets/charts/chart_types.dart';
 import 'package:intl/intl.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'analytics_provider.g.dart';
 
@@ -20,21 +21,18 @@ Future<List<ChartPoint>> aggregatedChartData(
       if (transactions.isEmpty) return <ChartPoint>[];
 
       // Use compute to offload heavy aggregation to a background isolate
-      return await compute(
-        _aggregateData,
-        _AggregationParams(transactions, period),
-      );
+      return compute(_aggregateData, _AggregationParams(transactions, period));
     },
     loading: () => <ChartPoint>[],
-    error: (_, __) => <ChartPoint>[],
+    error: (e, s) => <ChartPoint>[],
   );
 }
 
 class _AggregationParams {
+  _AggregationParams(this.transactions, this.period);
+
   final List<TransactionEntity> transactions;
   final ChartPeriod period;
-
-  _AggregationParams(this.transactions, this.period);
 }
 
 List<ChartPoint> _aggregateData(_AggregationParams params) {

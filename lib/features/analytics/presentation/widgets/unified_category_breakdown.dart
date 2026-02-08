@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
 
-import '../../domain/financial_data_models.dart';
 import '../../../categories/presentation/widgets/category_assets.dart';
+import '../../domain/financial_data_models.dart';
 import 'category_donut_chart.dart';
 
 /// A unified category breakdown widget that binds a donut chart with a list.

@@ -4,11 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:open_filex/open_filex.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/util/formatting_utils.dart';
 import '../../../core/util/theme_extension.dart';
 import '../../../features/settings/presentation/providers/currency_provider.dart';
-import '../../../core/util/formatting_utils.dart';
 import '../../categories/presentation/providers/category_map_provider.dart';
-
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';

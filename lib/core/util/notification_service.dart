@@ -7,9 +7,11 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  NotificationService._internal();
-  static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
+
+  NotificationService._internal();
+
+  static final NotificationService _instance = NotificationService._internal();
 
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
@@ -84,7 +86,7 @@ class NotificationService {
   int _getNotificationIdForDate(DateTime date) {
     // Using a simple hash that fits in 32-bit int
     // Result = (Year % 10 * 400) + dayOfYear
-    final jan1 = DateTime(date.year, 1, 1);
+    final jan1 = DateTime(date.year);
     final dayOfYear = date.difference(jan1).inDays;
     return 1000 + ((date.year % 10) * 400) + dayOfYear;
   }
@@ -100,7 +102,6 @@ class NotificationService {
 
     // Hardcoded to 8 PM as per new requirement
     const targetHour = 20;
-    const targetMinute = 0;
 
     for (var i = 0; i < daysAhead; i++) {
       final targetDate = now.add(Duration(days: i));
@@ -125,7 +126,6 @@ class NotificationService {
         targetDate.month,
         targetDate.day,
         targetHour,
-        targetMinute,
       );
 
       // Special logic for TODAY

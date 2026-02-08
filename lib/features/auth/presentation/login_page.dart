@@ -80,7 +80,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to manage your habits and wealth.',
+                  'Sign in to manage your wealth.',
                   style: Theme.of(
                     context,
                   ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),

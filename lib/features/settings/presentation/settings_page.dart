@@ -283,7 +283,7 @@ class _SettingsTile extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) trailing,
+              trailing ?? const SizedBox.shrink(),
               if (trailing == null)
                 Icon(
                   Icons.chevron_right_rounded,

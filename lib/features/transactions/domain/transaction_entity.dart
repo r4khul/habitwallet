@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'attachment_entity.dart';
+
 import '../../../core/util/formatting_utils.dart';
+import 'attachment_entity.dart';
 
 part 'transaction_entity.freezed.dart';
 part 'transaction_entity.g.dart';

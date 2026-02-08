@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
+import 'daos/attachment_dao.dart';
 import 'daos/category_dao.dart';
 import 'daos/transaction_dao.dart';
-import 'daos/attachment_dao.dart';
 import 'tables.dart';
 
 part 'database.g.dart';

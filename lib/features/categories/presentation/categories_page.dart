@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../domain/category_entity.dart';
 import '../data/category_repository_provider.dart';
+import '../domain/category_entity.dart';
 import 'providers/category_providers.dart';
 import 'widgets/category_assets.dart';
 
