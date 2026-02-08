@@ -16,7 +16,7 @@ class FormattingUtils {
 
     if (absAmount < 1000) {
       // For small amounts, show up to 2 decimal places, but remove trailing .00
-      String formatted = absAmount.toStringAsFixed(2);
+      var formatted = absAmount.toStringAsFixed(2);
       if (formatted.endsWith('.00')) {
         formatted = formatted.substring(0, formatted.length - 3);
       } else if (formatted.contains('.') && formatted.endsWith('0')) {
@@ -28,7 +28,7 @@ class FormattingUtils {
     final formatter = NumberFormat.compact();
     formatter.maximumFractionDigits = decimalDigits;
 
-    String compactValue = formatter.format(absAmount);
+    final compactValue = formatter.format(absAmount);
     return '$symbol$compactValue';
   }
 

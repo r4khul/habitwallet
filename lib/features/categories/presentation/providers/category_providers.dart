@@ -19,7 +19,7 @@ class CategoryController extends _$CategoryController {
         // Try to pull from remote first if fresh
         try {
           await repository.syncWithRemote();
-        } catch (_) {
+        } on Object catch (_) {
           // If sync fails (e.g. no internet), we'll fallback to seeding
         }
 
@@ -29,7 +29,7 @@ class CategoryController extends _$CategoryController {
           await _seed(repository);
         }
       }
-    } catch (_) {
+    } on Object catch (_) {
       // If DB is initially unhealthy, seeding might fail too,
       // but we try to continue to watchAll which might recover
       // if it was just a transient migration/open error.

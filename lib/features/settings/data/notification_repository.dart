@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitwallet/core/providers/shared_preferences_provider.dart';
 import 'package:habitwallet/features/settings/domain/notification_settings.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -22,7 +21,7 @@ class NotificationRepository {
       return NotificationSettings.fromJson(
         jsonDecode(jsonString) as Map<String, dynamic>,
       );
-    } catch (_) {
+    } on Object catch (_) {
       return const NotificationSettings();
     }
   }

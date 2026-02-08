@@ -77,11 +77,11 @@ class _DetailsView extends ConsumerWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final iconData =
-                        CategoryAssets.icons[category?.icon] ??
-                        (transaction.isIncome
-                            ? Icons.arrow_downward_rounded
-                            : Icons.arrow_upward_rounded);
+                    final iconData = category != null
+                        ? CategoryAssets.getIcon(category.icon)
+                        : (transaction.isIncome
+                              ? Icons.arrow_downward_rounded
+                              : Icons.arrow_upward_rounded);
                     final color = category != null
                         ? Color(category.color)
                         : amountColor;

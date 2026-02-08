@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habitwallet/core/providers/network_providers.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/util/theme_extension.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
-import 'package:habitwallet/core/providers/network_providers.dart';
 import 'package:habitwallet/features/settings/presentation/providers/notification_provider.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
 
@@ -37,7 +37,7 @@ class SettingsPage extends ConsumerWidget {
             subtitle: currencyAsync.when(
               data: (c) => '${c.name} (${c.symbol})',
               loading: () => 'Loading...',
-              error: (_, __) => 'Error loading currency',
+              error: (e, s) => 'Error loading currency',
             ),
             trailing: currencyAsync.when(
               data: (c) => Container(
@@ -48,7 +48,7 @@ class SettingsPage extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color:
                       (context.isDarkMode
-                              ? theme.colorScheme.surfaceVariant
+                              ? theme.colorScheme.surfaceContainerHighest
                               : AppColors.grey200)
                           .withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(20),
@@ -75,7 +75,7 @@ class SettingsPage extends ConsumerWidget {
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              error: (_, __) =>
+              error: (e, s) =>
                   const Icon(Icons.error_outline, color: AppColors.error),
             ),
             onTap: () {
@@ -104,7 +104,7 @@ class SettingsPage extends ConsumerWidget {
             subtitle: 'Notify if no transactions logged',
             trailing: Switch.adaptive(
               value: notificationSettings.isEnabled,
-              activeColor: AppColors.primary,
+              activeTrackColor: AppColors.primary,
               onChanged: (value) => ref
                   .read(notificationControllerProvider.notifier)
                   .toggleEnabled(value),
@@ -220,6 +220,7 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final trailing = this.trailing;
 
     return Material(
       color: Colors.transparent,
@@ -282,7 +283,7 @@ class _SettingsTile extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) trailing!,
+              if (trailing != null) trailing,
               if (trailing == null)
                 Icon(
                   Icons.chevron_right_rounded,

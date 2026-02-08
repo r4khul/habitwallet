@@ -37,6 +37,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
     _syncStatusController.add(status);
   }
 
+  @override
   void dispose() {
     _syncStatusController.close();
   }

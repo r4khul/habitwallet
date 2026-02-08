@@ -3,6 +3,7 @@ import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
 
 import '../../domain/financial_data_models.dart';
+import '../../../categories/presentation/widgets/category_assets.dart';
 import 'category_donut_chart.dart';
 
 /// A unified category breakdown widget that binds a donut chart with a list.
@@ -121,7 +122,7 @@ class _UnifiedCategoryBreakdownState extends State<UnifiedCategoryBreakdown> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Icon(
-                            _getCategoryIcon(cat.categoryIcon),
+                            CategoryAssets.getIcon(cat.categoryIcon),
                             size: 22,
                             color: Color(cat.categoryColor),
                           ),
@@ -202,35 +203,6 @@ class _UnifiedCategoryBreakdownState extends State<UnifiedCategoryBreakdown> {
         ),
       ],
     );
-  }
-
-  IconData _getCategoryIcon(String iconName) {
-    switch (iconName.toLowerCase()) {
-      case 'food':
-        return Icons.restaurant_rounded;
-      case 'transport':
-        return Icons.directions_car_rounded;
-      case 'bills':
-        return Icons.receipt_long_rounded;
-      case 'shopping':
-        return Icons.shopping_bag_rounded;
-      case 'education':
-        return Icons.school_rounded;
-      case 'savings':
-        return Icons.savings_rounded;
-      case 'travel':
-        return Icons.flight_rounded;
-      case 'salary':
-        return Icons.payments_rounded;
-      case 'entertainment':
-        return Icons.movie_rounded;
-      case 'health':
-        return Icons.medical_services_rounded;
-      case 'other':
-      case 'category':
-      default:
-        return Icons.category_rounded;
-    }
   }
 
   String _formatAmount(double amount) {

@@ -10,7 +10,7 @@ class SyncController extends _$SyncController {
   void build() {
     // Background sync on start.
     // We don't await it here to avoid blocking startup.
-    Future.microtask(() => syncAll());
+    Future.microtask(syncAll);
   }
 
   Future<void> syncAll() async {
@@ -21,7 +21,7 @@ class SyncController extends _$SyncController {
     try {
       await catRepo.syncWithRemote();
       await txRepo.syncWithRemote();
-    } catch (e) {
+    } on Object catch (_) {
       // Errors are handled in repos
     }
   }

@@ -149,6 +149,8 @@ class _CategoryTile extends ConsumerWidget {
         .read(categoryRepositoryProvider)
         .isCategoryUsed(category.id);
 
+    if (!context.mounted) return;
+
     if (!isUsed) {
       final confirmed = await showDialog<bool>(
         context: context,
@@ -179,7 +181,7 @@ class _CategoryTile extends ConsumerWidget {
 
     // Category is in use, show the options bottom sheet
     if (context.mounted) {
-      showModalBottomSheet<void>(
+      await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
@@ -273,29 +275,35 @@ class _CategoryUsageActionSheetState
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<CategoryEntity>(
-            value: _targetCategory,
+          InputDecorator(
             decoration: const InputDecoration(
               hintText: 'Select New Category',
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            items: otherCategories.map((cat) {
-              return DropdownMenuItem(
-                value: cat,
-                child: Row(
-                  children: [
-                    Icon(
-                      CategoryAssets.getIcon(cat.icon),
-                      size: 18,
-                      color: Color(cat.color),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<CategoryEntity>(
+                value: _targetCategory,
+                isExpanded: true,
+                hint: const Text('Select New Category'),
+                items: otherCategories.map((cat) {
+                  return DropdownMenuItem(
+                    value: cat,
+                    child: Row(
+                      children: [
+                        Icon(
+                          CategoryAssets.getIcon(cat.icon),
+                          size: 18,
+                          color: Color(cat.color),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(cat.name),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Text(cat.name),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (val) => setState(() => _targetCategory = val),
+                  );
+                }).toList(),
+                onChanged: (val) => setState(() => _targetCategory = val),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           SizedBox(

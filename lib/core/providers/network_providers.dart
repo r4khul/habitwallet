@@ -1,6 +1,7 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'shared_preferences_provider.dart';
 
 part 'network_providers.g.dart';
@@ -29,17 +30,7 @@ Dio dio(Ref ref) {
   final baseUrl = ref.watch(baseUrlControllerProvider);
   final dio = Dio(BaseOptions(baseUrl: baseUrl));
 
-  dio.interceptors.add(
-    PrettyDioLogger(
-      requestHeader: true,
-      requestBody: true,
-      responseBody: true,
-      responseHeader: false,
-      error: true,
-      compact: true,
-      maxWidth: 90,
-    ),
-  );
+  dio.interceptors.add(PrettyDioLogger(requestHeader: true, requestBody: true));
 
   return dio;
 }

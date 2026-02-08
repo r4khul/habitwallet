@@ -1,14 +1,15 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter/material.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
 class NotificationService {
+  NotificationService._internal();
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
-  NotificationService._internal();
 
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
@@ -17,7 +18,7 @@ class NotificationService {
     // 1. Initialize Timezones
     tz.initializeTimeZones();
 
-    String locationName = 'UTC';
+    var locationName = 'UTC';
     try {
       final timeZoneName = (await FlutterTimezone.getLocalTimezone())
           .toString();
@@ -40,7 +41,7 @@ class NotificationService {
       }
 
       tz.setLocalLocation(tz.getLocation(locationName));
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint(
         'NotificationService: Failed to set local location "$locationName", falling back to UTC: $e',
       );
@@ -48,18 +49,14 @@ class NotificationService {
     }
 
     // 2. Android settings
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/launcher_icon');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/launcher_icon',
+    );
 
     // 3. iOS settings
-    const DarwinInitializationSettings iosSettings =
-        DarwinInitializationSettings(
-          requestAlertPermission: true,
-          requestBadgePermission: true,
-          requestSoundPermission: true,
-        );
+    const iosSettings = DarwinInitializationSettings();
 
-    final InitializationSettings initSettings = InitializationSettings(
+    final initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
@@ -102,10 +99,10 @@ class NotificationService {
     final now = tz.TZDateTime.now(tz.local);
 
     // Hardcoded to 8 PM as per new requirement
-    const int targetHour = 20;
-    const int targetMinute = 0;
+    const targetHour = 20;
+    const targetMinute = 0;
 
-    for (int i = 0; i < daysAhead; i++) {
+    for (var i = 0; i < daysAhead; i++) {
       final targetDate = now.add(Duration(days: i));
       final notificationId = _getNotificationIdForDate(targetDate);
 
@@ -157,7 +154,6 @@ class NotificationService {
             channelDescription: 'Notifies you if no transactions were logged',
             importance: Importance.max,
             priority: Priority.high,
-            showWhen: true,
           ),
           iOS: DarwinNotificationDetails(
             presentAlert: true,

@@ -192,7 +192,7 @@ class _CustomRangeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = filter.isCustom;
 
-    String label = 'Custom Range';
+    var label = 'Custom Range';
     if (isSelected) {
       final df = DateFormat('d MMM');
       label = '${df.format(filter.start)} - ${df.format(filter.end)}';

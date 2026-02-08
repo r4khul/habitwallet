@@ -46,7 +46,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       // 1. Get user registry
       final registryJson = await _storage.read(key: _registryKey);
-      Map<String, String> registry = {};
+      var registry = <String, String>{};
       if (registryJson != null) {
         registry = Map<String, String>.from(
           jsonDecode(registryJson) as Map<dynamic, dynamic>,

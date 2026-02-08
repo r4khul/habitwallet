@@ -20,7 +20,7 @@ class UserProfileController extends _$UserProfileController {
       return UserProfile.fromJson(
         json.decode(jsonString) as Map<String, dynamic>,
       );
-    } catch (_) {
+    } on Object catch (_) {
       return const UserProfile();
     }
   }
@@ -45,7 +45,7 @@ class UserProfileController extends _$UserProfileController {
 @riverpod
 Stream<double> currentYearSavings(Ref ref) {
   final now = DateTime.now();
-  final start = DateTime(now.year, 1, 1);
+  final start = DateTime(now.year);
   final end = DateTime(now.year, 12, 31, 23, 59, 59);
 
   return ref.watch(transactionRepositoryProvider).watchInRange(start, end).map((

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:habitwallet/core/util/formatting_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habitwallet/core/util/formatting_utils.dart';
 
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/theme_extension.dart';
 import '../../../features/settings/presentation/providers/currency_provider.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
-
+import '../../categories/domain/category_entity.dart';
 import '../../categories/presentation/providers/category_map_provider.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
-import '../../categories/domain/category_entity.dart';
 import '../../profile/presentation/providers/user_profile_provider.dart';
 import '../data/transaction_repository_provider.dart';
 import '../domain/transaction_entity.dart';
@@ -63,7 +62,7 @@ class TransactionsPage extends ConsumerWidget {
                         await ref
                             .read(transactionRepositoryProvider)
                             .syncWithRemote();
-                      } catch (_) {
+                      } on Object catch (_) {
                         // Fail silently or show toast, but let the refresher close
                       }
                     },
@@ -193,8 +192,7 @@ class _TransactionTile extends StatelessWidget {
     final semanticsLabel =
         '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}';
 
-    final iconData =
-        CategoryAssets.icons[category?.icon] ?? Icons.category_rounded;
+    final iconData = CategoryAssets.getIcon(category?.icon);
     final color = category != null ? Color(category!.color) : AppColors.grey500;
 
     return InkWell(

@@ -13,13 +13,13 @@ abstract class NotificationSettings with _$NotificationSettings {
 
   const NotificationSettings._();
 
+  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
+      _$NotificationSettingsFromJson(json);
+
   TimeOfDay get reminderTime {
     final parts = reminderTimeStr.split(':');
     return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
-
-  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
-      _$NotificationSettingsFromJson(json);
 }
 
 class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {

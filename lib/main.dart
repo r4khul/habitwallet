@@ -12,11 +12,12 @@ import 'core/theme/app_theme.dart';
 import 'core/util/notification_service.dart';
 import 'features/settings/presentation/providers/notification_provider.dart';
 
+/// Entry point of the Habit Wallet application.
+/// Handles initialization of services, native splash screen, and root widget setup.
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Parallel initialization for faster startup
   final results = await Future.wait([
     SharedPreferences.getInstance(),
     NotificationService().init().then((_) => null),
@@ -41,7 +42,6 @@ class HabitWalletApp extends ConsumerStatefulWidget {
 
 class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
     with WidgetsBindingObserver {
-  // Cache platform brightness to avoid constant MediaQuery lookups
   Brightness? _platformBrightness;
 
   @override
@@ -58,7 +58,6 @@ class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
 
   @override
   void didChangePlatformBrightness() {
-    // Only rebuild when platform brightness actually changes
     final newBrightness =
         WidgetsBinding.instance.platformDispatcher.platformBrightness;
     if (_platformBrightness != newBrightness) {
@@ -73,18 +72,13 @@ class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
     final routerConfig = ref.watch(routerProvider);
     final themeMode = ref.watch(themeControllerProvider);
 
-    // Initialize notification listener (does not cause rebuild)
     ref.watch(notificationControllerProvider);
-
-    // Trigger background sync on start (does not cause rebuild)
     ref.watch(syncControllerProvider);
 
-    // Remove splash screen once the initial auth state is ready
     ref.listen(routerProvider, (prev, next) {
       FlutterNativeSplash.remove();
     });
 
-    // Use cached brightness or get initial value
     _platformBrightness ??=
         WidgetsBinding.instance.platformDispatcher.platformBrightness;
 
