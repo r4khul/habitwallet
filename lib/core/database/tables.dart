@@ -55,3 +55,32 @@ class Transactions extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Attachments table schema.
+/// Stores metadata for files attached to transactions.
+class Attachments extends Table {
+  /// Unique identifier. Primary Key.
+  TextColumn get id => text()();
+
+  /// The transaction this attachment belongs to.
+  /// References [Transactions.id].
+  TextColumn get transactionId => text().references(Transactions, #id)();
+
+  /// Original file name.
+  TextColumn get fileName => text()();
+
+  /// Absolute local file path.
+  TextColumn get filePath => text()();
+
+  /// File MIME type (e.g. image/jpeg).
+  TextColumn get mimeType => text().nullable()();
+
+  /// File size in bytes.
+  IntColumn get sizeBytes => integer().nullable()();
+
+  /// When the attachment was added.
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

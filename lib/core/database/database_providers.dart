@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'daos/category_dao.dart';
 import 'daos/transaction_dao.dart';
+import 'daos/attachment_dao.dart';
 import 'database.dart';
 
 part 'database_providers.g.dart';
@@ -46,4 +47,11 @@ TransactionDao transactionDao(Ref ref) {
 CategoryDao categoryDao(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   return CategoryDao(db);
+}
+
+/// Provider for [AttachmentDao].
+@riverpod
+AttachmentDao attachmentDao(Ref ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return AttachmentDao(db);
 }

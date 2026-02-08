@@ -1,11 +1,15 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../categories/domain/category_entity.dart';
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
+import '../domain/attachment_entity.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
 
@@ -28,6 +32,7 @@ class _AddEditTransactionPageState
   String? _selectedCategoryId;
   DateTime _selectedDate = DateTime.now();
   bool _isIncome = false;
+  List<AttachmentEntity> _attachments = [];
   bool _isInitialized = false;
 
   @override
@@ -42,6 +47,7 @@ class _AddEditTransactionPageState
             _noteController.text = tx.note ?? '';
             _selectedDate = tx.timestamp;
             _isIncome = tx.isIncome;
+            _attachments = List.from(tx.attachments);
             setState(() {});
           }
         });
@@ -66,9 +72,21 @@ class _AddEditTransactionPageState
         return;
       }
 
+      final transactionId = widget.transactionId ?? const Uuid().v4();
+
       final amountValue = double.parse(_amountController.text);
+
+      // Ensure attachments have the correct transaction ID
+      final updatedAttachments = _attachments
+          .map(
+            (a) => a.transactionId.isEmpty
+                ? a.copyWith(transactionId: transactionId)
+                : a,
+          )
+          .toList();
+
       final transaction = TransactionEntity(
-        id: widget.transactionId ?? '', // Handled in controller
+        id: transactionId,
         amount: amountValue, // Sign handled in controller based on isIncome
         categoryId: _selectedCategoryId!,
         timestamp: _selectedDate,
@@ -76,12 +94,62 @@ class _AddEditTransactionPageState
             ? null
             : _noteController.text.trim(),
         editedLocally: true,
+        attachments: updatedAttachments,
       );
 
       await ref
           .read(transactionControllerProvider.notifier)
           .upsertTransaction(transaction, isIncome: _isIncome);
       if (mounted) context.pop();
+    }
+  }
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null && result.files.single.path != null) {
+      final file = result.files.single;
+      final attachment = AttachmentEntity(
+        id: const Uuid().v4(),
+        transactionId: widget.transactionId ?? '', // Will fill on save if new
+        fileName: file.name,
+        filePath: file.path!,
+        sizeBytes: file.size,
+        createdAt: DateTime.now(),
+      );
+      setState(() {
+        _attachments.add(attachment);
+      });
+    }
+  }
+
+  void _removeAttachment(String id) {
+    setState(() {
+      _attachments.removeWhere((a) => a.id == id);
+    });
+  }
+
+  Future<void> _openFile(String path) async {
+    try {
+      final result = await OpenFilex.open(path);
+      if (result.type != ResultType.done) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Could not open file: ${result.message}'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    } on Object catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
@@ -207,6 +275,59 @@ class _AddEditTransactionPageState
                 ),
                 maxLines: 3,
               ),
+              const SizedBox(height: 24),
+
+              // Attachments Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Attachments',
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  TextButton.icon(
+                    onPressed: _pickFile,
+                    icon: const Icon(Icons.attach_file, size: 18),
+                    label: const Text('Add'),
+                  ),
+                ],
+              ),
+              if (_attachments.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                  child: Column(
+                    children: _attachments.map((attachment) {
+                      return ListTile(
+                        dense: true,
+                        onTap: () => _openFile(attachment.filePath),
+                        leading: const Icon(Icons.insert_drive_file_outlined),
+                        title: Text(
+                          attachment.fileName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: attachment.sizeBytes != null
+                            ? Text(
+                                '${(attachment.sizeBytes! / 1024).toStringAsFixed(1)} KB',
+                              )
+                            : null,
+                        trailing: IconButton(
+                          icon: const Icon(Icons.close, size: 18),
+                          onPressed: () => _removeAttachment(attachment.id),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 48),
 
               ElevatedButton(

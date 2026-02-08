@@ -56,7 +56,7 @@ final class SyncControllerProvider
   }
 }
 
-String _$syncControllerHash() => r'427113b70e2ed3271a2b87c04c91b29502b41e10';
+String _$syncControllerHash() => r'a2883d2b5578135242679f0424ef6176c5619359';
 
 /// Sync Controller: Orchestrates the synchronization lifecycle.
 /// Guarantees:

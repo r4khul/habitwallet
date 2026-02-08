@@ -1,7 +1,9 @@
 import 'dart:async';
 import '../../../core/database/daos/transaction_dao.dart';
+import '../../../core/database/daos/attachment_dao.dart';
 import '../../../core/database/database.dart';
 import '../../../core/error/failures.dart';
+import '../domain/attachment_entity.dart';
 import '../domain/transaction_entity.dart';
 import '../domain/transaction_repository.dart';
 import 'transaction_remote_data_source.dart';
@@ -9,9 +11,14 @@ import 'transaction_remote_data_source.dart';
 /// Transactions Feature Data: Implementation of TransactionRepository.
 /// Orchestrates data flow with explicit error handling for local persistence.
 class TransactionRepositoryImpl implements TransactionRepository {
-  TransactionRepositoryImpl(this._transactionDao, this._remoteDataSource);
+  TransactionRepositoryImpl(
+    this._transactionDao,
+    this._attachmentDao,
+    this._remoteDataSource,
+  );
 
   final TransactionDao _transactionDao;
+  final AttachmentDao _attachmentDao;
   final TransactionRemoteDataSource _remoteDataSource;
 
   final _syncStatusController = StreamController<SyncStatus>.broadcast();
@@ -49,7 +56,12 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<TransactionEntity?> getById(String id) async {
     try {
       final row = await _transactionDao.getById(id);
-      return row != null ? _toEntity(row) : null;
+      if (row == null) return null;
+
+      final attachmentRows = await _attachmentDao.getByTransactionId(id);
+      return _toEntity(
+        row,
+      ).copyWith(attachments: attachmentRows.map(_toAttachmentEntity).toList());
     } on Object catch (_) {
       throw const DatabaseFailure('Failed to retrieve transaction details.');
     }
@@ -58,7 +70,20 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<void> upsert(TransactionEntity transaction) async {
     try {
+      // Upsert transaction row
       await _transactionDao.upsert(_toRow(transaction));
+
+      // Handle attachments
+      // Strategy: Delete all existing attachments for this transaction and re-insert valid ones.
+      final existing = await _attachmentDao.getByTransactionId(transaction.id);
+      for (final a in existing) {
+        await _attachmentDao.deleteAttachment(a.id);
+      }
+
+      // Insert new ones
+      for (final attachment in transaction.attachments) {
+        await _attachmentDao.insertAttachment(_toAttachmentRow(attachment));
+      }
     } on Object catch (_) {
       throw const DatabaseFailure('Failed to save transaction locally.');
     }
@@ -67,6 +92,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<void> delete(String id) async {
     try {
+      // Explicitly delete attachments first to avoid FK constraint violations
+      // and ensure clean cleanup.
+      final existing = await _attachmentDao.getByTransactionId(id);
+      for (final a in existing) {
+        await _attachmentDao.deleteAttachment(a.id);
+      }
+
       await _transactionDao.deleteById(id);
     } on Object catch (_) {
       throw const DatabaseFailure('Failed to remove transaction.');
@@ -82,9 +114,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     try {
       // 1. Push Phase: Pick up local changes and replicate to remote.
-      // Safety: We iterate through local changes. If a push fails, the loop throws,
-      // stopping the sync. The 'editedLocally' flag is ONLY cleared after a successful push.
-      // This ensures that on failure, the transaction remains marked as dirty and will be retried.
       final editedLocally = await _transactionDao.getEditedLocally();
       for (final row in editedLocally) {
         await _remoteDataSource.push(_toEntity(row));
@@ -93,9 +122,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
       }
 
       // 2. Pull Phase: Fetch remote state and merge into local.
-      // Safety: Remote fetch failure throws, stopping the sync.
-      // Partial updates during the loop are safe because each upsert is atomic and
-      // we strictly respect the 'editedLocally' precedence (Local Wins).
       final remoteRecords = await _remoteDataSource.fetchAll();
       for (final remote in remoteRecords) {
         final local = await _transactionDao.getById(remote.id);
@@ -107,13 +133,11 @@ class TransactionRepositoryImpl implements TransactionRepository {
           );
         } else if (!local.editedLocally) {
           // Rule: Overwrite local records only if editedLocally == false.
-          // Rule: Deterministic last-write-wins (Remote is assumed authoritative if local is clean).
           await _transactionDao.upsert(
             _toRow(remote).copyWith(editedLocally: false),
           );
         } else {
           // Rule: Skip remote records if local is edited locally (Local edits win).
-          // LOG: Skipping sync for transaction ${remote.id} due to local conflict.
         }
       }
 
@@ -156,6 +180,30 @@ class TransactionRepositoryImpl implements TransactionRepository {
       editedLocally: true, // Mark as edited locally on save/update
       createdAt: now, // Initial metadata, actual logic may vary in real apps
       updatedAt: now,
+    );
+  }
+
+  AttachmentEntity _toAttachmentEntity(Attachment row) {
+    return AttachmentEntity(
+      id: row.id,
+      transactionId: row.transactionId,
+      fileName: row.fileName,
+      filePath: row.filePath,
+      mimeType: row.mimeType,
+      sizeBytes: row.sizeBytes,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+    );
+  }
+
+  Attachment _toAttachmentRow(AttachmentEntity entity) {
+    return Attachment(
+      id: entity.id,
+      transactionId: entity.transactionId,
+      fileName: entity.fileName,
+      filePath: entity.filePath,
+      mimeType: entity.mimeType,
+      sizeBytes: entity.sizeBytes,
+      createdAt: entity.createdAt.millisecondsSinceEpoch,
     );
   }
 }

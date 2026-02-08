@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:open_filex/open_filex.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/theme_extension.dart';
@@ -159,6 +160,64 @@ class _DetailsView extends ConsumerWidget {
               icon: Icons.notes_rounded,
             ),
 
+          if (transaction.attachments.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            Text(
+              'Attachments',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppColors.grey500,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...transaction.attachments.map(
+              (attachment) => InkWell(
+                onTap: () => _openAttachment(context, attachment.filePath),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.insert_drive_file_outlined,
+                        size: 20,
+                        color: AppColors.grey600,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              attachment.fileName,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (attachment.sizeBytes != null)
+                              Text(
+                                '${(attachment.sizeBytes! / 1024).toStringAsFixed(1)} KB',
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppColors.grey500),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.open_in_new_rounded,
+                        size: 20,
+                        color: AppColors.grey400,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+
           const SizedBox(height: 40),
 
           // Delete Action
@@ -188,6 +247,31 @@ class _DetailsView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openAttachment(BuildContext context, String path) async {
+    try {
+      final result = await OpenFilex.open(path);
+      if (result.type != ResultType.done) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Could not open file: ${result.message}'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    } on Object catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 }
 

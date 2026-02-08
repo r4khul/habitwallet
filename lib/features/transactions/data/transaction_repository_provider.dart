@@ -18,9 +18,10 @@ TransactionRemoteDataSource transactionRemoteDataSource(Ref ref) {
 @riverpod
 TransactionRepository transactionRepository(Ref ref) {
   final dao = ref.watch(transactionDaoProvider);
+  final attachmentDao = ref.watch(attachmentDaoProvider);
   final remote = ref.watch(transactionRemoteDataSourceProvider);
 
-  final repository = TransactionRepositoryImpl(dao, remote);
+  final repository = TransactionRepositoryImpl(dao, attachmentDao, remote);
   ref.onDispose(repository.dispose);
 
   return repository;

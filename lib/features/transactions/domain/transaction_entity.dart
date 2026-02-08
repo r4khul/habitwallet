@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'attachment_entity.dart';
 
 part 'transaction_entity.freezed.dart';
 
@@ -35,6 +36,9 @@ abstract class TransactionEntity with _$TransactionEntity {
 
     /// Internal flag representing local state vs remote persistence.
     @Default(false) bool editedLocally,
+
+    /// List of attached files.
+    @Default([]) List<AttachmentEntity> attachments,
   }) = _TransactionEntity;
 
   const TransactionEntity._();

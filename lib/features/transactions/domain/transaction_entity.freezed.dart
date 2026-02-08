@@ -20,7 +20,8 @@ mixin _$TransactionEntity {
  String get categoryId;/// Authoritative timestamp of when the transaction occurred.
  DateTime get timestamp;/// Optional user-provided description or context.
  String? get note;/// Internal flag representing local state vs remote persistence.
- bool get editedLocally;
+ bool get editedLocally;/// List of attached files.
+ List<AttachmentEntity> get attachments;
 /// Create a copy of TransactionEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,16 +32,16 @@ $TransactionEntityCopyWith<TransactionEntity> get copyWith => _$TransactionEntit
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.note, note) || other.note == note)&&(identical(other.editedLocally, editedLocally) || other.editedLocally == editedLocally));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.note, note) || other.note == note)&&(identical(other.editedLocally, editedLocally) || other.editedLocally == editedLocally)&&const DeepCollectionEquality().equals(other.attachments, attachments));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,amount,categoryId,timestamp,note,editedLocally);
+int get hashCode => Object.hash(runtimeType,id,amount,categoryId,timestamp,note,editedLocally,const DeepCollectionEquality().hash(attachments));
 
 @override
 String toString() {
-  return 'TransactionEntity(id: $id, amount: $amount, categoryId: $categoryId, timestamp: $timestamp, note: $note, editedLocally: $editedLocally)';
+  return 'TransactionEntity(id: $id, amount: $amount, categoryId: $categoryId, timestamp: $timestamp, note: $note, editedLocally: $editedLocally, attachments: $attachments)';
 }
 
 
@@ -51,7 +52,7 @@ abstract mixin class $TransactionEntityCopyWith<$Res>  {
   factory $TransactionEntityCopyWith(TransactionEntity value, $Res Function(TransactionEntity) _then) = _$TransactionEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, double amount, String categoryId, DateTime timestamp, String? note, bool editedLocally
+ String id, double amount, String categoryId, DateTime timestamp, String? note, bool editedLocally, List<AttachmentEntity> attachments
 });
 
 
@@ -68,7 +69,7 @@ class _$TransactionEntityCopyWithImpl<$Res>
 
 /// Create a copy of TransactionEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? amount = null,Object? categoryId = null,Object? timestamp = null,Object? note = freezed,Object? editedLocally = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? amount = null,Object? categoryId = null,Object? timestamp = null,Object? note = freezed,Object? editedLocally = null,Object? attachments = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
@@ -76,7 +77,8 @@ as double,categoryId: null == categoryId ? _self.categoryId : categoryId // igno
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String?,editedLocally: null == editedLocally ? _self.editedLocally : editedLocally // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,attachments: null == attachments ? _self.attachments : attachments // ignore: cast_nullable_to_non_nullable
+as List<AttachmentEntity>,
   ));
 }
 
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  double amount,  String categoryId,  DateTime timestamp,  String? note,  bool editedLocally)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  double amount,  String categoryId,  DateTime timestamp,  String? note,  bool editedLocally,  List<AttachmentEntity> attachments)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TransactionEntity() when $default != null:
-return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.note,_that.editedLocally);case _:
+return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.note,_that.editedLocally,_that.attachments);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.not
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  double amount,  String categoryId,  DateTime timestamp,  String? note,  bool editedLocally)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  double amount,  String categoryId,  DateTime timestamp,  String? note,  bool editedLocally,  List<AttachmentEntity> attachments)  $default,) {final _that = this;
 switch (_that) {
 case _TransactionEntity():
-return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.note,_that.editedLocally);case _:
+return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.note,_that.editedLocally,_that.attachments);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.not
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  double amount,  String categoryId,  DateTime timestamp,  String? note,  bool editedLocally)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  double amount,  String categoryId,  DateTime timestamp,  String? note,  bool editedLocally,  List<AttachmentEntity> attachments)?  $default,) {final _that = this;
 switch (_that) {
 case _TransactionEntity() when $default != null:
-return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.note,_that.editedLocally);case _:
+return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.note,_that.editedLocally,_that.attachments);case _:
   return null;
 
 }
@@ -217,7 +219,7 @@ return $default(_that.id,_that.amount,_that.categoryId,_that.timestamp,_that.not
 
 
 class _TransactionEntity extends TransactionEntity {
-  const _TransactionEntity({required this.id, required this.amount, required this.categoryId, required this.timestamp, this.note, this.editedLocally = false}): super._();
+  const _TransactionEntity({required this.id, required this.amount, required this.categoryId, required this.timestamp, this.note, this.editedLocally = false, final  List<AttachmentEntity> attachments = const []}): _attachments = attachments,super._();
   
 
 /// Unique stable identifier. Invariant: Stable and immutable.
@@ -232,6 +234,15 @@ class _TransactionEntity extends TransactionEntity {
 @override final  String? note;
 /// Internal flag representing local state vs remote persistence.
 @override@JsonKey() final  bool editedLocally;
+/// List of attached files.
+ final  List<AttachmentEntity> _attachments;
+/// List of attached files.
+@override@JsonKey() List<AttachmentEntity> get attachments {
+  if (_attachments is EqualUnmodifiableListView) return _attachments;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_attachments);
+}
+
 
 /// Create a copy of TransactionEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -243,16 +254,16 @@ _$TransactionEntityCopyWith<_TransactionEntity> get copyWith => __$TransactionEn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.note, note) || other.note == note)&&(identical(other.editedLocally, editedLocally) || other.editedLocally == editedLocally));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.note, note) || other.note == note)&&(identical(other.editedLocally, editedLocally) || other.editedLocally == editedLocally)&&const DeepCollectionEquality().equals(other._attachments, _attachments));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,amount,categoryId,timestamp,note,editedLocally);
+int get hashCode => Object.hash(runtimeType,id,amount,categoryId,timestamp,note,editedLocally,const DeepCollectionEquality().hash(_attachments));
 
 @override
 String toString() {
-  return 'TransactionEntity(id: $id, amount: $amount, categoryId: $categoryId, timestamp: $timestamp, note: $note, editedLocally: $editedLocally)';
+  return 'TransactionEntity(id: $id, amount: $amount, categoryId: $categoryId, timestamp: $timestamp, note: $note, editedLocally: $editedLocally, attachments: $attachments)';
 }
 
 
@@ -263,7 +274,7 @@ abstract mixin class _$TransactionEntityCopyWith<$Res> implements $TransactionEn
   factory _$TransactionEntityCopyWith(_TransactionEntity value, $Res Function(_TransactionEntity) _then) = __$TransactionEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, double amount, String categoryId, DateTime timestamp, String? note, bool editedLocally
+ String id, double amount, String categoryId, DateTime timestamp, String? note, bool editedLocally, List<AttachmentEntity> attachments
 });
 
 
@@ -280,7 +291,7 @@ class __$TransactionEntityCopyWithImpl<$Res>
 
 /// Create a copy of TransactionEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? amount = null,Object? categoryId = null,Object? timestamp = null,Object? note = freezed,Object? editedLocally = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? amount = null,Object? categoryId = null,Object? timestamp = null,Object? note = freezed,Object? editedLocally = null,Object? attachments = null,}) {
   return _then(_TransactionEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
@@ -288,7 +299,8 @@ as double,categoryId: null == categoryId ? _self.categoryId : categoryId // igno
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String?,editedLocally: null == editedLocally ? _self.editedLocally : editedLocally // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,attachments: null == attachments ? _self._attachments : attachments // ignore: cast_nullable_to_non_nullable
+as List<AttachmentEntity>,
   ));
 }
 
