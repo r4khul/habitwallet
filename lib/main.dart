@@ -17,6 +17,7 @@ class HabitWalletApp extends ConsumerWidget {
       title: 'Habit Wallet',
       debugShowCheckedModeBanner: false,
       routerConfig: routerConfig,
+      theme: ThemeData(fontFamily: 'Chillax', useMaterial3: true),
     );
   }
 }
