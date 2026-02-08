@@ -39,27 +39,24 @@ class _FlowChartState extends State<FlowChart>
   int? _selectedIndex;
   Offset? _tapPosition;
 
-  bool _showScrollHint = true;
+  // Cache bar config to avoid recomputation
+  _BarConfig? _cachedConfig;
+  TimeRange? _cachedTimeRange;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      // Slightly faster animation for snappier feel
+      duration: const Duration(milliseconds: 600),
     );
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOutCubic,
     );
-    _scrollController = ScrollController()..addListener(_onScroll);
+    _scrollController = ScrollController();
     _animationController.forward();
-  }
-
-  void _onScroll() {
-    if (_scrollController.offset > 20 && _showScrollHint) {
-      setState(() => _showScrollHint = false);
-    }
   }
 
   @override
@@ -68,7 +65,8 @@ class _FlowChartState extends State<FlowChart>
     if (oldWidget.timeRange != widget.timeRange ||
         oldWidget.data.length != widget.data.length) {
       _selectedIndex = null;
-      _showScrollHint = true;
+      // Reset cached config on data change
+      _cachedConfig = null;
       _animationController.forward(from: 0);
     }
   }
@@ -76,22 +74,39 @@ class _FlowChartState extends State<FlowChart>
   @override
   void dispose() {
     _animationController.dispose();
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
+  /// Cached bar config getter to avoid repeated switch evaluation
   _BarConfig get _barConfig {
-    switch (widget.timeRange) {
-      case TimeRange.daily:
-        return const _BarConfig(width: 18, spacing: 10, cornerRadius: 4);
-      case TimeRange.weekly:
-        return const _BarConfig(width: 28, spacing: 14, cornerRadius: 5);
-      case TimeRange.monthly:
-        return const _BarConfig(width: 24, spacing: 8, cornerRadius: 4);
-      case TimeRange.yearly:
-        return const _BarConfig(width: 48, spacing: 24, cornerRadius: 6);
+    if (_cachedConfig != null && _cachedTimeRange == widget.timeRange) {
+      return _cachedConfig!;
     }
+    _cachedTimeRange = widget.timeRange;
+    _cachedConfig = switch (widget.timeRange) {
+      TimeRange.daily => const _BarConfig(
+        width: 18,
+        spacing: 10,
+        cornerRadius: 4,
+      ),
+      TimeRange.weekly => const _BarConfig(
+        width: 28,
+        spacing: 14,
+        cornerRadius: 5,
+      ),
+      TimeRange.monthly => const _BarConfig(
+        width: 24,
+        spacing: 8,
+        cornerRadius: 4,
+      ),
+      TimeRange.yearly => const _BarConfig(
+        width: 48,
+        spacing: 24,
+        cornerRadius: 6,
+      ),
+    };
+    return _cachedConfig!;
   }
 
   @override

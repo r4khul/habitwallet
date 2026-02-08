@@ -28,6 +28,8 @@ class TransactionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionsAsync = ref.watch(filteredTransactionsProvider);
     final categoryMapAsync = ref.watch(categoryMapProvider);
+    // Hoist currency symbol watch to parent - prevents N provider lookups in list
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -105,6 +107,7 @@ class TransactionsPage extends ConsumerWidget {
                             child: _TransactionTile(
                               transaction: tx,
                               category: category,
+                              currencySymbol: currencySymbol,
                             ),
                           );
                         },
@@ -171,21 +174,24 @@ class TransactionsPage extends ConsumerWidget {
   }
 }
 
-class _TransactionTile extends ConsumerWidget {
-  const _TransactionTile({required this.transaction, required this.category});
+class _TransactionTile extends StatelessWidget {
+  const _TransactionTile({
+    required this.transaction,
+    required this.category,
+    required this.currencySymbol,
+  });
 
   final TransactionEntity transaction;
   final CategoryEntity? category;
+  final String currencySymbol;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final amountColor = transaction.isIncome
         ? AppColors.success
         : AppColors.error;
     final semanticsLabel =
         '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}';
-
-    final currencySymbol = ref.watch(currencySymbolProvider);
 
     final iconData =
         CategoryAssets.icons[category?.icon] ?? Icons.category_rounded;

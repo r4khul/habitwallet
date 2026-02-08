@@ -49,32 +49,25 @@ class _DivergingBarChartState extends State<DivergingBarChart>
   int? _hoveredIndex;
   Offset? _hoverPosition;
 
+  // Throttle hover updates to prevent jank
+  DateTime? _lastHoverUpdate;
+  static const _hoverThrottleMs = 16; // ~60fps max
+
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(
-        milliseconds: 1000,
-      ), // Slightly slower for elegance
+      // Faster animation for snappier feel
+      duration: const Duration(milliseconds: 700),
     );
     _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
     _controller.forward();
-  }
-
-  void _onScroll() {
-    if (_hoveredIndex != null) {
-      setState(() {
-        // Force rebuild to update tooltip position if scrolling while hovering
-      });
-    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
@@ -124,13 +117,26 @@ class _DivergingBarChartState extends State<DivergingBarChart>
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: MouseRegion(
               onHover: (event) {
-                setState(() {
-                  _hoverPosition = event.localPosition;
-                  _hoveredIndex = _calculateIndex(
-                    event.localPosition.dx,
-                    barSettings,
-                  );
-                });
+                // Throttle hover updates to ~60fps max
+                final now = DateTime.now();
+                if (_lastHoverUpdate != null &&
+                    now.difference(_lastHoverUpdate!).inMilliseconds <
+                        _hoverThrottleMs) {
+                  return;
+                }
+                _lastHoverUpdate = now;
+
+                final newIndex = _calculateIndex(
+                  event.localPosition.dx,
+                  barSettings,
+                );
+                // Only rebuild if hover state actually changed
+                if (_hoveredIndex != newIndex) {
+                  setState(() {
+                    _hoverPosition = event.localPosition;
+                    _hoveredIndex = newIndex;
+                  });
+                }
               },
               onExit: (_) {
                 setState(() {
@@ -141,27 +147,29 @@ class _DivergingBarChartState extends State<DivergingBarChart>
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  return CustomPaint(
-                    size: Size(totalWidth - 32, widget.height),
-                    painter: _DivergingBarChartPainter(
-                      data: widget.data,
-                      progress: Curves.fastLinearToSlowEaseIn.transform(
-                        _controller.value,
+                  return RepaintBoundary(
+                    child: CustomPaint(
+                      size: Size(totalWidth - 32, widget.height),
+                      painter: _DivergingBarChartPainter(
+                        data: widget.data,
+                        progress: Curves.fastLinearToSlowEaseIn.transform(
+                          _controller.value,
+                        ),
+                        hoveredIndex: _hoveredIndex,
+                        period: widget.period,
+                        incomeColor:
+                            widget.incomeColor ?? const Color(0xFF10B981),
+                        expenseColor:
+                            widget.expenseColor ?? const Color(0xFFF43F5E),
+                        gridColor: AppColors.grey200.withValues(alpha: 0.5),
+                        labelStyle: AppTypography.labelSmall.copyWith(
+                          color: widget.labelColor ?? AppColors.grey500,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        barWidth: barSettings.width,
+                        barSpacing: barSettings.spacing,
+                        showGrid: widget.showGrid,
                       ),
-                      hoveredIndex: _hoveredIndex,
-                      period: widget.period,
-                      incomeColor:
-                          widget.incomeColor ?? const Color(0xFF10B981),
-                      expenseColor:
-                          widget.expenseColor ?? const Color(0xFFF43F5E),
-                      gridColor: AppColors.grey200.withValues(alpha: 0.5),
-                      labelStyle: AppTypography.labelSmall.copyWith(
-                        color: widget.labelColor ?? AppColors.grey500,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      barWidth: barSettings.width,
-                      barSpacing: barSettings.spacing,
-                      showGrid: widget.showGrid,
                     ),
                   );
                 },

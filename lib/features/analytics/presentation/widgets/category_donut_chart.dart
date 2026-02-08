@@ -41,7 +41,8 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      // Faster animation for snappier feel
+      duration: const Duration(milliseconds: 700),
     );
     _animation = CurvedAnimation(
       parent: _controller,
@@ -91,15 +92,17 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
         child: AnimatedBuilder(
           animation: _animation,
           builder: (context, child) {
-            return CustomPaint(
-              size: Size(widget.size, widget.size),
-              painter: _DonutPainter(
-                data: widget.data,
-                progress: _animation.value,
-                selectedIndex: widget.selectedIndex,
-                totalExpense: widget.totalExpense,
-                isDark: isDark,
-                currencySymbol: widget.currencySymbol,
+            return RepaintBoundary(
+              child: CustomPaint(
+                size: Size(widget.size, widget.size),
+                painter: _DonutPainter(
+                  data: widget.data,
+                  progress: _animation.value,
+                  selectedIndex: widget.selectedIndex,
+                  totalExpense: widget.totalExpense,
+                  isDark: isDark,
+                  currencySymbol: widget.currencySymbol,
+                ),
               ),
             );
           },
