@@ -17,5 +17,25 @@ abstract class TransactionRepository {
 
   /// Synchronizes local transactions with the remote source.
   /// Implement Push-then-Pull model with deterministic conflict resolution.
+  /// Guarantee: Local data is never lost on failure.
   Future<void> syncWithRemote();
+
+  /// Exposes the current synchronization status.
+  /// Use this to update the UI state (e.g., show a spinner or error icon).
+  Stream<SyncStatus> get syncStatus;
+
+  /// Cleans up resources (e.g., closes streams).
+  void dispose();
+}
+
+/// Represents the current state of data synchronization.
+enum SyncStatus {
+  /// No synchronization is currently in progress.
+  idle,
+
+  /// Synchronization is active (pushing or pulling data).
+  syncing,
+
+  /// The last synchronization attempt failed.
+  failed,
 }

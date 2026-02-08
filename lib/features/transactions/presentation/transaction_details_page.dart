@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/util/theme_extension.dart';
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
-import '../../../core/util/theme_extension.dart';
 
 /// Transaction Details Feature Presentation: Detailed view of a specific transaction.
 /// Implements a sophisticated, read-only view with edit capability.

@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../../../core/database/daos/transaction_dao.dart';
 import '../../../core/database/database.dart';
 import '../../../core/error/failures.dart';
@@ -12,6 +13,25 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   final TransactionDao _transactionDao;
   final TransactionRemoteDataSource _remoteDataSource;
+
+  final _syncStatusController = StreamController<SyncStatus>.broadcast();
+  SyncStatus _currentStatus = SyncStatus.idle;
+
+  @override
+  Stream<SyncStatus> get syncStatus async* {
+    yield _currentStatus;
+    yield* _syncStatusController.stream;
+  }
+
+  @override
+  void dispose() {
+    _syncStatusController.close();
+  }
+
+  void _updateStatus(SyncStatus status) {
+    _currentStatus = status;
+    _syncStatusController.add(status);
+  }
 
   @override
   Future<List<TransactionEntity>> getAll() async {
@@ -55,8 +75,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<void> syncWithRemote() async {
+    // Guaranty: Prevent concurrent syncs to ensure predictability.
+    if (_currentStatus == SyncStatus.syncing) return;
+
+    _updateStatus(SyncStatus.syncing);
+
     try {
       // 1. Push Phase: Pick up local changes and replicate to remote.
+      // Safety: We iterate through local changes. If a push fails, the loop throws,
+      // stopping the sync. The 'editedLocally' flag is ONLY cleared after a successful push.
+      // This ensures that on failure, the transaction remains marked as dirty and will be retried.
       final editedLocally = await _transactionDao.getEditedLocally();
       for (final row in editedLocally) {
         await _remoteDataSource.push(_toEntity(row));
@@ -65,6 +93,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
       }
 
       // 2. Pull Phase: Fetch remote state and merge into local.
+      // Safety: Remote fetch failure throws, stopping the sync.
+      // Partial updates during the loop are safe because each upsert is atomic and
+      // we strictly respect the 'editedLocally' precedence (Local Wins).
       final remoteRecords = await _remoteDataSource.fetchAll();
       for (final remote in remoteRecords) {
         final local = await _transactionDao.getById(remote.id);
@@ -85,9 +116,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
           // LOG: Skipping sync for transaction ${remote.id} due to local conflict.
         }
       }
+
+      // Sync completed successfully.
+      _updateStatus(SyncStatus.idle);
     } on Failure {
+      // Surface domain failures with state update
+      _updateStatus(SyncStatus.failed);
       rethrow;
     } on Object catch (e) {
+      // Catch unexpected errors, wrap in SyncFailure, update state
+      _updateStatus(SyncStatus.failed);
       throw SyncFailure('Sync failed due to unexpected error: $e');
     }
   }

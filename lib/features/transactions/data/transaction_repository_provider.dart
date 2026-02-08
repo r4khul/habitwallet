@@ -19,5 +19,9 @@ TransactionRemoteDataSource transactionRemoteDataSource(Ref ref) {
 TransactionRepository transactionRepository(Ref ref) {
   final dao = ref.watch(transactionDaoProvider);
   final remote = ref.watch(transactionRemoteDataSourceProvider);
-  return TransactionRepositoryImpl(dao, remote);
+
+  final repository = TransactionRepositoryImpl(dao, remote);
+  ref.onDispose(repository.dispose);
+
+  return repository;
 }
