@@ -21,6 +21,7 @@ class Categories extends Table {
 
 /// Transactions table schema.
 /// Represents the authoritative local record of all financial events.
+@TableIndex(name: 'tx_filter_idx', columns: {#timestamp, #categoryId})
 class Transactions extends Table {
   /// Unique stable identifier. Primary Key.
   /// This ID is preserved across syncs to ensure idempotency.

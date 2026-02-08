@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../transactions/presentation/providers/transaction_providers.dart';
+import '../../../transactions/data/transaction_repository_provider.dart';
 import '../../domain/user_profile.dart';
 
 part 'user_profile_provider.g.dart';
@@ -43,16 +43,14 @@ class UserProfileController extends _$UserProfileController {
 }
 
 @riverpod
-Future<double> currentYearSavings(Ref ref) async {
-  final transactions = await ref.watch(transactionControllerProvider.future);
+Stream<double> currentYearSavings(Ref ref) {
   final now = DateTime.now();
-  final currentYearTransactions = transactions.where(
-    (tx) => tx.timestamp.year == now.year,
-  );
+  final start = DateTime(now.year, 1, 1);
+  final end = DateTime(now.year, 12, 31, 23, 59, 59);
 
-  double savings = 0;
-  for (final tx in currentYearTransactions) {
-    savings += tx.amount; // amount sign is already handled in domain logic
-  }
-  return savings;
+  return ref.watch(transactionRepositoryProvider).watchInRange(start, end).map((
+    transactions,
+  ) {
+    return transactions.fold<double>(0, (sum, tx) => sum + tx.amount);
+  });
 }

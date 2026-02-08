@@ -134,18 +134,20 @@ class _FlowChartState extends State<FlowChart>
               child: AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
-                  return CustomPaint(
-                    size: Size(totalWidth - 32, widget.height),
-                    painter: _FlowChartPainter(
-                      data: widget.data,
-                      progress: _animation.value,
-                      selectedIndex: _selectedIndex,
-                      config: config,
-                      incomeColor:
-                          widget.incomeColor ?? const Color(0xFF10B981),
-                      expenseColor:
-                          widget.expenseColor ?? const Color(0xFFF43F5E),
-                      isDark: isDark,
+                  return RepaintBoundary(
+                    child: CustomPaint(
+                      size: Size(totalWidth - 32, widget.height),
+                      painter: _FlowChartPainter(
+                        data: widget.data,
+                        progress: _animation.value,
+                        selectedIndex: _selectedIndex,
+                        config: config,
+                        incomeColor:
+                            widget.incomeColor ?? const Color(0xFF10B981),
+                        expenseColor:
+                            widget.expenseColor ?? const Color(0xFFF43F5E),
+                        isDark: isDark,
+                      ),
                     ),
                   );
                 },

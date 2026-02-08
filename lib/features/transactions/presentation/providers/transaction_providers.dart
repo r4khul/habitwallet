@@ -54,17 +54,8 @@ Stream<TransactionEntity?> transactionById(Ref ref, String id) {
 }
 
 @riverpod
-Stream<List<TransactionEntity>> filteredTransactions(Ref ref) async* {
-  final transactionsAsync = ref.watch(transactionControllerProvider);
+Stream<List<TransactionEntity>> filteredTransactions(Ref ref) {
   final filter = ref.watch(dateFilterControllerProvider);
-
-  if (transactionsAsync.hasValue) {
-    final transactions = transactionsAsync.value!;
-    yield transactions.where((tx) {
-      return tx.timestamp.isAfter(
-            filter.start.subtract(const Duration(seconds: 1)),
-          ) &&
-          tx.timestamp.isBefore(filter.end.add(const Duration(seconds: 1)));
-    }).toList()..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-  }
+  final repository = ref.watch(transactionRepositoryProvider);
+  return repository.watchInRange(filter.start, filter.end);
 }

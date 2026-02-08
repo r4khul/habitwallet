@@ -111,4 +111,4 @@ final class FinancialSummaryProvider
   }
 }
 
-String _$financialSummaryHash() => r'c2279096ec6582d8c1d945b859847eae01c9afe9';
+String _$financialSummaryHash() => r'ecb5231e85edfd4720b0d1dd1e75bbc1efc1309f';

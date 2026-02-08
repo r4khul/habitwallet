@@ -60,6 +60,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
+  Stream<List<TransactionEntity>> watchInRange(DateTime start, DateTime end) {
+    return _transactionDao
+        .watchInRange(start, end)
+        .map((rows) => rows.map(_toEntity).toList());
+  }
+
+  @override
   Future<TransactionEntity?> getById(String id) async {
     try {
       final row = await _transactionDao.getById(id);
@@ -90,14 +97,21 @@ class TransactionRepositoryImpl implements TransactionRepository {
       await _transactionDao.upsert(_toRow(transaction));
 
       // Handle attachments
-      // Strategy: Delete all existing attachments for this transaction and re-insert valid ones.
+      // Handle attachments with diff-based updates
       final existing = await _attachmentDao.getByTransactionId(transaction.id);
+      final newIds = transaction.attachments.map((a) => a.id).toSet();
+
+      // Delete removed attachments
       for (final a in existing) {
-        await _attachmentDao.deleteAttachment(a.id);
+        if (!newIds.contains(a.id)) {
+          await _attachmentDao.deleteAttachment(a.id);
+        }
       }
 
-      // Insert new ones
+      // Upsert current attachments (new or updated)
       for (final attachment in transaction.attachments) {
+        // Since drift's insertOnConflictUpdate might be heavy if no change,
+        // strictly we could check dirty state, but this is safe and cleaner than delete-all.
         await _attachmentDao.insertAttachment(_toAttachmentRow(attachment));
       }
     } on Object catch (_) {

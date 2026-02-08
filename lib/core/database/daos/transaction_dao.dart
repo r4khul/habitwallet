@@ -25,6 +25,19 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
     )..orderBy([(t) => OrderingTerm.desc(t.timestamp)])).watch();
   }
 
+  /// Reactive stream of transactions within a date range.
+  Stream<List<Transaction>> watchInRange(DateTime start, DateTime end) {
+    return (select(transactions)
+          ..where(
+            (t) => t.timestamp.isBetweenValues(
+              start.millisecondsSinceEpoch,
+              end.millisecondsSinceEpoch,
+            ),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.timestamp)]))
+        .watch();
+  }
+
   /// Fetches a specific transaction row by its [id].
   Future<Transaction?> getById(String id) {
     return (select(

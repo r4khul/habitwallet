@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/widgets/charts/chart_types.dart';
 import 'package:habitwallet/core/widgets/charts/diverging_bar_chart.dart';
-import 'package:habitwallet/features/transactions/domain/transaction_entity.dart';
-import 'package:habitwallet/features/transactions/presentation/providers/transaction_providers.dart';
-import 'package:intl/intl.dart';
+import 'package:habitwallet/features/transactions/presentation/providers/analytics_provider.dart';
 
 class AnalyticsPage extends ConsumerStatefulWidget {
   const AnalyticsPage({super.key});
@@ -20,7 +18,9 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final transactionsAsync = ref.watch(transactionControllerProvider);
+    final chartDataAsync = ref.watch(
+      aggregatedChartDataProvider(_selectedPeriod),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -30,13 +30,11 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: transactionsAsync.when(
-        data: (transactions) {
-          if (transactions.isEmpty) {
+      body: chartDataAsync.when(
+        data: (List<ChartPoint> chartData) {
+          if (chartData.isEmpty) {
             return const Center(child: Text('No transactions to analyze'));
           }
-
-          final chartData = _aggregateData(transactions, _selectedPeriod);
 
           return SafeArea(
             child: Column(
@@ -111,80 +109,10 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (Object err, StackTrace stack) =>
+            Center(child: Text('Error: $err')),
       ),
     );
-  }
-
-  List<ChartPoint> _aggregateData(
-    List<TransactionEntity> transactions,
-    ChartPeriod period,
-  ) {
-    final groupedIncome = <String, double>{};
-    final groupedExpense = <String, double>{};
-    final dates = <String, DateTime>{};
-
-    for (var tx in transactions) {
-      final dateKey = _getDateKey(tx.timestamp, period);
-      if (!dates.containsKey(dateKey)) {
-        dates[dateKey] = _normalizeDate(tx.timestamp, period);
-      }
-
-      if (tx.isIncome) {
-        groupedIncome[dateKey] = (groupedIncome[dateKey] ?? 0) + tx.amount;
-      } else {
-        groupedExpense[dateKey] = (groupedExpense[dateKey] ?? 0) + tx.amount;
-      }
-    }
-
-    final allKeys = {...groupedIncome.keys, ...groupedExpense.keys}.toList()
-      ..sort((a, b) => dates[a]!.compareTo(dates[b]!));
-
-    final result = <ChartPoint>[];
-    for (var key in allKeys) {
-      final date = dates[key]!;
-      final inc = groupedIncome[key] ?? 0;
-      final exp = groupedExpense[key] ?? 0;
-
-      result.add(ChartPoint(date: date, income: inc, expense: exp));
-    }
-    return result;
-  }
-
-  DateTime _normalizeDate(DateTime date, ChartPeriod period) {
-    switch (period) {
-      case ChartPeriod.daily:
-        return DateTime(date.year, date.month, date.day);
-      case ChartPeriod.weekly:
-        // Start of week (Monday)
-        final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
-        return DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
-      case ChartPeriod.monthly:
-        return DateTime(date.year, date.month);
-      case ChartPeriod.yearly:
-        return DateTime(date.year);
-    }
-  }
-
-  String _getDateKey(DateTime date, ChartPeriod period) {
-    switch (period) {
-      case ChartPeriod.daily:
-        return '${date.year}-${date.month}-${date.day}';
-      case ChartPeriod.weekly:
-        // Use week number or start date string
-        final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
-        return '${startOfWeek.year}-W${_weekNumber(startOfWeek)}';
-      case ChartPeriod.monthly:
-        return '${date.year}-${date.month}';
-      case ChartPeriod.yearly:
-        return '${date.year}';
-    }
-  }
-
-  int _weekNumber(DateTime date) {
-    // Simple week number calc
-    final dayOfYear = int.parse(DateFormat('D').format(date));
-    return ((dayOfYear - date.weekday + 10) / 7).floor();
   }
 }
 

@@ -1339,6 +1339,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
   late final $AttachmentsTable attachments = $AttachmentsTable(this);
+  late final Index txFilterIdx = Index(
+    'tx_filter_idx',
+    'CREATE INDEX tx_filter_idx ON transactions (timestamp, category_id)',
+  );
   late final TransactionDao transactionDao = TransactionDao(
     this as AppDatabase,
   );
@@ -1352,6 +1356,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     transactions,
     categories,
     attachments,
+    txFilterIdx,
   ];
 }
 

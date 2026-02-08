@@ -42,15 +42,17 @@ class _UnifiedCategoryBreakdownState extends State<UnifiedCategoryBreakdown> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 32),
           child: Center(
-            child: CategoryDonutChart(
-              data: widget.data,
-              totalExpense: widget.totalExpense,
-              size: 220, // Increased size
-              selectedIndex: _selectedIndex,
-              currencySymbol: widget.currencySymbol,
-              onSelectionChanged: (index) {
-                setState(() => _selectedIndex = index);
-              },
+            child: RepaintBoundary(
+              child: CategoryDonutChart(
+                data: widget.data,
+                totalExpense: widget.totalExpense,
+                size: 220, // Increased size
+                selectedIndex: _selectedIndex,
+                currencySymbol: widget.currencySymbol,
+                onSelectionChanged: (index) {
+                  setState(() => _selectedIndex = index);
+                },
+              ),
             ),
           ),
         ),

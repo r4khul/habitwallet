@@ -9,6 +9,9 @@ abstract class TransactionRepository {
   /// Watch all transactions.
   Stream<List<TransactionEntity>> watchAll();
 
+  /// Watch transactions within a date range.
+  Stream<List<TransactionEntity>> watchInRange(DateTime start, DateTime end);
+
   /// Retrieves a specific transaction by its unique [id].
   Future<TransactionEntity?> getById(String id);
   Stream<TransactionEntity?> watchById(String id);

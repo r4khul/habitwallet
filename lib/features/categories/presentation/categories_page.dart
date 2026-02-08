@@ -20,6 +20,7 @@ class CategoriesPage extends ConsumerWidget {
         data: (categories) => ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: categories.length,
+          itemExtent: 76,
           itemBuilder: (context, index) {
             final category = categories[index];
             return _CategoryTile(category: category);

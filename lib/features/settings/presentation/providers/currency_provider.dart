@@ -115,3 +115,13 @@ class CurrencyController extends _$CurrencyController {
     await storage.write(key: _storageKey, value: currency.code);
   }
 }
+
+@riverpod
+String currencySymbol(Ref ref) {
+  return ref
+      .watch(currencyControllerProvider)
+      .maybeWhen(
+        data: (c) => c.symbol,
+        orElse: () => '₹', // Matches default
+      );
+}

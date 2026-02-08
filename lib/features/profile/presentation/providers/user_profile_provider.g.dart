@@ -58,8 +58,8 @@ abstract class _$UserProfileController extends $AsyncNotifier<UserProfile> {
 final currentYearSavingsProvider = CurrentYearSavingsProvider._();
 
 final class CurrentYearSavingsProvider
-    extends $FunctionalProvider<AsyncValue<double>, double, FutureOr<double>>
-    with $FutureModifier<double>, $FutureProvider<double> {
+    extends $FunctionalProvider<AsyncValue<double>, double, Stream<double>>
+    with $FutureModifier<double>, $StreamProvider<double> {
   CurrentYearSavingsProvider._()
     : super(
         from: null,
@@ -76,14 +76,14 @@ final class CurrentYearSavingsProvider
 
   @$internal
   @override
-  $FutureProviderElement<double> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+  $StreamProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
 
   @override
-  FutureOr<double> create(Ref ref) {
+  Stream<double> create(Ref ref) {
     return currentYearSavings(ref);
   }
 }
 
 String _$currentYearSavingsHash() =>
-    r'd03180d4e83857e3326cc002114aefd4d8d5bdcd';
+    r'9662edd0ab3af921479bb72c3dcc32f9bc2a0b72';

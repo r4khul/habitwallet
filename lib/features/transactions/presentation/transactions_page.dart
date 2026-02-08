@@ -10,9 +10,11 @@ import '../../../core/util/theme_extension.dart';
 import '../../../features/settings/presentation/providers/currency_provider.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
 
-import '../../categories/presentation/providers/category_providers.dart';
+import '../../categories/presentation/providers/category_map_provider.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
+import '../../categories/domain/category_entity.dart';
 import '../../profile/presentation/providers/user_profile_provider.dart';
+import '../data/transaction_repository_provider.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
 import 'widgets/date_range_selector.dart';
@@ -25,6 +27,7 @@ class TransactionsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionsAsync = ref.watch(filteredTransactionsProvider);
+    final categoryMapAsync = ref.watch(categoryMapProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -51,17 +54,39 @@ class TransactionsPage extends ConsumerWidget {
                     onAction: () => _openAddTransaction(context),
                   );
                 }
-                return RefreshIndicator(
-                  onRefresh: () async => ref
-                      .read(transactionControllerProvider.notifier)
-                      .refresh(),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    itemCount: transactions.length,
-                    itemBuilder: (context, index) {
-                      final tx = transactions[index];
-                      return _TransactionTile(transaction: tx);
+                return categoryMapAsync.when(
+                  data: (categoryMap) => RefreshIndicator(
+                    onRefresh: () async {
+                      try {
+                        await ref
+                            .read(transactionRepositoryProvider)
+                            .syncWithRemote();
+                      } catch (_) {
+                        // Fail silently or show toast, but let the refresher close
+                      }
                     },
+                    child: RepaintBoundary(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        itemCount: transactions.length,
+                        itemExtent: 72, // Fixed height for performance
+                        itemBuilder: (context, index) {
+                          final tx = transactions[index];
+                          final category = categoryMap[tx.categoryId];
+                          return _TransactionTile(
+                            transaction: tx,
+                            category: category,
+                          );
+                        },
+                        addAutomaticKeepAlives: true,
+                        addRepaintBoundaries: true,
+                      ),
+                    ),
+                  ),
+                  loading: () => const _LoadingState(),
+                  error: (e, s) => _ErrorState(
+                    message: 'Failed to load categories',
+                    onRetry: () => ref.refresh(categoryMapProvider),
                   ),
                 );
               },
@@ -89,9 +114,10 @@ class TransactionsPage extends ConsumerWidget {
 }
 
 class _TransactionTile extends ConsumerWidget {
-  const _TransactionTile({required this.transaction});
+  const _TransactionTile({required this.transaction, required this.category});
 
   final TransactionEntity transaction;
+  final CategoryEntity? category;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,11 +127,11 @@ class _TransactionTile extends ConsumerWidget {
     final semanticsLabel =
         '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}';
 
-    final categoryAsync = ref.watch(
-      categoryByIdProvider(transaction.categoryId),
-    );
-    final currencyAsync = ref.watch(currencyControllerProvider);
-    final currencySymbol = currencyAsync.value?.symbol ?? '\$';
+    final currencySymbol = ref.watch(currencySymbolProvider);
+
+    final iconData =
+        CategoryAssets.icons[category?.icon] ?? Icons.category_rounded;
+    final color = category != null ? Color(category!.color) : AppColors.grey500;
 
     return InkWell(
       onTap: () => context.push('/tx/${transaction.id}'),
@@ -113,58 +139,29 @@ class _TransactionTile extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            categoryAsync.when(
-              data: (category) {
-                final iconData =
-                    CategoryAssets.icons[category?.icon] ??
-                    Icons.category_rounded;
-                final color = category != null
-                    ? Color(category.color)
-                    : AppColors.grey500;
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    iconData,
-                    color: color,
-                    size: 24,
-                    semanticLabel: category?.name ?? 'Category icon',
-                  ),
-                );
-              },
-              loading: () => Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: context.isDarkMode
-                      ? AppColors.grey900
-                      : AppColors.grey200,
-                  shape: BoxShape.circle,
-                ),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              error: (error, stack) => const Icon(Icons.error_outline),
+              child: Icon(
+                iconData,
+                color: color,
+                size: 24,
+                semanticLabel: category?.name ?? 'Category icon',
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  categoryAsync.when(
-                    data: (category) => Text(
-                      category?.name ?? 'Unknown',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    loading: () => Container(
-                      height: 20,
-                      width: 80,
-                      color: context.isDarkMode
-                          ? AppColors.grey900
-                          : AppColors.grey200,
-                    ),
-                    error: (error, stack) => const Text('Error'),
+                  Text(
+                    category?.name ?? 'Unknown',
+                    style: Theme.of(context).textTheme.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Row(

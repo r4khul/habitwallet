@@ -206,4 +206,4 @@ final class FilteredTransactionsProvider
 }
 
 String _$filteredTransactionsHash() =>
-    r'077c8b3543e38ef6ff3cca0875319f363c032a85';
+    r'512b5a2201d9e55449c3ace9a73a2eede2f7a504';

@@ -7,7 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/util/theme_extension.dart';
 import '../../../features/settings/presentation/providers/currency_provider.dart';
 import '../../../core/util/formatting_utils.dart';
-import '../../categories/presentation/providers/category_providers.dart';
+import '../../categories/presentation/providers/category_map_provider.dart';
 
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
@@ -60,9 +60,9 @@ class _DetailsView extends ConsumerWidget {
     final amountColor = transaction.isIncome
         ? AppColors.success
         : AppColors.error;
-    final categoryAsync = ref.watch(
-      categoryByIdProvider(transaction.categoryId),
-    );
+    final categoryMapAsync = ref.watch(categoryMapProvider);
+    final category = categoryMapAsync.value?[transaction.categoryId];
+
     final currencyAsync = ref.watch(currencyControllerProvider);
     final currencySymbol = currencyAsync.value?.symbol ?? '\$';
 
@@ -75,8 +75,8 @@ class _DetailsView extends ConsumerWidget {
           Center(
             child: Column(
               children: [
-                categoryAsync.when(
-                  data: (category) {
+                Builder(
+                  builder: (context) {
                     final iconData =
                         CategoryAssets.icons[category?.icon] ??
                         (transaction.isIncome
@@ -99,17 +99,6 @@ class _DetailsView extends ConsumerWidget {
                       ),
                     );
                   },
-                  loading: () => Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: context.isDarkMode
-                          ? AppColors.grey900
-                          : AppColors.grey200,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  error: (error, stack) => const Icon(Icons.error_outline),
                 ),
                 const SizedBox(height: 16),
                 Semantics(
@@ -123,19 +112,11 @@ class _DetailsView extends ConsumerWidget {
                     ),
                   ),
                 ),
-                categoryAsync.when(
-                  data: (category) => Text(
-                    category?.name ?? 'Unknown',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.grey500,
-                    ),
-                  ),
-                  loading: () => Container(
-                    height: 24,
-                    width: 100,
-                    color: AppColors.grey900,
-                  ),
-                  error: (error, stack) => const Text('Error'),
+                Text(
+                  category?.name ?? 'Unknown',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineSmall?.copyWith(color: AppColors.grey500),
                 ),
               ],
             ),

@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../categories/presentation/providers/category_providers.dart';
@@ -26,11 +27,13 @@ Future<FinancialSummary> financialSummary(Ref ref) async {
   final transactions = await ref.watch(transactionControllerProvider.future);
   final categories = await ref.watch(categoryControllerProvider.future);
 
-  const aggregator = FinancialAggregator();
-
-  return aggregator.aggregate(
-    transactions: transactions,
-    categories: categories,
-    range: range,
-  );
+  // Calculate in background isolate to unblock UI thread
+  return Isolate.run(() {
+    const aggregator = FinancialAggregator();
+    return aggregator.aggregate(
+      transactions: transactions,
+      categories: categories,
+      range: range,
+    );
+  });
 }
