@@ -16,11 +16,23 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     return select(categories).get();
   }
 
+  /// Reactive stream of all category rows.
+  Stream<List<Category>> watchAll() {
+    return select(categories).watch();
+  }
+
   /// Fetches a specific category row by its [id].
   Future<Category?> getById(String id) {
     return (select(
       categories,
     )..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Reactive stream of a single category row.
+  Stream<Category?> watchById(String id) {
+    return (select(
+      categories,
+    )..where((t) => t.id.equals(id))).watchSingleOrNull();
   }
 
   /// Upserts a category row.

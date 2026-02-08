@@ -42,7 +42,7 @@ final class DateFilterControllerProvider
 }
 
 String _$dateFilterControllerHash() =>
-    r'4291f9c9e6a7bd7667c397d8ea22c5300d157ccf';
+    r'f359c1267e6eee1e04ed493950f3606645c5c210';
 
 abstract class _$DateFilterController extends $Notifier<DateRangeFilter> {
   DateRangeFilter build();

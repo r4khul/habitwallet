@@ -6,8 +6,12 @@ abstract class TransactionRepository {
   /// Retrieves all transactions.
   Future<List<TransactionEntity>> getAll();
 
+  /// Watch all transactions.
+  Stream<List<TransactionEntity>> watchAll();
+
   /// Retrieves a specific transaction by its unique [id].
   Future<TransactionEntity?> getById(String id);
+  Stream<TransactionEntity?> watchById(String id);
 
   /// Creates or updates a transaction while maintaining its identity.
   Future<void> upsert(TransactionEntity transaction);

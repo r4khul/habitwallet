@@ -26,6 +26,11 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
+  Stream<List<CategoryEntity>> watchAll() {
+    return _categoryDao.watchAll().map((rows) => rows.map(_toEntity).toList());
+  }
+
+  @override
   Future<CategoryEntity?> getById(String id) async {
     try {
       final row = await _categoryDao.getById(id);
@@ -33,6 +38,13 @@ class CategoryRepositoryImpl implements CategoryRepository {
     } on Object catch (_) {
       throw const DatabaseFailure('Failed to retrieve category details.');
     }
+  }
+
+  @override
+  Stream<CategoryEntity?> watchById(String id) {
+    return _categoryDao
+        .watchById(id)
+        .map((row) => row != null ? _toEntity(row) : null);
   }
 
   @override

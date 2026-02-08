@@ -32,6 +32,13 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
+  /// Reactive stream of a single transaction row.
+  Stream<Transaction?> watchById(String id) {
+    return (select(
+      transactions,
+    )..where((t) => t.id.equals(id))).watchSingleOrNull();
+  }
+
   /// Upserts a transaction row (inserts or replaces on conflict).
   Future<void> upsert(Transaction row) {
     return into(transactions).insertOnConflictUpdate(row);

@@ -53,6 +53,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
+  Stream<List<TransactionEntity>> watchAll() {
+    return _transactionDao.watchAll().map(
+      (rows) => rows.map(_toEntity).toList(),
+    );
+  }
+
+  @override
   Future<TransactionEntity?> getById(String id) async {
     try {
       final row = await _transactionDao.getById(id);
@@ -65,6 +72,15 @@ class TransactionRepositoryImpl implements TransactionRepository {
     } on Object catch (_) {
       throw const DatabaseFailure('Failed to retrieve transaction details.');
     }
+  }
+
+  @override
+  Stream<TransactionEntity?> watchById(String id) {
+    // Note: This stream won't react to attachment changes.
+    // In a real app, you'd combine it with an attachment stream.
+    return _transactionDao
+        .watchById(id)
+        .map((row) => row != null ? _toEntity(row) : null);
   }
 
   @override

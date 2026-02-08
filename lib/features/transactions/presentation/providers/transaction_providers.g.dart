@@ -20,7 +20,10 @@ final transactionControllerProvider = TransactionControllerProvider._();
 /// Ownership: Owns the transaction logic; calls repository only.
 final class TransactionControllerProvider
     extends
-        $AsyncNotifierProvider<TransactionController, List<TransactionEntity>> {
+        $StreamNotifierProvider<
+          TransactionController,
+          List<TransactionEntity>
+        > {
   /// Feature State: Manages the collection of transactions.
   /// Responsibility: Provides an observable list of transactions and handles mutative actions.
   /// Ownership: Owns the transaction logic; calls repository only.
@@ -44,15 +47,15 @@ final class TransactionControllerProvider
 }
 
 String _$transactionControllerHash() =>
-    r'c034808cfdb265ba861d90b2298b4a5d9d8ed94a';
+    r'db239bce59c6aaee5ff1b80522cc36060d568941';
 
 /// Feature State: Manages the collection of transactions.
 /// Responsibility: Provides an observable list of transactions and handles mutative actions.
 /// Ownership: Owns the transaction logic; calls repository only.
 
 abstract class _$TransactionController
-    extends $AsyncNotifier<List<TransactionEntity>> {
-  FutureOr<List<TransactionEntity>> build();
+    extends $StreamNotifier<List<TransactionEntity>> {
+  Stream<List<TransactionEntity>> build();
   @$mustCallSuper
   @override
   void runBuild() {
@@ -89,11 +92,11 @@ final class TransactionByIdProvider
         $FunctionalProvider<
           AsyncValue<TransactionEntity?>,
           TransactionEntity?,
-          FutureOr<TransactionEntity?>
+          Stream<TransactionEntity?>
         >
     with
         $FutureModifier<TransactionEntity?>,
-        $FutureProvider<TransactionEntity?> {
+        $StreamProvider<TransactionEntity?> {
   /// Feature State: Exposes a single transaction by its ID.
   TransactionByIdProvider._({
     required TransactionByIdFamily super.from,
@@ -118,12 +121,12 @@ final class TransactionByIdProvider
 
   @$internal
   @override
-  $FutureProviderElement<TransactionEntity?> $createElement(
+  $StreamProviderElement<TransactionEntity?> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  ) => $StreamProviderElement(pointer);
 
   @override
-  FutureOr<TransactionEntity?> create(Ref ref) {
+  Stream<TransactionEntity?> create(Ref ref) {
     final argument = this.argument as String;
     return transactionById(ref, argument);
   }
@@ -139,12 +142,12 @@ final class TransactionByIdProvider
   }
 }
 
-String _$transactionByIdHash() => r'0bfa7374a3961efb7b94fa30b48ed52573fcb3f0';
+String _$transactionByIdHash() => r'efbe395d6e41108d0eaf13f7b6fe4f4c715f2b2e';
 
 /// Feature State: Exposes a single transaction by its ID.
 
 final class TransactionByIdFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<TransactionEntity?>, String> {
+    with $FunctionalFamilyOverride<Stream<TransactionEntity?>, String> {
   TransactionByIdFamily._()
     : super(
         retry: null,
@@ -171,11 +174,11 @@ final class FilteredTransactionsProvider
         $FunctionalProvider<
           AsyncValue<List<TransactionEntity>>,
           List<TransactionEntity>,
-          FutureOr<List<TransactionEntity>>
+          Stream<List<TransactionEntity>>
         >
     with
         $FutureModifier<List<TransactionEntity>>,
-        $FutureProvider<List<TransactionEntity>> {
+        $StreamProvider<List<TransactionEntity>> {
   FilteredTransactionsProvider._()
     : super(
         from: null,
@@ -192,15 +195,15 @@ final class FilteredTransactionsProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<TransactionEntity>> $createElement(
+  $StreamProviderElement<List<TransactionEntity>> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  ) => $StreamProviderElement(pointer);
 
   @override
-  FutureOr<List<TransactionEntity>> create(Ref ref) {
+  Stream<List<TransactionEntity>> create(Ref ref) {
     return filteredTransactions(ref);
   }
 }
 
 String _$filteredTransactionsHash() =>
-    r'2419c20ae8a7c9cb8dc95000992068a4892e9484';
+    r'077c8b3543e38ef6ff3cca0875319f363c032a85';

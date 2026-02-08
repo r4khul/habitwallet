@@ -13,7 +13,7 @@ part of 'category_providers.dart';
 final categoryControllerProvider = CategoryControllerProvider._();
 
 final class CategoryControllerProvider
-    extends $AsyncNotifierProvider<CategoryController, List<CategoryEntity>> {
+    extends $StreamNotifierProvider<CategoryController, List<CategoryEntity>> {
   CategoryControllerProvider._()
     : super(
         from: null,
@@ -34,11 +34,11 @@ final class CategoryControllerProvider
 }
 
 String _$categoryControllerHash() =>
-    r'f0c8e40a09177c451bb1f9773482de4e64569da7';
+    r'5a4f5f162dc4deba7629caed5d69839f1370e61a';
 
 abstract class _$CategoryController
-    extends $AsyncNotifier<List<CategoryEntity>> {
-  FutureOr<List<CategoryEntity>> build();
+    extends $StreamNotifier<List<CategoryEntity>> {
+  Stream<List<CategoryEntity>> build();
   @$mustCallSuper
   @override
   void runBuild() {
@@ -68,9 +68,9 @@ final class CategoryByIdProvider
         $FunctionalProvider<
           AsyncValue<CategoryEntity?>,
           CategoryEntity?,
-          FutureOr<CategoryEntity?>
+          Stream<CategoryEntity?>
         >
-    with $FutureModifier<CategoryEntity?>, $FutureProvider<CategoryEntity?> {
+    with $FutureModifier<CategoryEntity?>, $StreamProvider<CategoryEntity?> {
   CategoryByIdProvider._({
     required CategoryByIdFamily super.from,
     required String super.argument,
@@ -94,12 +94,12 @@ final class CategoryByIdProvider
 
   @$internal
   @override
-  $FutureProviderElement<CategoryEntity?> $createElement(
+  $StreamProviderElement<CategoryEntity?> $createElement(
     $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  ) => $StreamProviderElement(pointer);
 
   @override
-  FutureOr<CategoryEntity?> create(Ref ref) {
+  Stream<CategoryEntity?> create(Ref ref) {
     final argument = this.argument as String;
     return categoryById(ref, argument);
   }
@@ -115,10 +115,10 @@ final class CategoryByIdProvider
   }
 }
 
-String _$categoryByIdHash() => r'2b730e42f221678b6075dcd673e1a79c56bd8132';
+String _$categoryByIdHash() => r'0f889716e6ad018d1e26c413e5fbb1c1271d9e36';
 
 final class CategoryByIdFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<CategoryEntity?>, String> {
+    with $FunctionalFamilyOverride<Stream<CategoryEntity?>, String> {
   CategoryByIdFamily._()
     : super(
         retry: null,
