@@ -55,4 +55,18 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
       const TransactionsCompanion(editedLocally: Value(false)),
     );
   }
+
+  /// Deletes all transactions associated with a specific category.
+  Future<int> deleteByCategoryId(String categoryId) {
+    return (delete(
+      transactions,
+    )..where((t) => t.categoryId.equals(categoryId))).go();
+  }
+
+  /// Reassigns all transactions from one category to another.
+  Future<int> reassignCategoryId(String oldCategoryId, String newCategoryId) {
+    return (update(transactions)
+          ..where((t) => t.categoryId.equals(oldCategoryId)))
+        .write(TransactionsCompanion(categoryId: Value(newCategoryId)));
+  }
 }

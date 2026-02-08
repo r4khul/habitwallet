@@ -6,4 +6,6 @@ abstract class CategoryRepository {
   Future<void> upsert(CategoryEntity category);
   Future<void> delete(String id);
   Future<bool> isCategoryUsed(String id);
+  Future<void> deleteWithTransactions(String id);
+  Future<void> reassignAndAndDelete(String oldId, String newId);
 }

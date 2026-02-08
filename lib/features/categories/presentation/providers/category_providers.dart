@@ -87,6 +87,18 @@ class CategoryController extends _$CategoryController {
     await ref.read(categoryRepositoryProvider).delete(id);
     await refresh();
   }
+
+  Future<void> deleteCategoryWithTransactions(String id) async {
+    await ref.read(categoryRepositoryProvider).deleteWithTransactions(id);
+    await refresh();
+  }
+
+  Future<void> reassignAndDeleteCategory(String oldId, String newId) async {
+    await ref
+        .read(categoryRepositoryProvider)
+        .reassignAndAndDelete(oldId, newId);
+    await refresh();
+  }
 }
 
 @riverpod

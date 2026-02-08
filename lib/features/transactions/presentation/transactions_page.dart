@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:habitwallet/core/util/formatting_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -206,7 +207,7 @@ class _TransactionTile extends ConsumerWidget {
             Semantics(
               label: semanticsLabel,
               child: Text(
-                '${transaction.displaySign}$currencySymbol${transaction.formattedAbsoluteAmount}',
+                '${transaction.displaySign}$currencySymbol${transaction.compactAbsoluteAmount}',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: amountColor,
                   fontWeight: FontWeight.w700,
@@ -472,7 +473,10 @@ class _AppDrawer extends ConsumerWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '$currencySymbol${current.toStringAsFixed(0)}',
+                                            FormattingUtils.formatCompact(
+                                              current,
+                                              symbol: currencySymbol,
+                                            ),
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .labelLarge
@@ -485,7 +489,7 @@ class _AppDrawer extends ConsumerWidget {
                                           ),
                                           if (isOverTarget)
                                             Text(
-                                              'Surplus: $currencySymbol${(current - goal).toStringAsFixed(0)}',
+                                              'Surplus: ${FormattingUtils.formatCompact(current - goal, symbol: currencySymbol)}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .labelSmall
@@ -572,7 +576,7 @@ class _AppDrawer extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Goal: $currencySymbol${goal.toStringAsFixed(0)}',
+                                    'Goal: ${FormattingUtils.formatCompact(goal, symbol: currencySymbol)}',
                                     style: Theme.of(context)
                                         .textTheme
                                         .labelSmall

@@ -51,6 +51,14 @@ class DateRangeSelector extends ConsumerWidget {
             onTap: () =>
                 ref.read(dateFilterControllerProvider.notifier).setThisMonth(),
           ),
+          _buildFilterChip(
+            context,
+            ref,
+            label: 'This Year',
+            isSelected: currentFilter.label == 'This Year',
+            onTap: () =>
+                ref.read(dateFilterControllerProvider.notifier).setThisYear(),
+          ),
           _buildCustomChip(context, ref, currentFilter),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
+import 'package:habitwallet/core/util/formatting_utils.dart';
 
 /// Summary card widget for displaying financial metrics.
 ///
@@ -201,7 +202,7 @@ class NetSavingsCard extends StatelessWidget {
           const SizedBox(height: 16),
           const SizedBox(height: 16),
           Text(
-            '${isPositive ? '+' : '-'} $currencySymbol${_formatAmount(netSavings.abs())}',
+            '${isPositive ? '+' : '-'} ${FormattingUtils.formatCompact(netSavings, symbol: currencySymbol)}',
             style: AppTypography.displayMedium.copyWith(
               color: primaryColor,
               fontWeight: FontWeight.w800,
@@ -212,14 +213,5 @@ class NetSavingsCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatAmount(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}K';
-    }
-    return amount.toStringAsFixed(0);
   }
 }

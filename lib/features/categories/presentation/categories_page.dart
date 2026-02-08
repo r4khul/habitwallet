@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../domain/category_entity.dart';
+import '../data/category_repository_provider.dart';
 import 'providers/category_providers.dart';
 import 'widgets/category_assets.dart';
 
@@ -114,43 +115,246 @@ class _CategoryTile extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Category?'),
-        content: const Text(
-          'This will permanently remove the category. It cannot be deleted if it is used in any transactions.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
+    final isUsed = await ref
+        .read(categoryRepositoryProvider)
+        .isCategoryUsed(category.id);
 
-    if (confirmed == true) {
-      try {
+    if (!isUsed) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete Category?'),
+          content: const Text('This will permanently remove the category.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed == true) {
         await ref
             .read(categoryControllerProvider.notifier)
             .deleteCategory(category.id);
-      } on Exception catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
       }
+      return;
     }
+
+    // Category is in use, show the options bottom sheet
+    if (context.mounted) {
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => _CategoryUsageActionSheet(category: category),
+      );
+    }
+  }
+}
+
+class _CategoryUsageActionSheet extends ConsumerStatefulWidget {
+  const _CategoryUsageActionSheet({required this.category});
+
+  final CategoryEntity category;
+
+  @override
+  ConsumerState<_CategoryUsageActionSheet> createState() =>
+      _CategoryUsageActionSheetState();
+}
+
+class _CategoryUsageActionSheetState
+    extends ConsumerState<_CategoryUsageActionSheet> {
+  CategoryEntity? _targetCategory;
+  bool _isDeleting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final categoriesAsync = ref.watch(categoryControllerProvider);
+    final otherCategories =
+        categoriesAsync.value
+            ?.where((c) => c.id != widget.category.id)
+            .toList() ??
+        [];
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: AppColors.error,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Category in Use',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '"${widget.category.name}" has existing transactions.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.grey500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          Text(
+            'Option 1: Move Transactions',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Reassign all transactions to another category before deleting this one.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<CategoryEntity>(
+            value: _targetCategory,
+            decoration: const InputDecoration(
+              hintText: 'Select New Category',
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            items: otherCategories.map((cat) {
+              return DropdownMenuItem(
+                value: cat,
+                child: Row(
+                  children: [
+                    Icon(
+                      CategoryAssets.icons[cat.icon] ?? Icons.category_rounded,
+                      size: 18,
+                      color: Color(cat.color),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(cat.name),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (val) => setState(() => _targetCategory = val),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _targetCategory == null || _isDeleting
+                  ? null
+                  : () async {
+                      setState(() => _isDeleting = true);
+                      await ref
+                          .read(categoryControllerProvider.notifier)
+                          .reassignAndDeleteCategory(
+                            widget.category.id,
+                            _targetCategory!.id,
+                          );
+                      if (context.mounted) Navigator.pop(context);
+                    },
+              child: _isDeleting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Move & Delete'),
+            ),
+          ),
+          const SizedBox(height: 32),
+          const Divider(),
+          const SizedBox(height: 24),
+          Text(
+            'Option 2: Delete Everything',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppColors.error,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'This will permanently delete this category AND all transactions associated with it. This action cannot be undone.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: _isDeleting
+                  ? null
+                  : () async {
+                      final confirmed = await _showFinalConfirm(context);
+                      if (confirmed) {
+                        setState(() => _isDeleting = true);
+                        await ref
+                            .read(categoryControllerProvider.notifier)
+                            .deleteCategoryWithTransactions(widget.category.id);
+                        if (context.mounted) Navigator.pop(context);
+                      }
+                    },
+              style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
+              child: const Text('Delete Category & Transactions'),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Future<bool> _showFinalConfirm(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Are you absolutely sure?'),
+            content: const Text(
+              'All records associated with this category will be lost forever.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('Delete All'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 }
 

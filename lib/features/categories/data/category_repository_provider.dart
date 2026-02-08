@@ -9,6 +9,8 @@ part 'category_repository_provider.g.dart';
 /// Dependency: Injects CategoryDao into the implementation.
 @riverpod
 CategoryRepository categoryRepository(Ref ref) {
-  final dao = ref.watch(categoryDaoProvider);
-  return CategoryRepositoryImpl(dao);
+  final catDao = ref.watch(categoryDaoProvider);
+  final txDao = ref.watch(transactionDaoProvider);
+  final db = ref.watch(appDatabaseProvider);
+  return CategoryRepositoryImpl(catDao, txDao, db);
 }

@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
+import 'package:habitwallet/core/util/formatting_utils.dart';
 import 'package:intl/intl.dart';
 
 import 'chart_types.dart';
@@ -189,7 +190,7 @@ class _DivergingBarChartState extends State<DivergingBarChart>
   }
 
   Widget _buildTooltip(ChartPoint point, int index, _BarSettings settings) {
-    final format = NumberFormat.currency(symbol: r'$', decimalDigits: 0);
+    const currencySymbol = r'$';
 
     // Calculate position relative to the Stack
     // index * stride + spacing + horizontal_padding_in_scrollview - scroll_offset
@@ -236,7 +237,10 @@ class _DivergingBarChartState extends State<DivergingBarChart>
                 const SizedBox(height: 8),
                 _TooltipRow(
                   label: 'Income',
-                  value: format.format(point.income),
+                  value: FormattingUtils.formatCompact(
+                    point.income,
+                    symbol: currencySymbol,
+                  ),
                   color: const Color(0xFF10B981),
                   visible: point.income > 0,
                 ),
@@ -244,7 +248,10 @@ class _DivergingBarChartState extends State<DivergingBarChart>
                   const SizedBox(height: 4),
                 _TooltipRow(
                   label: 'Expense',
-                  value: format.format(point.expense.abs()),
+                  value: FormattingUtils.formatCompact(
+                    point.expense.abs(),
+                    symbol: currencySymbol,
+                  ),
                   color: const Color(0xFFF43F5E),
                   visible: point.expense != 0,
                 ),

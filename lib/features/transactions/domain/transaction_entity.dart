@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'attachment_entity.dart';
+import '../../../core/util/formatting_utils.dart';
 
 part 'transaction_entity.freezed.dart';
 
@@ -55,6 +56,10 @@ abstract class TransactionEntity with _$TransactionEntity {
   /// Returns the amount formatted for display (e.g., "50.00").
   /// Constraint: Moved from UI to maintain pure widgets.
   String get formattedAbsoluteAmount => absoluteAmount.toStringAsFixed(2);
+
+  /// Returns a human-readable compact version of the amount (e.g. 1.2K).
+  String get compactAbsoluteAmount =>
+      FormattingUtils.formatCompact(absoluteAmount);
 
   /// Returns the symbol prefix based on transaction type.
   String get displaySign => isIncome ? '+' : '-';
