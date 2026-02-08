@@ -39,6 +39,8 @@ class _FlowChartState extends State<FlowChart>
   int? _selectedIndex;
   Offset? _tapPosition;
 
+  bool _showScrollHint = true;
+
   @override
   void initState() {
     super.initState();
@@ -50,8 +52,14 @@ class _FlowChartState extends State<FlowChart>
       parent: _animationController,
       curve: Curves.easeOutCubic,
     );
-    _scrollController = ScrollController();
+    _scrollController = ScrollController()..addListener(_onScroll);
     _animationController.forward();
+  }
+
+  void _onScroll() {
+    if (_scrollController.offset > 20 && _showScrollHint) {
+      setState(() => _showScrollHint = false);
+    }
   }
 
   @override
@@ -60,6 +68,7 @@ class _FlowChartState extends State<FlowChart>
     if (oldWidget.timeRange != widget.timeRange ||
         oldWidget.data.length != widget.data.length) {
       _selectedIndex = null;
+      _showScrollHint = true;
       _animationController.forward(from: 0);
     }
   }
@@ -67,6 +76,7 @@ class _FlowChartState extends State<FlowChart>
   @override
   void dispose() {
     _animationController.dispose();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
@@ -111,8 +121,8 @@ class _FlowChartState extends State<FlowChart>
     return SizedBox(
       height: widget.height,
       child: Stack(
-        clipBehavior: Clip.none,
         children: [
+          // The Scrollable Chart
           SingleChildScrollView(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -142,6 +152,7 @@ class _FlowChartState extends State<FlowChart>
               ),
             ),
           ),
+
           if (_selectedIndex != null && _tapPosition != null)
             _buildTooltip(context, widget.data[_selectedIndex!], config),
         ],

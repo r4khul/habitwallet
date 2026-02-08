@@ -199,25 +199,15 @@ class NetSavingsCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${isPositive ? '+' : '-'}$currencySymbol',
-                style: AppTypography.headlineMedium.copyWith(
-                  color: primaryColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                _formatAmount(netSavings.abs()),
-                style: AppTypography.displayMedium.copyWith(
-                  color: primaryColor,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -1,
-                ),
-              ),
-            ],
+          const SizedBox(height: 16),
+          Text(
+            '${isPositive ? '+' : '-'} $currencySymbol${_formatAmount(netSavings.abs())}',
+            style: AppTypography.displayMedium.copyWith(
+              color: primaryColor,
+              fontWeight: FontWeight.w800,
+              fontSize: 36,
+              letterSpacing: -1,
+            ),
           ),
         ],
       ),
@@ -226,10 +216,10 @@ class NetSavingsCard extends StatelessWidget {
 
   String _formatAmount(double amount) {
     if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(2)}M';
+      return '${(amount / 1000000).toStringAsFixed(1)}M';
     } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(2)}K';
+      return '${(amount / 1000).toStringAsFixed(1)}K';
     }
-    return amount.toStringAsFixed(2);
+    return amount.toStringAsFixed(0);
   }
 }

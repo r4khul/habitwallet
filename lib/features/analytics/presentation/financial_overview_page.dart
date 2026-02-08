@@ -9,10 +9,11 @@ import '../domain/financial_data_models.dart';
 import 'providers/financial_analytics_provider.dart';
 import 'widgets/flow_chart.dart';
 import 'widgets/summary_cards.dart';
-import 'widgets/time_range_selector.dart';
 import 'widgets/unified_category_breakdown.dart';
 
 /// The main Financial Overview page.
+///
+/// Refactored to use a dropdown for time selection and smooth fade transitions.
 class FinancialOverviewPage extends ConsumerWidget {
   const FinancialOverviewPage({super.key});
 
@@ -25,55 +26,129 @@ class FinancialOverviewPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : Colors.grey[50],
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: true,
-            pinned: true,
-            backgroundColor: isDark
-                ? AppColors.darkBackground
-                : Colors.grey[50],
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: isDark ? Colors.white : AppColors.grey900,
-              ),
-              onPressed: () => context.pop(),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
-              title: Text(
-                'Financial Overview',
-                style: AppTypography.headlineSmall.copyWith(
-                  color: isDark ? Colors.white : AppColors.grey900,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+      appBar: AppBar(
+        title: Text(
+          'Financial Overview',
+          style: AppTypography.titleLarge.copyWith(
+            color: isDark ? Colors.white : AppColors.grey900,
+            fontWeight: FontWeight.w700,
           ),
-          SliverToBoxAdapter(
-            child: currencyAsync.when(
-              data: (currency) => summaryAsync.when(
-                data: (summary) => _buildContent(
+        ),
+        centerTitle: false,
+        backgroundColor: isDark ? AppColors.darkBackground : Colors.grey[50],
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: isDark ? Colors.white : AppColors.grey900,
+          ),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          _buildRangePicker(context, ref, selectedRange, isDark),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: currencyAsync.when(
+        data: (currency) => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          child: KeyedSubtree(
+            key: ValueKey(selectedRange),
+            child: summaryAsync.when(
+              data: (summary) => SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 40),
+                child: _buildContent(
                   context,
                   ref,
                   summary,
                   selectedRange,
                   currency.symbol,
                 ),
-                loading: () => _buildLoadingState(context),
-                error: (error, stack) => _buildErrorState(context, error),
               ),
               loading: () => _buildLoadingState(context),
               error: (error, stack) => _buildErrorState(context, error),
             ),
           ),
-        ],
+        ),
+        loading: () => _buildLoadingState(context),
+        error: (error, stack) => _buildErrorState(context, error),
       ),
+    );
+  }
+
+  Widget _buildRangePicker(
+    BuildContext context,
+    WidgetRef ref,
+    TimeRange current,
+    bool isDark,
+  ) {
+    return PopupMenuButton<TimeRange>(
+      initialValue: current,
+      onSelected: (range) {
+        ref.read(selectedTimeRangeProvider.notifier).setRange(range);
+      },
+      offset: const Offset(0, 48),
+      position: PopupMenuPosition.under,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: isDark ? AppColors.darkCard : Colors.white,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _capitalize(current.name),
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 18,
+              color: AppColors.primary,
+            ),
+          ],
+        ),
+      ),
+      itemBuilder: (context) => TimeRange.values.map((range) {
+        final isSelected = current == range;
+        return PopupMenuItem<TimeRange>(
+          value: range,
+          child: Row(
+            children: [
+              Text(
+                _capitalize(range.name),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: isSelected
+                      ? AppColors.primary
+                      : (isDark ? Colors.white : AppColors.grey900),
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+              if (isSelected) ...[
+                const Spacer(),
+                const Icon(
+                  Icons.check_rounded,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+              ],
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -89,22 +164,7 @@ class FinancialOverviewPage extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
-
-        // Time Range Selector
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Center(
-            child: TimeRangeSelector(
-              selected: selectedRange,
-              onChanged: (range) {
-                ref.read(selectedTimeRangeProvider.notifier).setRange(range);
-              },
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
 
         // Net Savings Card
         Padding(
@@ -178,10 +238,37 @@ class FinancialOverviewPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildChartLegend('Income', const Color(0xFF10B981)),
-                    const SizedBox(width: 24),
-                    _buildChartLegend('Expense', const Color(0xFFF43F5E)),
+                    Row(
+                      children: [
+                        _buildChartLegend('Income', const Color(0xFF10B981)),
+                        const SizedBox(width: 24),
+                        _buildChartLegend('Expense', const Color(0xFFF43F5E)),
+                      ],
+                    ),
+                    if (summary.flowData.length > 8)
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.swap_horiz_rounded,
+                            size: 16,
+                            color: isDark
+                                ? AppColors.grey500
+                                : AppColors.grey400,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Scrollable',
+                            style: AppTypography.labelSmall.copyWith(
+                              color: isDark
+                                  ? AppColors.grey500
+                                  : AppColors.grey400,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -215,8 +302,6 @@ class FinancialOverviewPage extends ConsumerWidget {
             ),
           ),
         ],
-
-        const SizedBox(height: 48),
       ],
     );
   }
@@ -275,9 +360,7 @@ class FinancialOverviewPage extends ConsumerWidget {
   Widget _buildLoadingState(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      height: 400,
-      alignment: Alignment.center,
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -297,30 +380,30 @@ class FinancialOverviewPage extends ConsumerWidget {
   Widget _buildErrorState(BuildContext context, Object error) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      height: 400,
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
-          const SizedBox(height: 16),
-          Text(
-            'Could not load analytics',
-            style: AppTypography.titleMedium.copyWith(
-              color: isDark ? Colors.white : AppColors.grey900,
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
+            const SizedBox(height: 16),
+            Text(
+              'Could not load analytics',
+              style: AppTypography.titleMedium.copyWith(
+                color: isDark ? Colors.white : AppColors.grey900,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            error.toString(),
-            style: AppTypography.bodySmall.copyWith(
-              color: isDark ? AppColors.grey500 : AppColors.grey600,
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              style: AppTypography.bodySmall.copyWith(
+                color: isDark ? AppColors.grey500 : AppColors.grey600,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -333,4 +416,7 @@ class FinancialOverviewPage extends ConsumerWidget {
     }
     return amount.toStringAsFixed(0);
   }
+
+  String _capitalize(String s) =>
+      s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : s;
 }

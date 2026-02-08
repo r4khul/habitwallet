@@ -5,6 +5,7 @@ import '../features/analytics/presentation/financial_overview_page.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/categories/presentation/categories_page.dart';
+import '../features/profile/presentation/profile_edit_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
@@ -92,6 +93,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileEditPage(),
       ),
     ],
   );
