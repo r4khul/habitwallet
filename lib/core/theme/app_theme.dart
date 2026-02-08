@@ -25,6 +25,8 @@ class AppTheme {
         outline: AppColors.lightBorder,
       ),
       scaffoldBackgroundColor: AppColors.lightBackground,
+      primaryColor: AppColors.primary,
+      cardColor: AppColors.lightSurface,
       fontFamily: AppTypography.fontFamily,
       textTheme: _buildTextTheme(Colors.black87),
       dividerTheme: const DividerThemeData(
@@ -95,6 +97,8 @@ class AppTheme {
         outline: AppColors.darkBorder,
       ),
       scaffoldBackgroundColor: AppColors.darkBackground,
+      primaryColor: AppColors.primary,
+      cardColor: AppColors.darkCard,
       fontFamily: AppTypography.fontFamily,
       textTheme: _buildTextTheme(Colors.white),
       dividerTheme: const DividerThemeData(

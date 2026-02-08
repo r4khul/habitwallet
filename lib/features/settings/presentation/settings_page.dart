@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
+import 'package:habitwallet/core/util/theme_extension.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
 
@@ -42,12 +43,14 @@ class SettingsPage extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant.withValues(
-                    alpha: 0.3,
-                  ),
+                  color:
+                      (context.isDarkMode
+                              ? theme.colorScheme.surfaceVariant
+                              : AppColors.grey200)
+                          .withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: theme.dividerColor.withValues(alpha: 0.2),
+                    color: theme.dividerColor.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
@@ -93,6 +96,7 @@ class SettingsPage extends ConsumerWidget {
             icon: Icons.info_outline_rounded,
             title: 'Version',
             subtitle: '1.0.0 (Build 1)',
+            trailing: const SizedBox.shrink(),
             onTap: () {},
           ),
         ],
@@ -151,10 +155,14 @@ class _SettingsTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.cardColor.withValues(alpha: 0.3),
+            color: context.isDarkMode
+                ? theme.cardColor
+                : AppColors.grey100.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: theme.dividerColor.withValues(alpha: 0.1),
+              color: context.isDarkMode
+                  ? theme.dividerColor.withValues(alpha: 0.1)
+                  : AppColors.grey200.withValues(alpha: 0.5),
             ),
           ),
           child: Row(
@@ -169,7 +177,9 @@ class _SettingsTile extends StatelessWidget {
                 ),
                 child: Icon(
                   icon,
-                  color: iconColor ?? theme.primaryColor,
+                  color:
+                      iconColor ??
+                      (context.isDarkMode ? Colors.white : theme.primaryColor),
                   size: 20,
                 ),
               ),
@@ -200,7 +210,12 @@ class _SettingsTile extends StatelessWidget {
               ),
               if (trailing != null) trailing!,
               if (trailing == null)
-                Icon(Icons.chevron_right_rounded, color: theme.dividerColor),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: context.isDarkMode
+                      ? AppColors.grey700
+                      : theme.dividerColor,
+                ),
             ],
           ),
         ),
