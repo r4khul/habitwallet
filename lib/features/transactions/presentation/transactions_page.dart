@@ -17,7 +17,7 @@ class TransactionsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wallet'),
+        title: const Text('HabitWallet.'),
         actions: [
           IconButton(
             onPressed: () =>

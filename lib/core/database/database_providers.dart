@@ -1,4 +1,10 @@
+import 'dart:io';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'daos/category_dao.dart';
 import 'daos/transaction_dao.dart';
 import 'database.dart';
@@ -9,12 +15,23 @@ part 'database_providers.g.dart';
 /// Responsibility: Singleton access to the Drift database.
 @Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {
-  // Logic for opening the database (e.g., using sqlite3 on mobile/desktop)
-  // should ideally be handled here or in a dedicated opener.
-  // For now, we assume the construction is handled via an override or a simple instance.
-  throw UnimplementedError(
-    'Database connection logic not yet implemented. Use ProviderScope overrides for testing.',
-  );
+  final db = AppDatabase(_openConnection());
+
+  // Clean up the database when the provider is disposed
+  ref.onDispose(() => db.close());
+
+  return db;
+}
+
+LazyDatabase _openConnection() {
+  // the LazyDatabase util lets us find the right location for the file async.
+  return LazyDatabase(() async {
+    // put the database file, called db.sqlite here, into the documents folder
+    // for your app.
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    return NativeDatabase.createInBackground(file);
+  });
 }
 
 /// Provider for [TransactionDao].

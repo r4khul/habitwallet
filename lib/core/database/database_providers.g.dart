@@ -55,7 +55,7 @@ final class AppDatabaseProvider
   }
 }
 
-String _$appDatabaseHash() => r'12e2d615208cdc188128925c39c9d9d8245b8749';
+String _$appDatabaseHash() => r'1603fd9028d2a64349061e5941c091737c883fbc';
 
 /// Provider for [TransactionDao].
 
