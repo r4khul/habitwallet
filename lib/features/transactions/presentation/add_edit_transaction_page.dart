@@ -6,6 +6,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../features/settings/presentation/providers/currency_provider.dart';
+
 import '../../categories/domain/category_entity.dart';
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
@@ -157,6 +159,8 @@ class _AddEditTransactionPageState
   Widget build(BuildContext context) {
     final isEditing = widget.transactionId != null;
     final categoriesAsync = ref.watch(categoryControllerProvider);
+    final currencyAsync = ref.watch(currencyControllerProvider);
+    final currencySymbol = currencyAsync.value?.symbol ?? '\$';
 
     return Scaffold(
       appBar: AppBar(
@@ -193,8 +197,8 @@ class _AddEditTransactionPageState
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  prefixText: '\$ ',
+                decoration: InputDecoration(
+                  prefixText: '$currencySymbol ',
                   hintText: '0.00',
                 ),
                 keyboardType: const TextInputType.numberWithOptions(

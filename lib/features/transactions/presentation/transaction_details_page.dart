@@ -5,7 +5,9 @@ import 'package:open_filex/open_filex.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/theme_extension.dart';
+import '../../../features/settings/presentation/providers/currency_provider.dart';
 import '../../categories/presentation/providers/category_providers.dart';
+
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
 import 'providers/transaction_providers.dart';
@@ -60,6 +62,8 @@ class _DetailsView extends ConsumerWidget {
     final categoryAsync = ref.watch(
       categoryByIdProvider(transaction.categoryId),
     );
+    final currencyAsync = ref.watch(currencyControllerProvider);
+    final currencySymbol = currencyAsync.value?.symbol ?? '\$';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -111,7 +115,7 @@ class _DetailsView extends ConsumerWidget {
                   label:
                       '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}',
                   child: Text(
-                    '${transaction.displaySign}\$${transaction.formattedAbsoluteAmount}',
+                    '${transaction.displaySign}$currencySymbol${transaction.formattedAbsoluteAmount}',
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       color: amountColor,
                       fontWeight: FontWeight.w700,

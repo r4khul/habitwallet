@@ -1,0 +1,210 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habitwallet/core/theme/app_colors.dart';
+import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
+import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
+
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currencyAsync = ref.watch(currencyControllerProvider);
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        children: [
+          const _SectionHeader(title: 'General'),
+          const SizedBox(height: 8),
+
+          // Currency Selector
+          _SettingsTile(
+            icon: Icons.currency_exchange_rounded,
+            iconColor: AppColors.primary,
+            title: 'Currency',
+            subtitle: currencyAsync.when(
+              data: (c) => '${c.name} (${c.symbol})',
+              loading: () => 'Loading...',
+              error: (_, __) => 'Error loading currency',
+            ),
+            trailing: currencyAsync.when(
+              data: (c) => Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceVariant.withValues(
+                    alpha: 0.3,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: theme.dividerColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(c.flagEmoji, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(
+                      c.code,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              loading: () => const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              error: (_, __) =>
+                  const Icon(Icons.error_outline, color: AppColors.error),
+            ),
+            onTap: () {
+              showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                useSafeArea: true,
+                backgroundColor: theme.scaffoldBackgroundColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                builder: (context) => const CurrencySelectorSheet(),
+              );
+            },
+          ),
+
+          const SizedBox(height: 24),
+          const _SectionHeader(title: 'About'),
+          const SizedBox(height: 8),
+          _SettingsTile(
+            icon: Icons.info_outline_rounded,
+            title: 'Version',
+            subtitle: '1.0.0 (Build 1)',
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).textTheme.bodySmall?.color,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+    this.iconColor,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final Color? iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.cardColor.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.dividerColor.withValues(alpha: 0.1),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: (iconColor ?? theme.primaryColor).withValues(
+                    alpha: 0.1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor ?? theme.primaryColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.textTheme.bodyMedium?.color?.withValues(
+                            alpha: 0.7,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (trailing != null) trailing!,
+              if (trailing == null)
+                Icon(Icons.chevron_right_rounded, color: theme.dividerColor),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/theme_extension.dart';
+import '../../../features/settings/presentation/providers/currency_provider.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
+
 import '../../categories/presentation/providers/category_providers.dart';
 import '../../categories/presentation/widgets/category_assets.dart';
 import '../domain/transaction_entity.dart';
@@ -89,6 +91,8 @@ class _TransactionTile extends ConsumerWidget {
     final categoryAsync = ref.watch(
       categoryByIdProvider(transaction.categoryId),
     );
+    final currencyAsync = ref.watch(currencyControllerProvider);
+    final currencySymbol = currencyAsync.value?.symbol ?? '\$';
 
     return InkWell(
       onTap: () => context.push('/tx/${transaction.id}'),
@@ -190,7 +194,7 @@ class _TransactionTile extends ConsumerWidget {
             Semantics(
               label: semanticsLabel,
               child: Text(
-                '${transaction.displaySign}\$${transaction.formattedAbsoluteAmount}',
+                '${transaction.displaySign}$currencySymbol${transaction.formattedAbsoluteAmount}',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: amountColor,
                   fontWeight: FontWeight.w700,
@@ -416,7 +420,10 @@ class _AppDrawer extends ConsumerWidget {
             _DrawerItem(
               icon: Icons.settings_outlined,
               label: 'Settings',
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                context.push('/settings');
+              },
             ),
             _DrawerItem(
               icon: Icons.shield_outlined,

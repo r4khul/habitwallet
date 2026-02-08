@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/categories/presentation/categories_page.dart';
+import '../features/settings/presentation/settings_page.dart';
 import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
 import '../features/transactions/presentation/transactions_page.dart';
@@ -82,6 +83,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/categories',
         builder: (context, state) => const CategoriesPage(),
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsPage(),
       ),
     ],
   );
