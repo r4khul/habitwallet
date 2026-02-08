@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
-import '../features/habits/presentation/pages/habits_page.dart';
+import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
+import '../features/transactions/presentation/transactions_page.dart';
 
 part 'app_router.g.dart';
 
@@ -55,8 +57,22 @@ GoRouter router(Ref ref) {
     },
     routes: [
       GoRoute(path: '/', redirect: (context, state) => '/home'),
-      GoRoute(path: '/home', builder: (context, state) => const HabitsPage()),
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => const TransactionsPage(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/add-tx',
+        builder: (context, state) => const AddEditTransactionPage(),
+      ),
+      GoRoute(
+        path: '/edit-tx/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return AddEditTransactionPage(transactionId: id);
+        },
+      ),
       GoRoute(
         path: '/tx/:id',
         builder: (context, state) {

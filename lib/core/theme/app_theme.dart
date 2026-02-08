@@ -69,7 +69,7 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        modalBarrierColor: Colors.black.withOpacity(0.5),
+        modalBarrierColor: Colors.black.withValues(alpha: 0.5),
       ),
       dialogTheme: const DialogThemeData(
         backgroundColor: AppColors.lightSurface,
@@ -270,15 +270,15 @@ class AppGlassTheme extends ThemeExtension<AppGlassTheme> {
   });
 
   factory AppGlassTheme.light() => AppGlassTheme(
-    backgroundColor: Colors.white.withOpacity(0.7),
+    backgroundColor: Colors.white.withValues(alpha: 0.7),
     blur: 10.0,
-    borderColor: Colors.white.withOpacity(0.5),
+    borderColor: Colors.white.withValues(alpha: 0.5),
   );
 
   factory AppGlassTheme.dark() => AppGlassTheme(
-    backgroundColor: Colors.black.withOpacity(0.6),
+    backgroundColor: Colors.black.withValues(alpha: 0.6),
     blur: 15.0,
-    borderColor: Colors.white.withOpacity(0.1),
+    borderColor: Colors.white.withValues(alpha: 0.1),
   );
 
   final Color backgroundColor;
