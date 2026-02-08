@@ -1,34 +1,46 @@
 import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/auth/presentation/providers/auth_providers.dart';
+import 'daos/attachment_dao.dart';
 import 'daos/category_dao.dart';
 import 'daos/transaction_dao.dart';
-import 'daos/attachment_dao.dart';
 import 'database.dart';
-
-import '../../features/auth/presentation/providers/auth_providers.dart';
 
 part 'database_providers.g.dart';
 
 /// Derives the database name from auth state.
+/// Persists the name during loading states to avoid flickering and unnecessary DB recreations.
 @riverpod
-String dbName(Ref ref) {
-  final authState = ref.watch(authControllerProvider);
-  final user = authState.asData?.value;
-
-  return user != null
-      ? 'db_${user.email.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.sqlite'
-      : 'db_default.sqlite';
+class DbName extends _$DbName {
+  @override
+  String build() {
+    final authState = ref.watch(authControllerProvider);
+    return authState.maybeWhen(
+      data: (user) => user != null
+          ? 'db_${user.email.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.sqlite'
+          : 'db_default.sqlite',
+      // If we are loading (e.g. refreshing session), preserve the current name
+      loading: () => stateOrNull ?? 'db_default.sqlite',
+      orElse: () => stateOrNull ?? 'db_default.sqlite',
+    );
+  }
 }
 
 /// Provider for the central database instance.
 @Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {
   final name = ref.watch(dbNameProvider);
+
+  // Drift warns if multiple instances of the same class are alive.
+  // This happens during user-switch transitions where the old DB is closing async
+  // while the new one is opening. Since they use different files/executors, it's safe.
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
   final db = AppDatabase(_openConnection(name));
 

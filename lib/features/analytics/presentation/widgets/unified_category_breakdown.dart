@@ -205,21 +205,29 @@ class _UnifiedCategoryBreakdownState extends State<UnifiedCategoryBreakdown> {
   }
 
   IconData _getCategoryIcon(String iconName) {
-    switch (iconName) {
+    switch (iconName.toLowerCase()) {
       case 'food':
         return Icons.restaurant_rounded;
       case 'transport':
         return Icons.directions_car_rounded;
+      case 'bills':
+        return Icons.receipt_long_rounded;
       case 'shopping':
         return Icons.shopping_bag_rounded;
+      case 'education':
+        return Icons.school_rounded;
+      case 'savings':
+        return Icons.savings_rounded;
+      case 'travel':
+        return Icons.flight_rounded;
+      case 'salary':
+        return Icons.payments_rounded;
       case 'entertainment':
         return Icons.movie_rounded;
       case 'health':
-        return Icons.favorite_rounded;
-      case 'salary':
-        return Icons.account_balance_wallet_rounded;
-      case 'others':
-        return Icons.more_horiz_rounded;
+        return Icons.medical_services_rounded;
+      case 'other':
+      case 'category':
       default:
         return Icons.category_rounded;
     }

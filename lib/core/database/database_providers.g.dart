@@ -9,15 +9,16 @@ part of 'database_providers.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Derives the database name from auth state.
+/// Persists the name during loading states to avoid flickering and unnecessary DB recreations.
 
-@ProviderFor(dbName)
+@ProviderFor(DbName)
 final dbNameProvider = DbNameProvider._();
 
 /// Derives the database name from auth state.
-
-final class DbNameProvider extends $FunctionalProvider<String, String, String>
-    with $Provider<String> {
+/// Persists the name during loading states to avoid flickering and unnecessary DB recreations.
+final class DbNameProvider extends $NotifierProvider<DbName, String> {
   /// Derives the database name from auth state.
+  /// Persists the name during loading states to avoid flickering and unnecessary DB recreations.
   DbNameProvider._()
     : super(
         from: null,
@@ -34,13 +35,7 @@ final class DbNameProvider extends $FunctionalProvider<String, String, String>
 
   @$internal
   @override
-  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String create(Ref ref) {
-    return dbName(ref);
-  }
+  DbName create() => DbName();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(String value) {
@@ -51,7 +46,28 @@ final class DbNameProvider extends $FunctionalProvider<String, String, String>
   }
 }
 
-String _$dbNameHash() => r'6f1d068af3352c097032639fd944e237a5fd2e16';
+String _$dbNameHash() => r'ac0d66a615f5b1f8580bdb03094c40d53b2dc2c1';
+
+/// Derives the database name from auth state.
+/// Persists the name during loading states to avoid flickering and unnecessary DB recreations.
+
+abstract class _$DbName extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
 /// Provider for the central database instance.
 
@@ -97,7 +113,7 @@ final class AppDatabaseProvider
   }
 }
 
-String _$appDatabaseHash() => r'c692bf6f1fe1c073091091cd09aaaeb55b346668';
+String _$appDatabaseHash() => r'1cfc1b8766f2e8800b161198d47548ef29359af1';
 
 /// Provider for [TransactionDao].
 

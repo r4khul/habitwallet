@@ -58,8 +58,7 @@ class _CategoryTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final iconData =
-        CategoryAssets.icons[category.icon] ?? Icons.category_rounded;
+    final iconData = CategoryAssets.getIcon(category.icon);
     final color = Color(category.color);
 
     return Container(
@@ -286,7 +285,7 @@ class _CategoryUsageActionSheetState
                 child: Row(
                   children: [
                     Icon(
-                      CategoryAssets.icons[cat.icon] ?? Icons.category_rounded,
+                      CategoryAssets.getIcon(cat.icon),
                       size: 18,
                       color: Color(cat.color),
                     ),
