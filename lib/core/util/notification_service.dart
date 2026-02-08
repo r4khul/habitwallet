@@ -49,7 +49,7 @@ class NotificationService {
 
     // 2. Android settings
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
     // 3. iOS settings
     const DarwinInitializationSettings iosSettings =
@@ -59,7 +59,7 @@ class NotificationService {
           requestSoundPermission: true,
         );
 
-    const InitializationSettings initSettings = InitializationSettings(
+    final InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
