@@ -418,6 +418,14 @@ class _AppDrawer extends ConsumerWidget {
               },
             ),
             _DrawerItem(
+              icon: Icons.bar_chart_rounded,
+              label: 'Analytics',
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/analytics');
+              },
+            ),
+            _DrawerItem(
               icon: Icons.settings_outlined,
               label: 'Settings',
               onTap: () {

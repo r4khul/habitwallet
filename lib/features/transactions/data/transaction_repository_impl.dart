@@ -1,6 +1,6 @@
 import 'dart:async';
-import '../../../core/database/daos/transaction_dao.dart';
 import '../../../core/database/daos/attachment_dao.dart';
+import '../../../core/database/daos/transaction_dao.dart';
 import '../../../core/database/database.dart';
 import '../../../core/error/failures.dart';
 import '../domain/attachment_entity.dart';

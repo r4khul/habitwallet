@@ -7,6 +7,7 @@ import '../features/categories/presentation/categories_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
+import '../features/transactions/presentation/analytics_page.dart';
 import '../features/transactions/presentation/transactions_page.dart';
 
 part 'app_router.g.dart';
@@ -58,6 +59,10 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/analytics',
+        builder: (context, state) => const AnalyticsPage(),
+      ),
       GoRoute(path: '/', redirect: (context, state) => '/home'),
       GoRoute(
         path: '/home',
