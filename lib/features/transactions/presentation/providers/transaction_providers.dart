@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/transaction_repository_provider.dart';
 import '../../domain/transaction_entity.dart';
+import 'date_filter_provider.dart';
 
 part 'transaction_providers.g.dart';
 
@@ -60,4 +61,17 @@ class TransactionController extends _$TransactionController {
 Future<TransactionEntity?> transactionById(Ref ref, String id) {
   final repository = ref.watch(transactionRepositoryProvider);
   return repository.getById(id);
+}
+
+@riverpod
+Future<List<TransactionEntity>> filteredTransactions(Ref ref) async {
+  final transactions = await ref.watch(transactionControllerProvider.future);
+  final filter = ref.watch(dateFilterControllerProvider);
+
+  return transactions.where((tx) {
+    return tx.timestamp.isAfter(
+          filter.start.subtract(const Duration(seconds: 1)),
+        ) &&
+        tx.timestamp.isBefore(filter.end.add(const Duration(seconds: 1)));
+  }).toList()..sort((a, b) => b.timestamp.compareTo(a.timestamp));
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app_router.dart';
 import 'core/providers/theme_provider.dart';
@@ -16,13 +17,23 @@ class HabitWalletApp extends ConsumerWidget {
     final routerConfig = ref.watch(routerProvider);
     final themeMode = ref.watch(themeControllerProvider);
 
-    return MaterialApp.router(
-      title: 'Habit Wallet',
-      debugShowCheckedModeBanner: false,
-      routerConfig: routerConfig,
-      themeMode: themeMode,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+    final isDarkMode =
+        themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDarkMode
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
+      child: MaterialApp.router(
+        title: 'Habit Wallet',
+        debugShowCheckedModeBanner: false,
+        routerConfig: routerConfig,
+        themeMode: themeMode,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+      ),
     );
   }
 }

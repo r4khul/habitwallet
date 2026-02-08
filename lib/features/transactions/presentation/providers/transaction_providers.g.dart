@@ -162,3 +162,45 @@ final class TransactionByIdFamily extends $Family
   @override
   String toString() => r'transactionByIdProvider';
 }
+
+@ProviderFor(filteredTransactions)
+final filteredTransactionsProvider = FilteredTransactionsProvider._();
+
+final class FilteredTransactionsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<TransactionEntity>>,
+          List<TransactionEntity>,
+          FutureOr<List<TransactionEntity>>
+        >
+    with
+        $FutureModifier<List<TransactionEntity>>,
+        $FutureProvider<List<TransactionEntity>> {
+  FilteredTransactionsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'filteredTransactionsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$filteredTransactionsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<TransactionEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<TransactionEntity>> create(Ref ref) {
+    return filteredTransactions(ref);
+  }
+}
+
+String _$filteredTransactionsHash() =>
+    r'2419c20ae8a7c9cb8dc95000992068a4892e9484';

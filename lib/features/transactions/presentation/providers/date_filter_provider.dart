@@ -1,0 +1,70 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'date_filter_provider.freezed.dart';
+part 'date_filter_provider.g.dart';
+
+@freezed
+abstract class DateRangeFilter with _$DateRangeFilter {
+  const factory DateRangeFilter({
+    required DateTime start,
+    required DateTime end,
+    required String label,
+    @Default(false) bool isCustom,
+  }) = _DateRangeFilter;
+}
+
+@riverpod
+class DateFilterController extends _$DateFilterController {
+  @override
+  DateRangeFilter build() {
+    return _allTime();
+  }
+
+  DateRangeFilter _allTime() {
+    return DateRangeFilter(
+      start: DateTime(2000),
+      end: DateTime(2100),
+      label: 'All Time',
+    );
+  }
+
+  void setAllTime() => state = _allTime();
+
+  void setToday() {
+    final now = DateTime.now();
+    state = DateRangeFilter(
+      start: DateTime(now.year, now.month, now.day),
+      end: DateTime(now.year, now.month, now.day, 23, 59, 59),
+      label: 'Today',
+    );
+  }
+
+  void setThisWeek() {
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    state = DateRangeFilter(
+      start: DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day),
+      end: DateTime(now.year, now.month, now.day, 23, 59, 59),
+      label: 'This Week',
+    );
+  }
+
+  void setThisMonth() {
+    final now = DateTime.now();
+    state = DateRangeFilter(
+      start: DateTime(now.year, now.month, 1),
+      end: DateTime(now.year, now.month, now.day, 23, 59, 59),
+      label: 'This Month',
+    );
+  }
+
+  void setCustomRange(DateTime start, DateTime end) {
+    state = DateRangeFilter(
+      start: DateTime(start.year, start.month, start.day),
+      end: DateTime(end.year, end.month, end.day, 23, 59, 59),
+      label: 'Custom',
+      isCustom: true,
+    );
+  }
+}
