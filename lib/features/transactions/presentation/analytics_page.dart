@@ -126,7 +126,6 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
 
     for (var tx in transactions) {
       final dateKey = _getDateKey(tx.timestamp, period);
-      // Ensure we have a representative date for this key (e.g. start of period)
       if (!dates.containsKey(dateKey)) {
         dates[dateKey] = _normalizeDate(tx.timestamp, period);
       }
@@ -134,7 +133,6 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
       if (tx.isIncome) {
         groupedIncome[dateKey] = (groupedIncome[dateKey] ?? 0) + tx.amount;
       } else {
-        // amounts are negative, so we sum naturally
         groupedExpense[dateKey] = (groupedExpense[dateKey] ?? 0) + tx.amount;
       }
     }
@@ -148,14 +146,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
       final inc = groupedIncome[key] ?? 0;
       final exp = groupedExpense[key] ?? 0;
 
-      if (inc > 0) {
-        result.add(ChartPoint(date: date, amount: inc));
-      }
-      if (exp < 0) {
-        result.add(ChartPoint(date: date, amount: exp));
-      }
-      // If separate bars for same period, later logic in chart will render them sequentially.
-      // This is acceptable for simple diverging chart.
+      result.add(ChartPoint(date: date, income: inc, expense: exp));
     }
     return result;
   }

@@ -8,21 +8,25 @@ import 'package:intl/intl.dart';
 
 import 'chart_types.dart';
 
-/// A diverging bar chart that visualizes income (positive) and expense (negative) values.
+/// A professional, finance-grade diverging bar chart with a perfectly centered zero baseline.
 ///
-/// Designed for high performance with minimal configuration.
-/// Renders using [CustomPainter] for smooth 60fps animations.
-/// Handles different time granularities: Daily, Weekly, Monthly, Yearly.
+/// Designed to meet high-end dashboard standards (Stripe/Linear style).
+/// Features:
+/// - Perfectly centered zero baseline.
+/// - Symmetrical income (up) and expense (down) bars.
+/// - Seamless baseline-out animations.
+/// - Interactive hover states with floating tooltips.
+/// - Visual density control for various time periods.
 class DivergingBarChart extends StatefulWidget {
   const DivergingBarChart({
     super.key,
     required this.data,
     this.period = ChartPeriod.daily,
-    this.height = 200,
+    this.height = 240,
     this.incomeColor,
     this.expenseColor,
-    this.zeroLineColor,
     this.labelColor,
+    this.showGrid = true,
   });
 
   final List<ChartPoint> data;
@@ -30,8 +34,8 @@ class DivergingBarChart extends StatefulWidget {
   final double height;
   final Color? incomeColor;
   final Color? expenseColor;
-  final Color? zeroLineColor;
   final Color? labelColor;
+  final bool showGrid;
 
   @override
   State<DivergingBarChart> createState() => _DivergingBarChartState();
@@ -40,72 +44,61 @@ class DivergingBarChart extends StatefulWidget {
 class _DivergingBarChartState extends State<DivergingBarChart>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  List<ChartPoint> _startData = [];
-  List<ChartPoint> _endData = [];
+  late ScrollController _scrollController;
+  int? _hoveredIndex;
+  Offset? _hoverPosition;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(
+        milliseconds: 1000,
+      ), // Slightly slower for elegance
     );
-    // Initial animation from zero
-    _startData = widget.data
-        .map((e) => ChartPoint(date: e.date, amount: 0, label: e.label))
-        .toList();
-    _endData = widget.data;
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
     _controller.forward();
   }
 
-  @override
-  void didUpdateWidget(DivergingBarChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.data != oldWidget.data) {
-      // Capture current state of animation as the new start
-      final currentData = _calculateCurrentData(_controller.value);
+  void _onScroll() {
+    if (_hoveredIndex != null) {
       setState(() {
-        _startData = currentData;
-        _endData = widget.data;
+        // Force rebuild to update tooltip position if scrolling while hovering
       });
-      _controller.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
-  }
-
-  List<ChartPoint> _calculateCurrentData(double t) {
-    if (_startData.isEmpty && _endData.isEmpty) return [];
-    // Ensure we have a valid ChartDataTween
-    final tween = ChartDataTween(begin: _startData, end: _endData);
-    return tween.lerp(t);
   }
 
   _BarSettings _getBarSettings(ChartPeriod period) {
     switch (period) {
       case ChartPeriod.daily:
-        return const _BarSettings(width: 12, spacing: 8);
+        return const _BarSettings(width: 14, spacing: 10);
       case ChartPeriod.weekly:
-        return const _BarSettings(width: 16, spacing: 12);
+        return const _BarSettings(width: 22, spacing: 14);
       case ChartPeriod.monthly:
-        return const _BarSettings(width: 20, spacing: 12);
+        return const _BarSettings(width: 32, spacing: 18);
       case ChartPeriod.yearly:
-        return const _BarSettings(width: 24, spacing: 16);
+        return const _BarSettings(width: 44, spacing: 24);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.isEmpty && _endData.isEmpty) {
+    if (widget.data.isEmpty) {
       return SizedBox(
         height: widget.height,
         child: Center(
           child: Text(
-            'No data',
+            'No data available',
             style: AppTypography.bodyMedium.copyWith(color: AppColors.grey500),
           ),
         ),
@@ -113,237 +106,364 @@ class _DivergingBarChartState extends State<DivergingBarChart>
     }
 
     final barSettings = _getBarSettings(widget.period);
-
-    // Determine the number of items needed for width calculation.
-    // Use the maximum length to avoid jitter during transition if one list is longer.
-    final itemCount = math.max(_startData.length, _endData.length);
-
-    final totalWidth = math.max(
-      MediaQuery.of(context).size.width - 32,
-      itemCount * (barSettings.width + barSettings.spacing) +
-          barSettings.spacing,
-    );
+    final totalWidth =
+        widget.data.length * (barSettings.width + barSettings.spacing) +
+        barSettings.spacing +
+        32;
 
     return SizedBox(
       height: widget.height,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            final curvedValue = Curves.easeOutCubic.transform(
-              _controller.value,
-            );
-            final animatedData = _calculateCurrentData(curvedValue);
-            return CustomPaint(
-              size: Size(totalWidth, widget.height),
-              painter: _DivergingBarChartPainter(
-                data: animatedData,
-                period: widget.period,
-                incomeColor: widget.incomeColor ?? AppColors.success,
-                expenseColor: widget.expenseColor ?? AppColors.error,
-                zeroLineColor: widget.zeroLineColor ?? AppColors.grey300,
-                labelStyle: AppTypography.labelSmall.copyWith(
-                  color: widget.labelColor ?? AppColors.grey600,
-                ),
-                barWidth: barSettings.width,
-                barSpacing: barSettings.spacing,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: MouseRegion(
+              onHover: (event) {
+                setState(() {
+                  _hoverPosition = event.localPosition;
+                  _hoveredIndex = _calculateIndex(
+                    event.localPosition.dx,
+                    barSettings,
+                  );
+                });
+              },
+              onExit: (_) {
+                setState(() {
+                  _hoveredIndex = null;
+                  _hoverPosition = null;
+                });
+              },
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return CustomPaint(
+                    size: Size(totalWidth - 32, widget.height),
+                    painter: _DivergingBarChartPainter(
+                      data: widget.data,
+                      progress: Curves.fastLinearToSlowEaseIn.transform(
+                        _controller.value,
+                      ),
+                      hoveredIndex: _hoveredIndex,
+                      period: widget.period,
+                      incomeColor:
+                          widget.incomeColor ?? const Color(0xFF10B981),
+                      expenseColor:
+                          widget.expenseColor ?? const Color(0xFFF43F5E),
+                      gridColor: AppColors.grey200.withValues(alpha: 0.5),
+                      labelStyle: AppTypography.labelSmall.copyWith(
+                        color: widget.labelColor ?? AppColors.grey500,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      barWidth: barSettings.width,
+                      barSpacing: barSettings.spacing,
+                      showGrid: widget.showGrid,
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ),
+          if (_hoveredIndex != null && _hoverPosition != null)
+            _buildTooltip(
+              widget.data[_hoveredIndex!],
+              _hoveredIndex!,
+              barSettings,
+            ),
+        ],
+      ),
+    );
+  }
+
+  int? _calculateIndex(double x, _BarSettings settings) {
+    final adjustedX = x - settings.spacing / 2;
+    if (adjustedX < 0) return null;
+    final index = (adjustedX / (settings.width + settings.spacing)).floor();
+    if (index >= 0 && index < widget.data.length) {
+      return index;
+    }
+    return null;
+  }
+
+  Widget _buildTooltip(ChartPoint point, int index, _BarSettings settings) {
+    final format = NumberFormat.currency(symbol: r'$', decimalDigits: 0);
+
+    // Calculate position relative to the Stack
+    // index * stride + spacing + horizontal_padding_in_scrollview - scroll_offset
+    final xPos =
+        (index * (settings.width + settings.spacing)) +
+        settings.spacing +
+        16 -
+        _scrollController.offset;
+    final yPos = _hoverPosition!.dy;
+
+    return Positioned(
+      left: xPos + settings.width / 2 - 80, // Center tooltip on bar
+      top: math.max(10, yPos - 100), // Stay within visible area
+      child: IgnorePointer(
+        child: AnimatedOpacity(
+          opacity: _hoveredIndex != null ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 150),
+          child: Container(
+            width: 160,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.98),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+              border: Border.all(color: AppColors.grey200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat('MMMM d, yyyy').format(point.date),
+                  style: AppTypography.labelSmall.copyWith(
+                    color: AppColors.grey500,
+                    fontSize: 10,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _TooltipRow(
+                  label: 'Income',
+                  value: format.format(point.income),
+                  color: const Color(0xFF10B981),
+                  visible: point.income > 0,
+                ),
+                if (point.income > 0 && point.expense != 0)
+                  const SizedBox(height: 4),
+                _TooltipRow(
+                  label: 'Expense',
+                  value: format.format(point.expense.abs()),
+                  color: const Color(0xFFF43F5E),
+                  visible: point.expense != 0,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-class _BarSettings {
-  const _BarSettings({required this.width, required this.spacing});
+class _TooltipRow extends StatelessWidget {
+  const _TooltipRow({
+    required this.label,
+    required this.value,
+    required this.color,
+    this.visible = true,
+  });
 
-  final double width;
-  final double spacing;
-}
-
-class ChartDataTween extends Tween<List<ChartPoint>> {
-  ChartDataTween({super.begin, super.end});
+  final String label;
+  final String value;
+  final Color color;
+  final bool visible;
 
   @override
-  List<ChartPoint> lerp(double t) {
-    final start = begin ?? [];
-    final finish = end ?? [];
-
-    if (start.isEmpty && finish.isEmpty) return [];
-
-    final count = math.max(start.length, finish.length);
-    final result = <ChartPoint>[];
-
-    for (var i = 0; i < count; i++) {
-      if (i < start.length && i < finish.length) {
-        // Interpolate existing
-        final s = start[i];
-        final f = finish[i];
-        result.add(
-          ChartPoint(
-            date: f.date,
-            amount: s.amount + (f.amount - s.amount) * t,
-            label: f.label,
+  Widget build(BuildContext context) {
+    if (!visible) return const SizedBox.shrink();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.grey600,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          value,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.grey900,
+            fontSize: 11,
           ),
-        );
-      } else if (i < finish.length) {
-        // New item appearing (fade in / scale up)
-        final f = finish[i];
-        result.add(
-          ChartPoint(date: f.date, amount: f.amount * t, label: f.label),
-        );
-      } else if (i < start.length) {
-        // Old item disappearing (fade out / scale down)
-        final s = start[i];
-        result.add(
-          ChartPoint(date: s.date, amount: s.amount * (1 - t), label: s.label),
-        );
-      }
-    }
-    return result;
+        ),
+      ],
+    );
   }
+}
+
+class _BarSettings {
+  const _BarSettings({required this.width, required this.spacing});
+  final double width;
+  final double spacing;
 }
 
 class _DivergingBarChartPainter extends CustomPainter {
   _DivergingBarChartPainter({
     required this.data,
+    required this.progress,
+    required this.hoveredIndex,
     required this.period,
     required this.incomeColor,
     required this.expenseColor,
-    required this.zeroLineColor,
+    required this.gridColor,
     required this.labelStyle,
     required this.barWidth,
     required this.barSpacing,
+    required this.showGrid,
   });
 
   final List<ChartPoint> data;
+  final double progress;
+  final int? hoveredIndex;
   final ChartPeriod period;
   final Color incomeColor;
   final Color expenseColor;
-  final Color zeroLineColor;
+  final Color gridColor;
   final TextStyle labelStyle;
   final double barWidth;
   final double barSpacing;
+  final bool showGrid;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (data.isEmpty) return;
+    final labelHeight = 32.0;
+    final chartHeight = size.height - labelHeight;
+    final baselineY = chartHeight / 2;
 
-    // 1. Calculate Range (Min/Max)
-    double maxIncome = 0;
-    double maxExpense = 0;
+    // 1. Calculate Scale
+    double maxVal = 0;
+    for (var p in data) {
+      maxVal = math.max(maxVal, p.income);
+      maxVal = math.max(maxVal, p.expense.abs());
+    }
+    // Add headroom and handle 0
+    maxVal = maxVal == 0 ? 100 : maxVal * 1.15;
 
-    for (var point in data) {
-      if (point.amount > 0) maxIncome = math.max(maxIncome, point.amount);
-      if (point.amount < 0) {
-        maxExpense = math.max(maxExpense, point.amount.abs());
+    final halfChartHeight = baselineY;
+    final valueToPixels =
+        (halfChartHeight - 20) / maxVal; // 20px padding at top/bottom
+
+    // 2. Draw Grid
+    if (showGrid) {
+      final gridPaint = Paint()
+        ..color = gridColor
+        ..strokeWidth = 1;
+
+      // Horizontal grid lines
+      final steps = 4;
+      for (var i = -steps; i <= steps; i++) {
+        if (i == 0) continue; // Zero line drawn separately
+        final y = baselineY - (i * (maxVal / steps) * valueToPixels);
+        canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
       }
     }
 
-    // Add some headroom (10%)
-    maxIncome *= 1.1;
-    maxExpense *= 1.1;
-
-    // Handle case where all are 0
-    if (maxIncome == 0 && maxExpense == 0) maxIncome = 100;
-
-    final totalRange = maxIncome + maxExpense;
-    final safeTotalRange = totalRange == 0 ? 1.0 : totalRange;
-
-    // 2. Determine Zero Line Y-Coordinate
-    final labelHeight = 24.0;
-    final chartHeight = size.height - labelHeight;
-    final zeroLineY = (maxIncome / safeTotalRange) * chartHeight;
-
-    final paintDetails = Paint()..style = PaintingStyle.fill;
-    final linePaint = Paint()
-      ..color = zeroLineColor
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-
-    // 3. Draw Zero Line
+    // 3. Draw Zero Baseline
+    final baselinePaint = Paint()
+      ..color = AppColors.grey300
+      ..strokeWidth = 1.5;
     canvas.drawLine(
-      Offset(0, zeroLineY),
-      Offset(size.width, zeroLineY),
-      linePaint,
+      Offset(0, baselineY),
+      Offset(size.width, baselineY),
+      baselinePaint,
     );
 
-    // 4. Draw Bars & Labels
-    // Move formatter creation outside loop, but inside paint is necessary unless cached
+    // 4. Draw Bars
     final dateFormat = _getDateFormat(period);
 
-    // Padding for alignment
-    const startPadding = 16.0;
-
     for (var i = 0; i < data.length; i++) {
-      final point = data[i];
-      final x = startPadding + i * (barWidth + barSpacing);
+      final p = data[i];
+      final x = i * (barWidth + barSpacing) + barSpacing;
+      final isOtherHovered = hoveredIndex != null && hoveredIndex != i;
+      final opacity = isOtherHovered ? 0.3 : 1.0;
 
-      // Skip drawing if out of visible bounds (simple optimization)
-      if (x > size.width) break;
-
-      // Draw Bar
-      if (point.amount.abs() > 0.01) {
-        // Avoid drawing microscopic bars
-        final isIncome = point.amount > 0;
-        final barHeight = (point.amount.abs() / safeTotalRange) * chartHeight;
-
-        // Position:
-        // Income grows UP from zeroLineY
-        // Expense grows DOWN from zeroLineY
-
-        final top = isIncome ? (zeroLineY - barHeight) : zeroLineY;
-
-        final barRect = RRect.fromRectAndCorners(
-          Rect.fromLTWH(x, top, barWidth, barHeight),
-          topLeft: isIncome ? const Radius.circular(4) : Radius.zero,
-          topRight: isIncome ? const Radius.circular(4) : Radius.zero,
-          bottomLeft: !isIncome ? const Radius.circular(4) : Radius.zero,
-          bottomRight: !isIncome ? const Radius.circular(4) : Radius.zero,
+      // Income (Up)
+      if (p.income > 0) {
+        final h = p.income * valueToPixels * progress;
+        final rect = Rect.fromLTWH(x, baselineY - h, barWidth, h);
+        final rrect = RRect.fromRectAndCorners(
+          rect,
+          topLeft: const Radius.circular(4),
+          topRight: const Radius.circular(4),
         );
-
-        paintDetails.color = isIncome ? incomeColor : expenseColor;
-        canvas.drawRRect(barRect, paintDetails);
+        canvas.drawRRect(
+          rrect,
+          Paint()..color = incomeColor.withValues(alpha: opacity),
+        );
       }
 
-      // Draw Label
-      final labelText = point.label ?? dateFormat.format(point.date);
-      final span = TextSpan(style: labelStyle, text: labelText);
-      final tp = TextPainter(
-        text: span,
-        textAlign: TextAlign.center,
-        textDirection: ui.TextDirection.ltr,
-      );
-      tp.layout();
+      // Expense (Down)
+      if (p.expense != 0) {
+        final h = p.expense.abs() * valueToPixels * progress;
+        final rect = Rect.fromLTWH(x, baselineY, barWidth, h);
+        final rrect = RRect.fromRectAndCorners(
+          rect,
+          bottomLeft: const Radius.circular(4),
+          bottomRight: const Radius.circular(4),
+        );
+        canvas.drawRRect(
+          rrect,
+          Paint()..color = expenseColor.withValues(alpha: opacity),
+        );
+      }
 
-      final labelX = x + (barWidth - tp.width) / 2;
-      final labelY = chartHeight + 8;
-      tp.paint(canvas, Offset(labelX, labelY));
+      // 5. Draw Labels (sampled to avoid overlap)
+      if (_shouldShowLabel(i, data.length, period)) {
+        final labelText = p.label ?? dateFormat.format(p.date);
+        final tp = TextPainter(
+          text: TextSpan(text: labelText, style: labelStyle),
+          textDirection: ui.TextDirection.ltr,
+        )..layout();
+        tp.paint(
+          canvas,
+          Offset(x + (barWidth - tp.width) / 2, chartHeight + 8),
+        );
+      }
     }
+  }
+
+  bool _shouldShowLabel(int index, int total, ChartPeriod period) {
+    if (total < 10) return true;
+    if (period == ChartPeriod.daily) return index % 2 == 0;
+    if (period == ChartPeriod.weekly) return index % 1 == 0;
+    if (period == ChartPeriod.monthly) return index % 3 == 0;
+    return true;
   }
 
   DateFormat _getDateFormat(ChartPeriod period) {
     switch (period) {
       case ChartPeriod.daily:
-        return DateFormat.E();
+        return DateFormat('E');
       case ChartPeriod.weekly:
-        return DateFormat('Md');
+        return DateFormat('MMM d');
       case ChartPeriod.monthly:
-        return DateFormat.MMM();
+        return DateFormat('MMM');
       case ChartPeriod.yearly:
-        return DateFormat.y();
+        return DateFormat('yyyy');
     }
   }
 
   @override
-  bool shouldRepaint(covariant _DivergingBarChartPainter oldDelegate) {
-    return oldDelegate.data != data ||
-        oldDelegate.period != period ||
-        oldDelegate.incomeColor != incomeColor ||
-        oldDelegate.expenseColor != expenseColor;
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    if (oldDelegate is! _DivergingBarChartPainter) return true;
+    return oldDelegate.progress != progress ||
+        oldDelegate.hoveredIndex != hoveredIndex ||
+        oldDelegate.data != data ||
+        oldDelegate.period != period;
   }
 }

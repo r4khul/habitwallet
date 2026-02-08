@@ -1,13 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../features/analytics/presentation/financial_overview_page.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/categories/presentation/categories_page.dart';
 import '../features/settings/presentation/settings_page.dart';
 import '../features/transactions/presentation/add_edit_transaction_page.dart';
 import '../features/transactions/presentation/transaction_details_page.dart';
-import '../features/transactions/presentation/analytics_page.dart';
 import '../features/transactions/presentation/transactions_page.dart';
 
 part 'app_router.g.dart';
@@ -61,7 +61,7 @@ GoRouter router(Ref ref) {
     routes: [
       GoRoute(
         path: '/analytics',
-        builder: (context, state) => const AnalyticsPage(),
+        builder: (context, state) => const FinancialOverviewPage(),
       ),
       GoRoute(path: '/', redirect: (context, state) => '/home'),
       GoRoute(

@@ -1,0 +1,518 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:habitwallet/core/theme/app_colors.dart';
+import 'package:habitwallet/core/theme/app_typography.dart';
+
+import '../../domain/financial_data_models.dart';
+
+/// A finance-grade diverging bar chart for income/expense visualization.
+///
+/// Features:
+/// - Centered zero baseline with income above and expense below.
+/// - Smooth entry animations with staggered bars.
+/// - Hover/tap interactions with floating tooltips.
+/// - Adaptive bar sizing for different time ranges.
+/// - Dark/light mode support.
+class FlowChart extends StatefulWidget {
+  const FlowChart({
+    super.key,
+    required this.data,
+    required this.timeRange,
+    this.height = 220,
+    this.incomeColor,
+    this.expenseColor,
+  });
+
+  final List<FlowDataPoint> data;
+  final TimeRange timeRange;
+  final double height;
+  final Color? incomeColor;
+  final Color? expenseColor;
+
+  @override
+  State<FlowChart> createState() => _FlowChartState();
+}
+
+class _FlowChartState extends State<FlowChart>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  late ScrollController _scrollController;
+
+  int? _selectedIndex;
+  Offset? _tapPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    );
+    _scrollController = ScrollController();
+    _animationController.forward();
+  }
+
+  @override
+  void didUpdateWidget(FlowChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.timeRange != widget.timeRange ||
+        oldWidget.data.length != widget.data.length) {
+      _selectedIndex = null;
+      _animationController.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  _BarConfig get _barConfig {
+    switch (widget.timeRange) {
+      case TimeRange.daily:
+        return const _BarConfig(width: 18, spacing: 10, cornerRadius: 4);
+      case TimeRange.weekly:
+        return const _BarConfig(width: 28, spacing: 14, cornerRadius: 5);
+      case TimeRange.monthly:
+        return const _BarConfig(width: 24, spacing: 8, cornerRadius: 4);
+      case TimeRange.yearly:
+        return const _BarConfig(width: 48, spacing: 24, cornerRadius: 6);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    if (widget.data.isEmpty) {
+      return SizedBox(
+        height: widget.height,
+        child: Center(
+          child: Text(
+            'No data for this period',
+            style: AppTypography.bodyMedium.copyWith(
+              color: isDark ? AppColors.grey500 : AppColors.grey600,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final config = _barConfig;
+    final totalWidth =
+        widget.data.length * (config.width + config.spacing) +
+        config.spacing +
+        32;
+
+    return SizedBox(
+      height: widget.height,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: GestureDetector(
+              onTapDown: (details) => _handleTap(details.localPosition, config),
+              onTapUp: (_) {},
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return CustomPaint(
+                    size: Size(totalWidth - 32, widget.height),
+                    painter: _FlowChartPainter(
+                      data: widget.data,
+                      progress: _animation.value,
+                      selectedIndex: _selectedIndex,
+                      config: config,
+                      incomeColor:
+                          widget.incomeColor ?? const Color(0xFF10B981),
+                      expenseColor:
+                          widget.expenseColor ?? const Color(0xFFF43F5E),
+                      isDark: isDark,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          if (_selectedIndex != null && _tapPosition != null)
+            _buildTooltip(context, widget.data[_selectedIndex!], config),
+        ],
+      ),
+    );
+  }
+
+  void _handleTap(Offset position, _BarConfig config) {
+    final adjustedX = position.dx - config.spacing / 2;
+    if (adjustedX < 0) return;
+
+    final index = (adjustedX / (config.width + config.spacing)).floor();
+    if (index >= 0 && index < widget.data.length) {
+      setState(() {
+        if (_selectedIndex == index) {
+          _selectedIndex = null;
+          _tapPosition = null;
+        } else {
+          _selectedIndex = index;
+          _tapPosition = position;
+        }
+      });
+    }
+  }
+
+  Widget _buildTooltip(
+    BuildContext context,
+    FlowDataPoint point,
+    _BarConfig config,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Calculate position
+    final xPos =
+        (_selectedIndex! * (config.width + config.spacing)) +
+        config.spacing +
+        16 -
+        _scrollController.offset;
+
+    return Positioned(
+      left: xPos + config.width / 2 - 85,
+      top: 8,
+      child: IgnorePointer(
+        child: AnimatedOpacity(
+          opacity: _selectedIndex != null ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 150),
+          child: Container(
+            width: 170,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkCard.withValues(alpha: 0.95)
+                  : Colors.white.withValues(alpha: 0.98),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.grey200,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  point.label ?? _formatDate(point.date),
+                  style: AppTypography.labelSmall.copyWith(
+                    color: isDark ? AppColors.grey400 : AppColors.grey500,
+                    fontSize: 10,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (point.income > 0)
+                  _buildTooltipRow(
+                    'Income',
+                    '\$${_formatAmount(point.income)}',
+                    const Color(0xFF10B981),
+                    isDark,
+                  ),
+                if (point.income > 0 && point.expense != 0)
+                  const SizedBox(height: 6),
+                if (point.expense != 0)
+                  _buildTooltipRow(
+                    'Expense',
+                    '\$${_formatAmount(point.expense.abs())}',
+                    const Color(0xFFF43F5E),
+                    isDark,
+                  ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.grey200,
+                ),
+                const SizedBox(height: 8),
+                _buildTooltipRow(
+                  'Net',
+                  '${point.netValue >= 0 ? '+' : ''}\$${_formatAmount(point.netValue.abs())}',
+                  point.netValue >= 0
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFFF43F5E),
+                  isDark,
+                  isBold: true,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTooltipRow(
+    String label,
+    String value,
+    Color color,
+    bool isDark, {
+    bool isBold = false,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTypography.bodySmall.copyWith(
+                color: isDark ? AppColors.grey400 : AppColors.grey600,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          value,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
+            color: isBold ? color : (isDark ? Colors.white : AppColors.grey900),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatAmount(double amount) {
+    if (amount >= 1000000) {
+      return '${(amount / 1000000).toStringAsFixed(1)}M';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(1)}K';
+    }
+    return amount.toStringAsFixed(0);
+  }
+}
+
+class _BarConfig {
+  const _BarConfig({
+    required this.width,
+    required this.spacing,
+    required this.cornerRadius,
+  });
+
+  final double width;
+  final double spacing;
+  final double cornerRadius;
+}
+
+class _FlowChartPainter extends CustomPainter {
+  _FlowChartPainter({
+    required this.data,
+    required this.progress,
+    required this.selectedIndex,
+    required this.config,
+    required this.incomeColor,
+    required this.expenseColor,
+    required this.isDark,
+  });
+
+  final List<FlowDataPoint> data;
+  final double progress;
+  final int? selectedIndex;
+  final _BarConfig config;
+  final Color incomeColor;
+  final Color expenseColor;
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const labelHeight = 28.0;
+    final chartHeight = size.height - labelHeight;
+    final baselineY = chartHeight / 2;
+
+    // Calculate max value for scaling
+    double maxVal = 0;
+    for (var p in data) {
+      maxVal = math.max(maxVal, p.income);
+      maxVal = math.max(maxVal, p.expense.abs());
+    }
+    maxVal = maxVal == 0 ? 100 : maxVal * 1.1;
+
+    final halfChartHeight = baselineY;
+    final valueToPixels = (halfChartHeight - 16) / maxVal;
+
+    // Draw subtle grid
+    _drawGrid(canvas, size, chartHeight, baselineY, maxVal, valueToPixels);
+
+    // Draw zero baseline
+    final baselinePaint = Paint()
+      ..color = isDark ? AppColors.grey700 : AppColors.grey300
+      ..strokeWidth = 1.5;
+    canvas.drawLine(
+      Offset(0, baselineY),
+      Offset(size.width, baselineY),
+      baselinePaint,
+    );
+
+    // Draw bars with staggered animation
+    for (var i = 0; i < data.length; i++) {
+      final p = data[i];
+      final x = i * (config.width + config.spacing) + config.spacing;
+
+      // Staggered progress for each bar
+      final staggeredProgress = _staggeredProgress(i, data.length, progress);
+      final isOtherSelected = selectedIndex != null && selectedIndex != i;
+      final opacity = isOtherSelected ? 0.25 : 1.0;
+
+      // Income bar (up)
+      if (p.income > 0) {
+        final h = p.income * valueToPixels * staggeredProgress;
+        final rect = Rect.fromLTWH(x, baselineY - h, config.width, h);
+        final rrect = RRect.fromRectAndCorners(
+          rect,
+          topLeft: Radius.circular(config.cornerRadius),
+          topRight: Radius.circular(config.cornerRadius),
+        );
+
+        // Gradient fill
+        final gradient = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            incomeColor.withValues(alpha: opacity),
+            incomeColor.withValues(alpha: opacity * 0.7),
+          ],
+        );
+
+        canvas.drawRRect(
+          rrect,
+          Paint()
+            ..shader = gradient.createShader(rect)
+            ..style = PaintingStyle.fill,
+        );
+      }
+
+      // Expense bar (down)
+      if (p.expense != 0) {
+        final h = p.expense.abs() * valueToPixels * staggeredProgress;
+        final rect = Rect.fromLTWH(x, baselineY, config.width, h);
+        final rrect = RRect.fromRectAndCorners(
+          rect,
+          bottomLeft: Radius.circular(config.cornerRadius),
+          bottomRight: Radius.circular(config.cornerRadius),
+        );
+
+        final gradient = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            expenseColor.withValues(alpha: opacity * 0.7),
+            expenseColor.withValues(alpha: opacity),
+          ],
+        );
+
+        canvas.drawRRect(
+          rrect,
+          Paint()
+            ..shader = gradient.createShader(rect)
+            ..style = PaintingStyle.fill,
+        );
+      }
+
+      // Draw labels
+      if (_shouldShowLabel(i, data.length)) {
+        final labelText = p.label ?? '';
+        final tp = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: TextStyle(
+              fontFamily: AppTypography.fontFamily,
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+              color: isDark ? AppColors.grey500 : AppColors.grey600,
+            ),
+          ),
+          textDirection: ui.TextDirection.ltr,
+        )..layout();
+
+        tp.paint(
+          canvas,
+          Offset(x + (config.width - tp.width) / 2, chartHeight + 8),
+        );
+      }
+    }
+  }
+
+  void _drawGrid(
+    Canvas canvas,
+    Size size,
+    double chartHeight,
+    double baselineY,
+    double maxVal,
+    double valueToPixels,
+  ) {
+    final gridPaint = Paint()
+      ..color = (isDark ? AppColors.grey800 : AppColors.grey200).withValues(
+        alpha: 0.5,
+      )
+      ..strokeWidth = 0.5;
+
+    // Draw 2 lines above and 2 below baseline
+    const steps = 2;
+    for (var i = -steps; i <= steps; i++) {
+      if (i == 0) continue;
+      final y = baselineY - (i * (maxVal / steps) * valueToPixels);
+      if (y >= 0 && y <= chartHeight) {
+        canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+      }
+    }
+  }
+
+  double _staggeredProgress(int index, int total, double progress) {
+    // Each bar starts slightly after the previous
+    const staggerDelay = 0.03;
+    final adjustedProgress = (progress - (index * staggerDelay)).clamp(
+      0.0,
+      1.0,
+    );
+    return Curves.easeOutBack.transform(adjustedProgress);
+  }
+
+  bool _shouldShowLabel(int index, int total) {
+    if (total <= 8) return true;
+    if (total <= 14) return index % 2 == 0;
+    return index % 3 == 0;
+  }
+
+  @override
+  bool shouldRepaint(_FlowChartPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.selectedIndex != selectedIndex ||
+        oldDelegate.data != data ||
+        oldDelegate.isDark != isDark;
+  }
+}
