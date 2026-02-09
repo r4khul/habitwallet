@@ -9,7 +9,7 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(transaction.isIncome, true);
@@ -21,7 +21,7 @@ void main() {
           id: 'tx1',
           amount: -50.0,
           categoryId: 'food',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(transaction.isExpense, true);
@@ -35,7 +35,7 @@ void main() {
             id: 'tx1',
             amount: 0.0,
             categoryId: 'adjustment',
-            timestamp: DateTime(2026, 2, 9, 10, 0),
+            timestamp: DateTime(2026, 2, 9, 10),
           );
 
           expect(transaction.isIncome, false);
@@ -50,14 +50,14 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         final expense = TransactionEntity(
           id: 'tx2',
           amount: -75.5,
           categoryId: 'food',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(income.absoluteAmount, 100.0);
@@ -69,14 +69,14 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         final transaction2 = TransactionEntity(
           id: 'tx2',
           amount: -75.555,
           categoryId: 'food',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(transaction1.formattedAbsoluteAmount, '100.00');
@@ -88,14 +88,14 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         final expense = TransactionEntity(
           id: 'tx2',
           amount: -50.0,
           categoryId: 'food',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(income.displaySign, '+');
@@ -107,14 +107,14 @@ void main() {
           id: 'tx1',
           amount: 1500.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         final transaction2 = TransactionEntity(
           id: 'tx2',
           amount: -1234567.0,
           categoryId: 'purchase',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(transaction1.compactAbsoluteAmount, '1.5K');
@@ -181,7 +181,7 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
           note: 'Test note',
           editedLocally: true,
         );
@@ -202,7 +202,7 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         final modified = original.copyWith(amount: 200.0, note: 'Updated');
@@ -218,7 +218,7 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'salary',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
           note: 'Original note',
         );
 
@@ -235,7 +235,7 @@ void main() {
           id: 'tx1',
           amount: 0.01,
           categoryId: 'adjustment',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(transaction.isIncome, true);
@@ -248,7 +248,7 @@ void main() {
           id: 'tx1',
           amount: 9999999.99,
           categoryId: 'lottery',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
         );
 
         expect(transaction.isIncome, true);
@@ -260,7 +260,7 @@ void main() {
           id: 'tx1',
           amount: 100.0,
           categoryId: 'food',
-          timestamp: DateTime(2026, 2, 9, 10, 0),
+          timestamp: DateTime(2026, 2, 9, 10),
           note: 'இட்லி வாங்கினேன்', // Tamil text
         );
 

@@ -247,7 +247,7 @@ void main() {
           name: 'Food',
           icon: 'restaurant',
           color: 0xFFFF5722,
-          updatedAt: DateTime(2026, 2, 1),
+          updatedAt: DateTime(2026, 2),
         );
 
         final newTimestamp = DateTime(2026, 2, 9);
