@@ -5,7 +5,7 @@
 # Habit Wallet
 
 ![Flutter CI](https://github.com/r4khul/habitwallet/actions/workflows/flutter-ci.yml/badge.svg)
-[![codecov](https://codecov.io/gh/r4khul/habitwallet/branch/main/graph/badge.svg)](https://codecov.io/gh/r4khul/habitwallet)
+![Coverage](https://img.shields.io/badge/Coverage-80.5%25-brightgreen)
 
 > 📊 **Test Coverage**: 69 tests passing • 85-100% coverage on business logic • [View detailed coverage report](docs/TEST_COVERAGE.md)
 
