@@ -7,7 +7,7 @@
 ![Flutter CI](https://github.com/r4khul/habitwallet/actions/workflows/flutter-ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)
 
-A habit management, todo, and self-growth application built with Flutter. This application provides offline-first financial transaction tracking with background synchronization capabilities, bilingual support (English and Tamil), and a modern, responsive user interface.
+A comprehensive finance management application built with Flutter. This application provides offline-first financial transaction tracking with background synchronization capabilities, bilingual support (English and Tamil), and a modern, responsive user interface.
 
 ## Project Overview
 
@@ -127,7 +127,7 @@ flutter build ios --release
 
 ### Why a Mock Server?
 
-Background sync in Habit Wallet depends on a remote API server. During local development, a mock server provides:
+Background sync depends on a remote API server. During local development, a mock server provides:
 
 - **Predictable responses** for testing sync logic
 - **Offline-safe development** without requiring a live backend
