@@ -5,6 +5,7 @@ import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/widgets/charts/chart_types.dart';
 import 'package:habitwallet/core/widgets/charts/diverging_bar_chart.dart';
 import 'package:habitwallet/features/transactions/presentation/providers/analytics_provider.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 
 class AnalyticsPage extends ConsumerStatefulWidget {
   const AnalyticsPage({super.key});
@@ -18,13 +19,14 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final chartDataAsync = ref.watch(
       aggregatedChartDataProvider(_selectedPeriod),
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: Text(l10n.analytics),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.pop(),
@@ -33,7 +35,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
       body: chartDataAsync.when(
         data: (List<ChartPoint> chartData) {
           if (chartData.isEmpty) {
-            return const Center(child: Text('No transactions to analyze'));
+            return Center(child: Text(l10n.noTransactionsAnalyze));
           }
 
           return SafeArea(
@@ -44,7 +46,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    'Financial Overview',
+                    l10n.financialOverview,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
@@ -80,7 +82,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Income vs Expense',
+                                    l10n.incomeVsExpense,
                                     style: Theme.of(
                                       context,
                                     ).textTheme.titleMedium,
@@ -110,7 +112,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (Object err, StackTrace stack) =>
-            Center(child: Text('Error: $err')),
+            Center(child: Text('${l10n.error}: $err')),
       ),
     );
   }
@@ -124,16 +126,32 @@ class _PeriodSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: ChartPeriod.values.map((period) {
           final isSelected = selected == period;
+          String label;
+          switch (period) {
+            case ChartPeriod.daily:
+              label = l10n.daily;
+              break;
+            case ChartPeriod.weekly:
+              label = l10n.weekly;
+              break;
+            case ChartPeriod.monthly:
+              label = l10n.monthly;
+              break;
+            case ChartPeriod.yearly:
+              label = l10n.yearly;
+              break;
+          }
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              label: Text(period.name.toUpperCase()),
+              label: Text(label.toUpperCase()),
               selected: isSelected,
               onSelected: (_) => onChanged(period),
               labelStyle: TextStyle(

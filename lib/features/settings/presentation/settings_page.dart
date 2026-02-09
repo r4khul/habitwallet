@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:habitwallet/l10n/app_localizations.dart';
+import 'package:habitwallet/core/providers/locale_provider.dart';
 import 'package:habitwallet/core/providers/network_providers.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/util/theme_extension.dart';
-import 'package:habitwallet/core/providers/locale_provider.dart';
+import 'package:habitwallet/features/settings/domain/language.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
 import 'package:habitwallet/features/settings/presentation/providers/notification_provider.dart';
-import 'package:habitwallet/features/settings/presentation/widgets/language_selector_sheet.dart';
-import 'package:habitwallet/features/settings/domain/language.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
+import 'package:habitwallet/features/settings/presentation/widgets/language_selector_sheet.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -32,7 +32,7 @@ class SettingsPage extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
-          const _SectionHeader(title: 'General'),
+          _SectionHeader(title: l10n.general),
           const SizedBox(height: 8),
 
           // Language Selector
@@ -104,8 +104,8 @@ class SettingsPage extends ConsumerWidget {
             title: l10n.currency,
             subtitle: currencyAsync.when(
               data: (c) => '${c.name} (${c.symbol})',
-              loading: () => 'Loading...',
-              error: (e, s) => 'Error loading currency',
+              loading: () => l10n.loading,
+              error: (e, s) => '${l10n.error} loading currency',
             ),
             trailing: currencyAsync.when(
               data: (c) => Container(
@@ -168,8 +168,8 @@ class SettingsPage extends ConsumerWidget {
           _SettingsTile(
             icon: Icons.notifications_active_rounded,
             iconColor: AppColors.accent,
-            title: 'Daily Reminder (8 PM)',
-            subtitle: 'Notify if no transactions logged',
+            title: l10n.dailyReminder,
+            subtitle: l10n.notifyTransactionsLogged,
             trailing: Switch.adaptive(
               value: notificationSettings.isEnabled,
               activeTrackColor: AppColors.primary,
@@ -185,24 +185,24 @@ class SettingsPage extends ConsumerWidget {
           ),
 
           const SizedBox(height: 24),
-          const _SectionHeader(title: 'Network'),
+          _SectionHeader(title: l10n.network),
           const SizedBox(height: 8),
 
           // Base URL Configuration
           _SettingsTile(
             icon: Icons.link_rounded,
             iconColor: Colors.blue,
-            title: 'Backend URL',
+            title: l10n.backendUrl,
             subtitle: ref.watch(baseUrlControllerProvider),
             onTap: () => _showBaseUrlDialog(context, ref),
           ),
 
           const SizedBox(height: 24),
-          const _SectionHeader(title: 'About'),
+          _SectionHeader(title: l10n.about),
           const SizedBox(height: 8),
           _SettingsTile(
             icon: Icons.info_outline_rounded,
-            title: 'Version',
+            title: l10n.version,
             subtitle: '1.0.0 (Build 1)',
             trailing: const SizedBox.shrink(),
             onTap: () {},
@@ -213,24 +213,25 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showBaseUrlDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(
       text: ref.read(baseUrlControllerProvider),
     );
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Configure Backend URL'),
+        title: Text(l10n.configureBackendUrl),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'https://api.example.com',
-            labelText: 'Base URL',
+            labelText: l10n.backendUrl,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -239,7 +240,7 @@ class SettingsPage extends ConsumerWidget {
                   .setUrl(controller.text.trim());
               Navigator.pop(context);
             },
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),

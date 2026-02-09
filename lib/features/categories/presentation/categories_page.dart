@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../data/category_repository_provider.dart';
@@ -13,9 +14,10 @@ class CategoriesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoryControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Categories')),
+      appBar: AppBar(title: Text(l10n.categories)),
       body: categoriesAsync.when(
         data: (categories) => ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
@@ -27,11 +29,11 @@ class CategoriesPage extends ConsumerWidget {
           separatorBuilder: (context, index) => const SizedBox(height: 12),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        error: (error, stack) => Center(child: Text('${l10n.error}: $error')),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddEditDialog(context, ref),
-        tooltip: 'Add Category',
+        tooltip: l10n.addCategory,
         child: const Icon(Icons.add_rounded),
       ),
     );
@@ -58,6 +60,7 @@ class _CategoryTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final iconData = CategoryAssets.getIcon(category.icon);
     final color = Color(category.color);
 
@@ -103,7 +106,7 @@ class _CategoryTile extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      'EDITED',
+                      l10n.edited,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: AppColors.primary,
                         fontSize: 10,
@@ -119,7 +122,7 @@ class _CategoryTile extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.edit_outlined, size: 20),
             visualDensity: VisualDensity.compact,
-            tooltip: 'Edit Category',
+            tooltip: l10n.editCategory,
             onPressed: () {
               showModalBottomSheet<void>(
                 context: context,
@@ -136,7 +139,7 @@ class _CategoryTile extends ConsumerWidget {
               color: AppColors.error,
             ),
             visualDensity: VisualDensity.compact,
-            tooltip: 'Delete Category',
+            tooltip: l10n.deleteCategory,
             onPressed: () => _confirmDelete(context, ref),
           ),
         ],
@@ -145,6 +148,7 @@ class _CategoryTile extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final isUsed = await ref
         .read(categoryRepositoryProvider)
         .isCategoryUsed(category.id);
@@ -155,17 +159,17 @@ class _CategoryTile extends ConsumerWidget {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Delete Category?'),
-          content: const Text('This will permanently remove the category.'),
+          title: Text(l10n.deleteCategoryConfirmTitle),
+          content: Text(l10n.deleteCategoryConfirmMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text('Delete'),
+              child: Text(l10n.delete),
             ),
           ],
         ),
@@ -208,6 +212,7 @@ class _CategoryUsageActionSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final categoriesAsync = ref.watch(categoryControllerProvider);
     final otherCategories =
         categoriesAsync.value
@@ -245,13 +250,13 @@ class _CategoryUsageActionSheetState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Category in Use',
+                      l10n.categoryInUse,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      '"${widget.category.name}" has existing transactions.',
+                      '"${widget.category.name}" ${l10n.hasTransactionsSuffix}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.grey500,
                       ),
@@ -263,7 +268,7 @@ class _CategoryUsageActionSheetState
           ),
           const SizedBox(height: 32),
           Text(
-            'Option 1: Move Transactions',
+            l10n.optionMoveTransactions,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
@@ -271,20 +276,23 @@ class _CategoryUsageActionSheetState
           ),
           const SizedBox(height: 12),
           Text(
-            'Reassign all transactions to another category before deleting this one.',
+            l10n.moveTransactionsDescription,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
           InputDecorator(
-            decoration: const InputDecoration(
-              hintText: 'Select New Category',
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: InputDecoration(
+              hintText: l10n.selectNewCategory,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<CategoryEntity>(
                 value: _targetCategory,
                 isExpanded: true,
-                hint: const Text('Select New Category'),
+                hint: Text(l10n.selectNewCategory),
                 items: otherCategories.map((cat) {
                   return DropdownMenuItem(
                     value: cat,
@@ -327,14 +335,14 @@ class _CategoryUsageActionSheetState
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Move & Delete'),
+                  : Text(l10n.moveAndDelete),
             ),
           ),
           const SizedBox(height: 32),
           const Divider(),
           const SizedBox(height: 24),
           Text(
-            'Option 2: Delete Everything',
+            l10n.optionDeleteEverything,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: AppColors.error,
               fontWeight: FontWeight.bold,
@@ -342,7 +350,7 @@ class _CategoryUsageActionSheetState
           ),
           const SizedBox(height: 12),
           Text(
-            'This will permanently delete this category AND all transactions associated with it. This action cannot be undone.',
+            l10n.deleteEverythingDescription,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
@@ -362,7 +370,7 @@ class _CategoryUsageActionSheetState
                       }
                     },
               style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text('Delete Category & Transactions'),
+              child: Text(l10n.deleteCategoryAndTransactions),
             ),
           ),
           const SizedBox(height: 16),
@@ -372,22 +380,21 @@ class _CategoryUsageActionSheetState
   }
 
   Future<bool> _showFinalConfirm(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Are you absolutely sure?'),
-            content: const Text(
-              'All records associated with this category will be lost forever.',
-            ),
+            title: Text(l10n.areYouSure),
+            content: Text(l10n.allRecordsWillBeLost),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('Delete All'),
+                child: Text(l10n.deleteAll),
               ),
             ],
           ),
@@ -429,6 +436,7 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.only(
         top: 24,
@@ -447,21 +455,21 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.category == null ? 'New Category' : 'Edit Category',
+              widget.category == null ? l10n.newCategory : l10n.editCategory,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 24),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                hintText: 'Category Name',
-                prefixIcon: Icon(Icons.label_outline_rounded),
+              decoration: InputDecoration(
+                hintText: l10n.categoryName,
+                prefixIcon: const Icon(Icons.label_outline_rounded),
               ),
               validator: (val) =>
-                  val == null || val.isEmpty ? 'Required' : null,
+                  val == null || val.isEmpty ? l10n.required : null,
             ),
             const SizedBox(height: 24),
-            Text('Icon', style: Theme.of(context).textTheme.labelLarge),
+            Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
             const SizedBox(height: 12),
             SizedBox(
               height: 50,
@@ -503,7 +511,7 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
               ),
             ),
             const SizedBox(height: 24),
-            Text('Color', style: Theme.of(context).textTheme.labelLarge),
+            Text(l10n.color, style: Theme.of(context).textTheme.labelLarge),
             const SizedBox(height: 12),
             SizedBox(
               height: 50,
@@ -552,7 +560,9 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
                   }
                 },
                 child: Text(
-                  widget.category == null ? 'Create Category' : 'Save Changes',
+                  widget.category == null
+                      ? l10n.createCategory
+                      : l10n.saveChanges,
                 ),
               ),
             ),

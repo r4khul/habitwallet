@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/util/theme_extension.dart';
 import '../../settings/presentation/providers/currency_provider.dart';
@@ -21,7 +22,7 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
   void initState() {
     super.initState();
     final profile = ref.read(userProfileControllerProvider).value;
-    _nameController = TextEditingController(text: profile?.name ?? 'User');
+    _nameController = TextEditingController(text: profile?.name ?? '');
     _goalController = TextEditingController(
       text: profile?.yearlySavingsGoal.toStringAsFixed(0) ?? '10000',
     );
@@ -34,7 +35,7 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  Future<void> _save(AppLocalizations l10n) async {
     final name = _nameController.text.trim();
     final goal = double.tryParse(_goalController.text.trim()) ?? 0.0;
 
@@ -47,8 +48,8 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully!'),
+        SnackBar(
+          content: Text(l10n.profileUpdated),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
@@ -59,18 +60,19 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currencyAsync = ref.watch(currencyControllerProvider);
     final currencySymbol = currencyAsync.value?.symbol ?? '\$';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text(l10n.editProfile),
         actions: [
           TextButton(
-            onPressed: _save,
-            child: const Text(
-              'Save',
-              style: TextStyle(
+            onPressed: () => _save(l10n),
+            child: Text(
+              l10n.save,
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
               ),
@@ -107,7 +109,7 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Customize your experience',
+                    l10n.customizeExperience,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.grey500,
                     ),
@@ -118,17 +120,17 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
             const SizedBox(height: 40),
 
             // Name Field
-            _buildFieldLabel('Display Name'),
+            _buildFieldLabel(l10n.displayName),
             const SizedBox(height: 8),
             _buildTextField(
               controller: _nameController,
-              hint: 'Enter your name',
+              hint: l10n.nameHint,
               prefixIcon: Icons.badge_outlined,
             ),
             const SizedBox(height: 24),
 
             // Goal Field
-            _buildFieldLabel('Yearly Savings Goal'),
+            _buildFieldLabel(l10n.yearlySavingsGoal),
             const SizedBox(height: 8),
             _buildTextField(
               controller: _goalController,
@@ -139,7 +141,7 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Set a target for your annual savings. We\'ll help you track your progress in the menu.',
+              l10n.savingsGoalDescription,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: AppColors.grey500,
                 height: 1.5,
@@ -184,7 +186,7 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'View Financial Overview',
+                          l10n.viewFinancialOverview,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

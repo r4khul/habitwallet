@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import 'providers/auth_providers.dart';
@@ -41,6 +42,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Listen for errors to show snackbars
     ref.listen(authControllerProvider, (previous, next) {
       next.whenOrNull(
@@ -73,14 +75,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 const SizedBox(height: 80),
                 Text(
-                  'Welcome Back',
+                  l10n.welcomeBack,
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to manage your wealth.',
+                  l10n.signInToManage,
                   style: Theme.of(
                     context,
                   ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),
@@ -89,24 +91,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 // Email Field
                 Text(
-                  'Email Address',
+                  l10n.emailAddress,
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    hintText: 'name@example.com',
-                  ),
+                  decoration: InputDecoration(hintText: l10n.emailHint),
                   keyboardType: TextInputType.emailAddress,
                   style: Theme.of(context).textTheme.bodyLarge,
                   enabled: !isLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Email is required';
+                      return l10n.emailRequired;
                     }
                     if (!value.contains('@')) {
-                      return 'Enter a valid email';
+                      return l10n.invalidEmail;
                     }
                     return null;
                   },
@@ -115,14 +115,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 // PIN Field
                 Text(
-                  'Security PIN',
+                  l10n.securityPIN,
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _pinController,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter your 4-digit PIN',
+                  decoration: InputDecoration(
+                    hintText: l10n.pinHint,
                     counterText: '', // Hide default counter
                   ),
                   obscureText: true,
@@ -134,10 +134,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   enabled: !isLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'PIN is required';
+                      return l10n.pinRequired;
                     }
                     if (value.length != 4) {
-                      return 'PIN must be exactly 4 digits';
+                      return l10n.pinLengthError;
                     }
                     return null;
                   },
@@ -168,7 +168,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ? null
                             : () => setState(() => _rememberMe = !_rememberMe),
                         child: Text(
-                          'Remember me on this device',
+                          l10n.rememberMe,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: AppColors.grey500),
                         ),
@@ -192,7 +192,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Sign In'),
+                        : Text(l10n.signIn),
                   ),
                 ),
                 const SizedBox(height: 24),

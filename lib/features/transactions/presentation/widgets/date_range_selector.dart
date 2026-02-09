@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/util/theme_extension.dart';
 import '../providers/date_filter_provider.dart';
 
 /// Optimized DateRangeSelector with separate widget classes for each chip.
-/// Performance improvements:
-/// - RepaintBoundary to isolate repaints
-/// - Separate StatelessWidget classes reduce rebuild scope
-/// - Cached isDark lookup passed down
-/// - Reduced animation duration (80ms vs 200ms)
-/// - cacheExtent for smooth scrolling
 class DateRangeSelector extends ConsumerWidget {
   const DateRangeSelector({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final currentFilter = ref.watch(dateFilterControllerProvider);
-    // Cache theme lookup at parent level
     final isDark = context.isDarkMode;
 
     return RepaintBoundary(
@@ -30,21 +25,21 @@ class DateRangeSelector extends ConsumerWidget {
           cacheExtent: 200,
           children: [
             _FilterChip(
-              label: 'Today',
+              label: l10n.today,
               isSelected: currentFilter.label == 'Today',
               isDark: isDark,
               onTap: () =>
                   ref.read(dateFilterControllerProvider.notifier).setToday(),
             ),
             _FilterChip(
-              label: 'This Week',
+              label: l10n.thisWeek,
               isSelected: currentFilter.label == 'This Week',
               isDark: isDark,
               onTap: () =>
                   ref.read(dateFilterControllerProvider.notifier).setThisWeek(),
             ),
             _FilterChip(
-              label: 'This Month',
+              label: l10n.thisMonth,
               isSelected: currentFilter.label == 'This Month',
               isDark: isDark,
               onTap: () => ref
@@ -52,14 +47,14 @@ class DateRangeSelector extends ConsumerWidget {
                   .setThisMonth(),
             ),
             _FilterChip(
-              label: 'This Year',
+              label: l10n.thisYear,
               isSelected: currentFilter.label == 'This Year',
               isDark: isDark,
               onTap: () =>
                   ref.read(dateFilterControllerProvider.notifier).setThisYear(),
             ),
             _FilterChip(
-              label: 'All Time',
+              label: l10n.allTime,
               isSelected: currentFilter.label == 'All Time',
               isDark: isDark,
               onTap: () =>
@@ -77,7 +72,6 @@ class DateRangeSelector extends ConsumerWidget {
   }
 
   Future<void> _showRangePicker(BuildContext context, WidgetRef ref) async {
-    // Pre-cache colors for the picker to avoid computing them inside builder
     final isDark = context.isDarkMode;
     final surfaceColor = isDark ? AppColors.darkSurface : Colors.white;
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
@@ -87,7 +81,6 @@ class DateRangeSelector extends ConsumerWidget {
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
       builder: (context, child) {
-        // Use pre-computed colors to avoid layout thrashing
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(

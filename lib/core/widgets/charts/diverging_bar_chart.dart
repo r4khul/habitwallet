@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
 import 'package:habitwallet/core/util/formatting_utils.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import 'chart_types.dart';
@@ -88,11 +89,12 @@ class _DivergingBarChartState extends State<DivergingBarChart>
   @override
   Widget build(BuildContext context) {
     if (widget.data.isEmpty) {
+      final l10n = AppLocalizations.of(context);
       return SizedBox(
         height: widget.height,
         child: Center(
           child: Text(
-            'No data available',
+            l10n?.noDataAvailable ?? 'No data available',
             style: AppTypography.bodyMedium.copyWith(color: AppColors.grey500),
           ),
         ),
@@ -244,7 +246,7 @@ class _DivergingBarChartState extends State<DivergingBarChart>
                 ),
                 const SizedBox(height: 8),
                 _TooltipRow(
-                  label: 'Income',
+                  label: AppLocalizations.of(context)?.income ?? 'Income',
                   value: FormattingUtils.formatCompact(
                     point.income,
                     symbol: currencySymbol,
@@ -255,7 +257,7 @@ class _DivergingBarChartState extends State<DivergingBarChart>
                 if (point.income > 0 && point.expense != 0)
                   const SizedBox(height: 4),
                 _TooltipRow(
-                  label: 'Expense',
+                  label: AppLocalizations.of(context)?.expense ?? 'Expense',
                   value: FormattingUtils.formatCompact(
                     point.expense.abs(),
                     symbol: currencySymbol,

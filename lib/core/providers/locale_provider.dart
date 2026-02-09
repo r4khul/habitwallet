@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:habitwallet/core/providers/shared_preferences_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'locale_provider.g.dart';
 

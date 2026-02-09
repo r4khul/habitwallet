@@ -193,6 +193,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign Out'**
   String get signOut;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get welcomeBack;
+
+  /// No description provided for @signInToManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to manage your wealth.'**
+  String get signInToManage;
+
+  /// No description provided for @emailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailAddress;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'name@example.com'**
+  String get emailHint;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get invalidEmail;
+
+  /// No description provided for @securityPIN.
+  ///
+  /// In en, this message translates to:
+  /// **'Security PIN'**
+  String get securityPIN;
+
+  /// No description provided for @pinHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your 4-digit PIN'**
+  String get pinHint;
+
+  /// No description provided for @pinRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN is required'**
+  String get pinRequired;
+
+  /// No description provided for @pinLengthError.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN must be exactly 4 digits'**
+  String get pinLengthError;
+
+  /// No description provided for @rememberMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember me on this device'**
+  String get rememberMe;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully!'**
+  String get profileUpdated;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @customizeExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your experience'**
+  String get customizeExperience;
+
+  /// No description provided for @displayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// No description provided for @nameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get nameHint;
+
+  /// No description provided for @yearlySavingsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Savings Goal'**
+  String get yearlySavingsGoal;
+
+  /// No description provided for @savingsGoalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a target for your annual savings. We\'ll help you track your progress in the menu.'**
+  String get savingsGoalDescription;
+
+  /// No description provided for @viewFinancialOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'View Financial Overview'**
+  String get viewFinancialOverview;
+
+  /// No description provided for @addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Category'**
+  String get addCategory;
+
+  /// No description provided for @newCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'New Category'**
+  String get newCategory;
+
+  /// No description provided for @editCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Category'**
+  String get editCategory;
+
+  /// No description provided for @deleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category'**
+  String get deleteCategory;
+
+  /// No description provided for @deleteCategoryConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category?'**
+  String get deleteCategoryConfirmTitle;
+
+  /// No description provided for @deleteCategoryConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently remove the category.'**
+  String get deleteCategoryConfirmMessage;
+
+  /// No description provided for @categoryInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Category in Use'**
+  String get categoryInUse;
+
+  /// No description provided for @hasTransactionsSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'has existing transactions.'**
+  String get hasTransactionsSuffix;
+
+  /// No description provided for @optionMoveTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Option 1: Move Transactions'**
+  String get optionMoveTransactions;
+
+  /// No description provided for @moveTransactionsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Reassign all transactions to another category before deleting this one.'**
+  String get moveTransactionsDescription;
+
+  /// No description provided for @selectNewCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select New Category'**
+  String get selectNewCategory;
+
+  /// No description provided for @moveAndDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Move & Delete'**
+  String get moveAndDelete;
+
+  /// No description provided for @optionDeleteEverything.
+  ///
+  /// In en, this message translates to:
+  /// **'Option 2: Delete Everything'**
+  String get optionDeleteEverything;
+
+  /// No description provided for @deleteEverythingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this category AND all transactions associated with it. This action cannot be undone.'**
+  String get deleteEverythingDescription;
+
+  /// No description provided for @deleteCategoryAndTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category & Transactions'**
+  String get deleteCategoryAndTransactions;
+
+  /// No description provided for @areYouSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you absolutely sure?'**
+  String get areYouSure;
+
+  /// No description provided for @allRecordsWillBeLost.
+  ///
+  /// In en, this message translates to:
+  /// **'All records associated with this category will be lost forever.'**
+  String get allRecordsWillBeLost;
+
+  /// No description provided for @deleteAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete All'**
+  String get deleteAll;
+
+  /// No description provided for @categoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Name'**
+  String get categoryName;
+
+  /// No description provided for @icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get icon;
+
+  /// No description provided for @color.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get color;
+
+  /// No description provided for @createCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Category'**
+  String get createCategory;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @required.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get required;
+
+  /// No description provided for @noTransactionsAnalyze.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions to analyze'**
+  String get noTransactionsAnalyze;
+
+  /// No description provided for @financialOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Overview'**
+  String get financialOverview;
+
+  /// No description provided for @incomeVsExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Income vs Expense'**
+  String get incomeVsExpense;
+
+  /// No description provided for @daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get daily;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
+  /// No description provided for @monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthly;
+
+  /// No description provided for @yearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get yearly;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @thisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// No description provided for @thisYear.
+  ///
+  /// In en, this message translates to:
+  /// **'This Year'**
+  String get thisYear;
+
+  /// No description provided for @allTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get allTime;
+
+  /// No description provided for @customRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Range'**
+  String get customRange;
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get noDataAvailable;
+
+  /// No description provided for @income.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get income;
+
+  /// No description provided for @expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expense;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @edited.
+  ///
+  /// In en, this message translates to:
+  /// **'EDITED'**
+  String get edited;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @backendUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend URL'**
+  String get backendUrl;
+
+  /// No description provided for @configureBackendUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Backend URL'**
+  String get configureBackendUrl;
+
+  /// No description provided for @dailyReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminder (8 PM)'**
+  String get dailyReminder;
+
+  /// No description provided for @notifyTransactionsLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify if no transactions logged'**
+  String get notifyTransactionsLogged;
+
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
+  /// No description provided for @network.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get network;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
 }
 
 class _AppLocalizationsDelegate

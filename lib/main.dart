@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/providers/shared_preferences_provider.dart';
 import 'package:habitwallet/core/providers/sync_provider.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app_router.dart';

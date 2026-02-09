@@ -1,15 +1,15 @@
 class AppLanguage {
-  final String name;
-  final String nativeName;
-  final String languageCode;
-  final String flagEmoji;
-
   const AppLanguage({
     required this.name,
     required this.nativeName,
     required this.languageCode,
     required this.flagEmoji,
   });
+
+  final String name;
+  final String nativeName;
+  final String languageCode;
+  final String flagEmoji;
 
   static const List<AppLanguage> availableLanguages = [
     AppLanguage(
