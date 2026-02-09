@@ -7,7 +7,7 @@
 ![Flutter CI](https://github.com/r4khul/habitwallet/actions/workflows/flutter-ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/Coverage-80.5%25-brightgreen)
 
-> 📊 **Test Coverage**: 69 tests passing • 85-100% coverage on business logic • [View detailed coverage report](docs/TEST_COVERAGE.md)
+> 📊 **Test Coverage**: 69 tests passing • [View detailed coverage report](docs/TEST_COVERAGE.md)
 
 A comprehensive finance management application built with Flutter. This application provides offline-first financial transaction tracking with background synchronization capabilities, bilingual support (English and Tamil), and a modern, responsive user interface.
 
@@ -26,6 +26,25 @@ Habit Wallet is a comprehensive financial tracking application designed to help 
 - **File attachments** for transaction receipts
 - **Category management** with custom icons and colors
 - **Profile customization** and settings management
+
+## App Screenshots
+
+<div align="center">
+  <img src="docs/images/s1.jpg" width="180" />
+  <img src="docs/images/s2.jpg" width="180" />
+  <img src="docs/images/s3.jpg" width="180" />
+  <img src="docs/images/s4.jpg" width="180" />
+  <br/>
+  <img src="docs/images/s5.jpg" width="180" />
+  <img src="docs/images/s6.jpg" width="180" />
+  <img src="docs/images/s7.jpg" width="180" />
+  <img src="docs/images/s8.jpg" width="180" />
+  <br/>
+  <img src="docs/images/s9.jpg" width="180" />
+  <img src="docs/images/s10.jpg" width="180" />
+  <img src="docs/images/s11.jpg" width="180" />
+  <img src="docs/images/s12.jpg" width="180" />
+</div>
 
 ## Codebase Structure
 
@@ -94,16 +113,19 @@ flutter pub run build_runner build --delete-conflicting-outputs
 ### 4. Run the Application
 
 For Android:
+
 ```bash
 flutter run
 ```
 
 For iOS:
+
 ```bash
 flutter run -d ios
 ```
 
 For debug mode with hot reload:
+
 ```bash
 flutter run --debug
 ```
@@ -111,16 +133,19 @@ flutter run --debug
 ### 5. Build for Production
 
 Android APK:
+
 ```bash
 flutter build apk --release
 ```
 
 Android App Bundle:
+
 ```bash
 flutter build appbundle --release
 ```
 
 iOS:
+
 ```bash
 flutter build ios --release
 ```
@@ -141,24 +166,26 @@ Background sync depends on a remote API server. During local development, a mock
 The app expects the following REST endpoints. The application is built with robust parsing that handles various response formats, making it easy to work with different mock server configurations.
 
 #### 1. Fetch Transactions
+
 ```
 GET /transactions
 Response: Array of transaction objects
 ```
 
 **Full format (recommended):**
+
 ```json
 [
   {
     "id": "tx_001",
-    "amount": -50.00,
+    "amount": -50.0,
     "category": "food",
     "ts": "2026-02-09T10:30:00.000Z",
     "note": "Lunch at restaurant"
   },
   {
     "id": "tx_002",
-    "amount": 2000.00,
+    "amount": 2000.0,
     "category": "salary",
     "ts": "2026-02-01T00:00:00.000Z",
     "note": "Monthly salary"
@@ -167,14 +194,27 @@ Response: Array of transaction objects
 ```
 
 **Simplified format (also supported):**
+
 ```json
 [
-  {"id":"t1","amount":-199.0,"category":"Food","ts":"2025-09-10T19:10:00Z","note":"Idli"},
-  {"id":"t2","amount":5000.0,"category":"Salary","ts":"2025-09-01T09:00:00Z"}
+  {
+    "id": "t1",
+    "amount": -199.0,
+    "category": "Food",
+    "ts": "2025-09-10T19:10:00Z",
+    "note": "Idli"
+  },
+  {
+    "id": "t2",
+    "amount": 5000.0,
+    "category": "Salary",
+    "ts": "2025-09-01T09:00:00Z"
+  }
 ]
 ```
 
 The app gracefully handles:
+
 - Missing optional fields (note, etc.)
 - Null values in responses
 - Empty arrays
@@ -182,6 +222,7 @@ The app gracefully handles:
 - Network failures (returns empty list)
 
 #### 2. Push Transaction
+
 ```
 POST /transactions
 Body: Transaction object (same structure as GET response)
@@ -189,12 +230,14 @@ Response: 200 OK or 201 Created
 ```
 
 #### 3. Fetch Categories
+
 ```
 GET /categories
 Response: Array of category objects
 ```
 
 **Full format (recommended):**
+
 ```json
 [
   {
@@ -215,13 +258,15 @@ Response: Array of category objects
 ```
 
 **Simplified format (also supported):**
+
 ```json
-["Food","Travel","Bills","Shopping","Salary","Other"]
+["Food", "Travel", "Bills", "Shopping", "Salary", "Other"]
 ```
 
 The app automatically adapts to simple string arrays by creating default category objects with generated IDs, icons, and colors.
 
 #### 4. Push Category
+
 ```
 POST /categories
 Body: Category object (same structure as GET response)
@@ -229,6 +274,7 @@ Response: 200 OK or 201 Created
 ```
 
 **Robustness Features:**
+
 - Validates required fields before parsing
 - Skips individual malformed records without failing entire sync
 - Handles null responses gracefully
@@ -325,6 +371,7 @@ flutter test --coverage
 ## Project Roadmap
 
 ### Current Version (v1.0.0)
+
 - Core transaction management
 - Category system
 - Local-first architecture with sync
@@ -332,6 +379,7 @@ flutter test --coverage
 - Analytics dashboard
 
 ### Future Enhancements
+
 - **SMS Transaction Parser** - Automatic transaction detection from banking SMS messages with AI-powered parsing
 - Budget tracking and alerts
 - Recurring transaction support
@@ -361,9 +409,9 @@ flutter test --coverage
 ### Database Issues
 
 The app uses schema version 3. If you encounter database errors after updates:
+
 - Uninstall and reinstall the app (development only)
 - Production migrations are handled automatically in `database.dart`
-
 
 ## License
 
