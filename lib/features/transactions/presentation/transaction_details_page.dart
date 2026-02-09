@@ -266,12 +266,6 @@ class _DetailsView extends ConsumerWidget {
 
         if (context.mounted) {
           // Success Feedback
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.transactionDeleted),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
           // Go back to the transactions list
           context.pop();
         }

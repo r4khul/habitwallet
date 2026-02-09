@@ -135,49 +135,65 @@ class _FlowChartState extends State<FlowChart>
         config.spacing +
         32;
 
-    return SizedBox(
-      height: widget.height,
-      child: Stack(
-        children: [
-          // The Scrollable Chart
-          SingleChildScrollView(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GestureDetector(
-              onTapDown: (details) => _handleTap(details.localPosition, config),
-              onTapUp: (_) {},
-              child: AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  return RepaintBoundary(
-                    child: CustomPaint(
-                      size: Size(totalWidth - 32, widget.height),
-                      painter: _FlowChartPainter(
-                        data: widget.data,
-                        progress: _animation.value,
-                        selectedIndex: _selectedIndex,
-                        config: config,
-                        incomeColor:
-                            widget.incomeColor ?? const Color(0xFF10B981),
-                        expenseColor:
-                            widget.expenseColor ?? const Color(0xFFF43F5E),
-                        isDark: isDark,
-                        timeRange: widget.timeRange,
-                        locale: AppLocalizations.of(context)!.localeName,
-                      ),
-                    ),
-                  );
-                },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          height: widget.height,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // The Scrollable Chart
+              SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GestureDetector(
+                  onTapDown: (details) =>
+                      _handleTap(details.localPosition, config),
+                  onTapUp: (_) {},
+                  child: AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return RepaintBoundary(
+                        child: CustomPaint(
+                          size: Size(totalWidth - 32, widget.height),
+                          painter: _FlowChartPainter(
+                            data: widget.data,
+                            progress: _animation.value,
+                            selectedIndex: _selectedIndex,
+                            config: config,
+                            incomeColor:
+                                widget.incomeColor ?? const Color(0xFF10B981),
+                            expenseColor:
+                                widget.expenseColor ?? const Color(0xFFF43F5E),
+                            isDark: isDark,
+                            timeRange: widget.timeRange,
+                            locale: AppLocalizations.of(context)!.localeName,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          if (_selectedIndex != null && _tapPosition != null)
-            _buildTooltip(context, widget.data[_selectedIndex!], config),
-        ],
-      ),
+              if (_selectedIndex != null && _tapPosition != null)
+                AnimatedBuilder(
+                  animation: _scrollController,
+                  builder: (context, _) {
+                    return _buildTooltip(
+                      context,
+                      widget.data[_selectedIndex!],
+                      config,
+                      constraints.maxWidth,
+                    );
+                  },
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -203,8 +219,11 @@ class _FlowChartState extends State<FlowChart>
     BuildContext context,
     FlowDataPoint point,
     _BarConfig config,
+    double maxWidth,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    const tooltipWidth = 170.0;
+    const margin = 8.0;
 
     final xPos =
         (_selectedIndex! * (config.width + config.spacing)) +
@@ -212,15 +231,30 @@ class _FlowChartState extends State<FlowChart>
         16 -
         _scrollController.offset;
 
+    // Hide tooltip if the bar is not visible in the viewport
+    if (xPos + config.width < 0 || xPos > maxWidth) {
+      return const SizedBox.shrink();
+    }
+
+    // Calculate initial centered position
+    double left = xPos + config.width / 2 - (tooltipWidth / 2);
+
+    // Smart clamp to keep tooltip within view bounds
+    if (left < margin) {
+      left = margin;
+    } else if (left + tooltipWidth > maxWidth - margin) {
+      left = maxWidth - tooltipWidth - margin;
+    }
+
     return Positioned(
-      left: xPos + config.width / 2 - 85,
+      left: left,
       top: 8,
       child: IgnorePointer(
         child: AnimatedOpacity(
           opacity: _selectedIndex != null ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 150),
           child: Container(
-            width: 170,
+            width: tooltipWidth,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: isDark

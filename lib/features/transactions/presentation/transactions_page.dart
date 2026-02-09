@@ -142,13 +142,6 @@ class TransactionsPage extends ConsumerWidget {
                                 ScaffoldMessenger.of(
                                   context,
                                 ).hideCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(l10n.transactionDeleted),
-                                    behavior: SnackBarBehavior.floating,
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
                               },
                               child: _TransactionTile(
                                 transaction: tx,
