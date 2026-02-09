@@ -237,7 +237,7 @@ class _FlowChartState extends State<FlowChart>
     }
 
     // Calculate initial centered position
-    double left = xPos + config.width / 2 - (tooltipWidth / 2);
+    var left = xPos + config.width / 2 - (tooltipWidth / 2);
 
     // Smart clamp to keep tooltip within view bounds
     if (left < margin) {

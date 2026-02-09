@@ -174,6 +174,19 @@ class FinancialAggregator {
             percentage: (entry.value / totalExpense) * 100,
           ),
         );
+      } else {
+        // Handle orphaned transactions (category not found)
+        // Create a fallback category entry
+        spends.add(
+          CategorySpend(
+            categoryId: entry.key,
+            categoryName: _formatCategoryName(entry.key),
+            categoryIcon: 'help_outline',
+            categoryColor: 0xFF9E9E9E, // Gray for unknown categories
+            amount: entry.value,
+            percentage: (entry.value / totalExpense) * 100,
+          ),
+        );
       }
     }
 
@@ -194,7 +207,7 @@ class FinancialAggregator {
         CategorySpend(
           categoryId: 'others',
           categoryName: 'Others',
-          categoryIcon: 'others',
+          categoryIcon: 'more_horiz',
           categoryColor: 0xFF9E9E9E,
           amount: othersTotal,
           percentage: othersPercentage,
@@ -204,6 +217,24 @@ class FinancialAggregator {
     }
 
     return spends;
+  }
+
+  /// Formats a category ID into a human-readable name.
+  /// Handles both simple strings and complex IDs.
+  String _formatCategoryName(String categoryId) {
+    // If it's a simple word, capitalize it
+    if (!categoryId.contains('_') && !categoryId.contains('-')) {
+      return categoryId[0].toUpperCase() + categoryId.substring(1);
+    }
+
+    // Handle snake_case or kebab-case
+    return categoryId
+        .split(RegExp(r'[_-]'))
+        .map(
+          (word) =>
+              word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1),
+        )
+        .join(' ');
   }
 
   String _getGroupKey(DateTime date, TimeRange range) {
