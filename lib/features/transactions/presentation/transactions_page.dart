@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/util/formatting_utils.dart';
 
 import '../../../core/providers/theme_provider.dart';
@@ -28,12 +29,29 @@ class TransactionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionsAsync = ref.watch(filteredTransactionsProvider);
     final categoryMapAsync = ref.watch(categoryMapProvider);
-    // Hoist currency symbol watch to parent - prevents N provider lookups in list
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HabitWallet.'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('HabitWallet.'),
+            transactionsAsync.when(
+              data: (txs) => Text(
+                l10n.transactionCount(txs.length),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppColors.grey500,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+          ],
+        ),
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -422,6 +440,8 @@ class _AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppTheme.getOverlayStyle(isDark: context.isDarkMode),
       child: Drawer(
@@ -657,7 +677,7 @@ class _AppDrawer extends ConsumerWidget {
               // Menu Items
               _DrawerItem(
                 icon: Icons.category_outlined,
-                label: 'Categories',
+                label: l10n.categories,
                 onTap: () {
                   Navigator.pop(context); // Close drawer
                   context.push('/categories');
@@ -665,7 +685,7 @@ class _AppDrawer extends ConsumerWidget {
               ),
               _DrawerItem(
                 icon: Icons.refresh_rounded,
-                label: 'Sync Data',
+                label: l10n.syncData,
                 onTap: () {
                   ref.read(transactionControllerProvider.notifier).refresh();
                   Navigator.pop(context);
@@ -673,7 +693,7 @@ class _AppDrawer extends ConsumerWidget {
               ),
               _DrawerItem(
                 icon: Icons.bar_chart_rounded,
-                label: 'Analytics',
+                label: l10n.analytics,
                 onTap: () {
                   Navigator.pop(context);
                   context.push('/analytics');
@@ -681,7 +701,7 @@ class _AppDrawer extends ConsumerWidget {
               ),
               _DrawerItem(
                 icon: Icons.settings_outlined,
-                label: 'Settings',
+                label: l10n.settings,
                 onTap: () {
                   Navigator.pop(context); // Close drawer
                   context.push('/settings');
@@ -693,7 +713,7 @@ class _AppDrawer extends ConsumerWidget {
               const Divider(height: 1),
               _DrawerItem(
                 icon: Icons.logout_rounded,
-                label: 'Sign Out',
+                label: l10n.signOut,
                 color: AppColors.error,
                 onTap: () {
                   ref.read(authControllerProvider.notifier).logout();

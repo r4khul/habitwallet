@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/providers/network_providers.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/util/theme_extension.dart';
+import 'package:habitwallet/core/providers/locale_provider.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
 import 'package:habitwallet/features/settings/presentation/providers/notification_provider.dart';
+import 'package:habitwallet/features/settings/presentation/widgets/language_selector_sheet.dart';
+import 'package:habitwallet/features/settings/domain/language.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -15,10 +19,12 @@ class SettingsPage extends ConsumerWidget {
     final currencyAsync = ref.watch(currencyControllerProvider);
     final notificationSettings = ref.watch(notificationControllerProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = ref.watch(localeControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -29,11 +35,73 @@ class SettingsPage extends ConsumerWidget {
           const _SectionHeader(title: 'General'),
           const SizedBox(height: 8),
 
+          // Language Selector
+          _SettingsTile(
+            icon: Icons.language_rounded,
+            iconColor: Colors.orange,
+            title: l10n.language,
+            subtitle: AppLanguage.availableLanguages
+                .firstWhere(
+                  (l) => l.languageCode == currentLocale.languageCode,
+                  orElse: () => AppLanguage.availableLanguages.first,
+                )
+                .nativeName,
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color:
+                    (context.isDarkMode
+                            ? theme.colorScheme.surfaceContainerHighest
+                            : AppColors.grey200)
+                        .withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: theme.dividerColor.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    AppLanguage.availableLanguages
+                        .firstWhere(
+                          (l) => l.languageCode == currentLocale.languageCode,
+                          orElse: () => AppLanguage.availableLanguages.first,
+                        )
+                        .flagEmoji,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    currentLocale.languageCode.toUpperCase(),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                useSafeArea: true,
+                backgroundColor: theme.scaffoldBackgroundColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                builder: (context) => const LanguageSelectorSheet(),
+              );
+            },
+          ),
+
+          const SizedBox(height: 12),
+
           // Currency Selector
           _SettingsTile(
             icon: Icons.currency_exchange_rounded,
             iconColor: AppColors.primary,
-            title: 'Currency',
+            title: l10n.currency,
             subtitle: currencyAsync.when(
               data: (c) => '${c.name} (${c.symbol})',
               loading: () => 'Loading...',
@@ -93,7 +161,7 @@ class SettingsPage extends ConsumerWidget {
           ),
 
           const SizedBox(height: 24),
-          const _SectionHeader(title: 'Notifications'),
+          _SectionHeader(title: l10n.notifications),
           const SizedBox(height: 8),
 
           // Notification Toggle

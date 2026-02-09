@@ -1,0 +1,19 @@
+{
+  "@@locale": "ta",
+  "appTitle": "Habit Wallet",
+  "settings": "அமைப்புகள்",
+  "language": "மொழி",
+  "currency": "நாணயம்",
+  "theme": "தீம்",
+  "notifications": "அறிவிப்புகள்",
+  "habitCount": "{count, plural, =0{பழக்கங்கள் இல்லை} =1{1 பழக்கம்} other{{count} பழக்கங்கள்}}",
+  "selectLanguage": "மொழியைத் தேர்ந்தெடுக்கவும்",
+  "english": "ஆங்கிலம்",
+  "tamil": "தமிழ்",
+  "transactionCount": "{count, plural, =0{பரிவர்த்தனைகள் இல்லை} =1{1 பரிவர்த்தனை} other{{count} பரிவர்த்தனைகள்}}",
+  "transactions": "பரிவர்த்தனைகள்",
+  "categories": "வகைகள்",
+  "syncData": "தரவை ஒத்திசை",
+  "analytics": "பகுப்பாய்வு",
+  "signOut": "வெளியேறு"
+}

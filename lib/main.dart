@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/providers/shared_preferences_provider.dart';
 import 'package:habitwallet/core/providers/sync_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app_router.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/util/notification_service.dart';
@@ -71,6 +74,7 @@ class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
   Widget build(BuildContext context) {
     final routerConfig = ref.watch(routerProvider);
     final themeMode = ref.watch(themeControllerProvider);
+    final locale = ref.watch(localeControllerProvider);
 
     ref.watch(notificationControllerProvider);
     ref.watch(syncControllerProvider);
@@ -96,6 +100,14 @@ class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
         themeMode: themeMode,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
+        locale: locale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
       ),
     );
   }

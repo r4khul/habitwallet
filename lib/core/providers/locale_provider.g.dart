@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'sync_provider.dart';
+part of 'locale_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,51 +9,51 @@ part of 'sync_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(SyncController)
-final syncControllerProvider = SyncControllerProvider._();
+@ProviderFor(LocaleController)
+final localeControllerProvider = LocaleControllerProvider._();
 
-final class SyncControllerProvider
-    extends $NotifierProvider<SyncController, void> {
-  SyncControllerProvider._()
+final class LocaleControllerProvider
+    extends $NotifierProvider<LocaleController, Locale> {
+  LocaleControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'syncControllerProvider',
+        name: r'localeControllerProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$syncControllerHash();
+  String debugGetCreateSourceHash() => _$localeControllerHash();
 
   @$internal
   @override
-  SyncController create() => SyncController();
+  LocaleController create() => LocaleController();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(void value) {
+  Override overrideWithValue(Locale value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<void>(value),
+      providerOverride: $SyncValueProvider<Locale>(value),
     );
   }
 }
 
-String _$syncControllerHash() => r'c61b5ffea16cdd1af9f924abf94adacc94e0a449';
+String _$localeControllerHash() => r'd0cec6dd28ec5feff61c1dbc0b6510e3081252fa';
 
-abstract class _$SyncController extends $Notifier<void> {
-  void build();
+abstract class _$LocaleController extends $Notifier<Locale> {
+  Locale build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<void, void>;
+    final ref = this.ref as $Ref<Locale, Locale>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<void, void>,
-              void,
+              AnyNotifier<Locale, Locale>,
+              Locale,
               Object?,
               Object?
             >;

@@ -34,7 +34,7 @@ final class UserProfileControllerProvider
 }
 
 String _$userProfileControllerHash() =>
-    r'84d4a01446231a539d9ff1a098ced265852024cc';
+    r'43a22cebf2c71b836b4b90b4996e581fc828b2dd';
 
 abstract class _$UserProfileController extends $AsyncNotifier<UserProfile> {
   FutureOr<UserProfile> build();
@@ -86,4 +86,4 @@ final class CurrentYearSavingsProvider
 }
 
 String _$currentYearSavingsHash() =>
-    r'9662edd0ab3af921479bb72c3dcc32f9bc2a0b72';
+    r'e3140b02fb11e8748e027aa2269301564fcc4ff8';
