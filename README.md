@@ -5,7 +5,9 @@
 # Habit Wallet
 
 ![Flutter CI](https://github.com/r4khul/habitwallet/actions/workflows/flutter-ci.yml/badge.svg)
-![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)
+[![codecov](https://codecov.io/gh/r4khul/habitwallet/branch/main/graph/badge.svg)](https://codecov.io/gh/r4khul/habitwallet)
+
+> 📊 **Test Coverage**: 69 tests passing • 85-100% coverage on business logic • [View detailed coverage report](docs/TEST_COVERAGE.md)
 
 A comprehensive finance management application built with Flutter. This application provides offline-first financial transaction tracking with background synchronization capabilities, bilingual support (English and Tamil), and a modern, responsive user interface.
 
