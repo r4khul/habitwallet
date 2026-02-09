@@ -362,17 +362,12 @@ The app uses schema version 3. If you encounter database errors after updates:
 - Uninstall and reinstall the app (development only)
 - Production migrations are handled automatically in `database.dart`
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes: `git commit -am 'Add new feature'`
-4. Push to the branch: `git push origin feature/your-feature-name`
-5. Submit a pull request
 
 ## License
 
-This project is proprietary software. All rights reserved.
+Copyright (c) 2026 Rakhul Prakash. All rights reserved.
+
+This source code is provided for evaluation purposes only. See the [LICENSE](LICENSE) file for full terms and conditions.
 
 ## Contact
 
