@@ -110,6 +110,7 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
                   const SizedBox(height: 16),
                   Text(
                     l10n.customizeExperience,
+                    textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.grey500,
                     ),
