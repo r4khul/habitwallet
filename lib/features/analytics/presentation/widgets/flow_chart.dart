@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
 
@@ -162,6 +164,8 @@ class _FlowChartState extends State<FlowChart>
                         expenseColor:
                             widget.expenseColor ?? const Color(0xFFF43F5E),
                         isDark: isDark,
+                        timeRange: widget.timeRange,
+                        locale: AppLocalizations.of(context)!.localeName,
                       ),
                     ),
                   );
@@ -248,7 +252,7 @@ class _FlowChartState extends State<FlowChart>
                 const SizedBox(height: 10),
                 if (point.income > 0)
                   _buildTooltipRow(
-                    'Income',
+                    AppLocalizations.of(context)!.income,
                     '${widget.currencySymbol}${_formatAmount(point.income)}',
                     const Color(0xFF10B981),
                     isDark,
@@ -257,7 +261,7 @@ class _FlowChartState extends State<FlowChart>
                   const SizedBox(height: 6),
                 if (point.expense != 0)
                   _buildTooltipRow(
-                    'Expense',
+                    AppLocalizations.of(context)!.expense,
                     '${widget.currencySymbol}${_formatAmount(point.expense.abs())}',
                     const Color(0xFFF43F5E),
                     isDark,
@@ -270,7 +274,7 @@ class _FlowChartState extends State<FlowChart>
                 ),
                 const SizedBox(height: 8),
                 _buildTooltipRow(
-                  'Net',
+                  AppLocalizations.of(context)!.net,
                   '${point.netValue >= 0 ? '+' : ''}${widget.currencySymbol}${_formatAmount(point.netValue.abs())}',
                   point.netValue >= 0
                       ? const Color(0xFF10B981)
@@ -360,6 +364,8 @@ class _FlowChartPainter extends CustomPainter {
     required this.incomeColor,
     required this.expenseColor,
     required this.isDark,
+    required this.timeRange,
+    required this.locale,
   });
 
   final List<FlowDataPoint> data;
@@ -369,6 +375,8 @@ class _FlowChartPainter extends CustomPainter {
   final Color incomeColor;
   final Color expenseColor;
   final bool isDark;
+  final TimeRange timeRange;
+  final String locale;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -458,7 +466,7 @@ class _FlowChartPainter extends CustomPainter {
       }
 
       if (_shouldShowLabel(i, data.length)) {
-        final labelText = p.label ?? '';
+        final labelText = _getLabel(p, timeRange, locale);
         final tp = TextPainter(
           text: TextSpan(
             text: labelText,
@@ -511,6 +519,20 @@ class _FlowChartPainter extends CustomPainter {
       1.0,
     );
     return Curves.easeOutBack.transform(adjustedProgress);
+  }
+
+  String _getLabel(FlowDataPoint point, TimeRange range, String locale) {
+    // Prefer formatting date locally over using point.label (which might be in English)
+    switch (range) {
+      case TimeRange.daily:
+        return DateFormat('E', locale).format(point.date);
+      case TimeRange.weekly:
+        return DateFormat('MMM d', locale).format(point.date);
+      case TimeRange.monthly:
+        return DateFormat('MMM', locale).format(point.date);
+      case TimeRange.yearly:
+        return DateFormat('yyyy', locale).format(point.date);
+    }
   }
 
   bool _shouldShowLabel(int index, int total) {

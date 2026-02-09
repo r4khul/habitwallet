@@ -420,12 +420,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get netDeficit => 'Net Deficit';
 
   @override
+  String get totalSpent => 'Total Spent';
+
+  @override
+  String get net => 'Net';
+
+  @override
   String savingsRateMsg(Object rate) {
     return 'You\'re saving $rate% of income';
   }
 
   @override
   String get spendingExceedsIncome => 'Spending exceeds income';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get transactionNotFound => 'Transaction Not Found';
+
+  @override
+  String get movedOrDeleted => 'It may have been deleted or moved.';
+
+  @override
+  String get goBack => 'Go Back';
 
   @override
   String get notificationTitle => 'Daily Check-in 📝';

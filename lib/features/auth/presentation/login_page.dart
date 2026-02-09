@@ -163,14 +163,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       const SizedBox(
                         width: 4,
                       ), // Reduced spacing slightly for tighter grouping
-                      GestureDetector(
-                        onTap: isLoading
-                            ? null
-                            : () => setState(() => _rememberMe = !_rememberMe),
-                        child: Text(
-                          l10n.rememberMe,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: AppColors.grey500),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: isLoading
+                              ? null
+                              : () =>
+                                    setState(() => _rememberMe = !_rememberMe),
+                          child: Text(
+                            l10n.rememberMe,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.grey500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],

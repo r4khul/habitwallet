@@ -39,16 +39,34 @@ class TransactionsPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('HabitWallet.'),
-            transactionsAsync.when(
-              data: (txs) => Text(
-                l10n.transactionCount(txs.length),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: AppColors.grey500,
-                  fontWeight: FontWeight.w500,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: transactionsAsync.when(
+                data: (txs) => Text(
+                  l10n.transactionCount(txs.length),
+                  key: const ValueKey('count'),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppColors.grey500,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                loading: () => Text(
+                  ' ',
+                  key: const ValueKey('loading'),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppColors.grey500,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                error: (error, stack) => Text(
+                  ' ',
+                  key: const ValueKey('error'),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppColors.grey500,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-              loading: () => const SizedBox.shrink(),
-              error: (error, stack) => const SizedBox.shrink(),
             ),
           ],
         ),
@@ -67,83 +85,95 @@ class TransactionsPage extends ConsumerWidget {
         children: [
           const DateRangeSelector(),
           Expanded(
-            child: transactionsAsync.when(
-              data: (transactions) {
-                if (transactions.isEmpty) {
-                  return _EmptyState(
-                    onAction: () => _openAddTransaction(context),
-                  );
-                }
-                return categoryMapAsync.when(
-                  data: (categoryMap) => RefreshIndicator(
-                    onRefresh: () async {
-                      try {
-                        await ref
-                            .read(transactionRepositoryProvider)
-                            .syncWithRemote();
-                      } on Object catch (_) {
-                        // Fail silently or show toast, but let the refresher close
-                      }
-                    },
-                    child: RepaintBoundary(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        itemCount: transactions.length,
-                        itemExtent: 72, // Fixed height for performance
-                        itemBuilder: (context, index) {
-                          final tx = transactions[index];
-                          final category = categoryMap[tx.categoryId];
-                          return Dismissible(
-                            key: Key(tx.id),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                              ),
-                              decoration: const BoxDecoration(
-                                color: AppColors.error,
-                              ),
-                              child: const Icon(
-                                Icons.delete_outline_rounded,
-                                color: Colors.white,
-                              ),
-                            ),
-                            confirmDismiss: (direction) =>
-                                _showDeleteConfirmation(context, ref, tx),
-                            onDismissed: (direction) {
-                              ref
-                                  .read(transactionControllerProvider.notifier)
-                                  .deleteTransaction(tx.id);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(l10n.transactionDeleted),
-                                  behavior: SnackBarBehavior.floating,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: transactionsAsync.when(
+                data: (transactions) {
+                  if (transactions.isEmpty) {
+                    return _EmptyState(
+                      key: const ValueKey('empty'),
+                      onAction: () => _openAddTransaction(context),
+                    );
+                  }
+                  return categoryMapAsync.when(
+                    data: (categoryMap) => RefreshIndicator(
+                      key: const ValueKey('list'),
+                      onRefresh: () async {
+                        try {
+                          await ref
+                              .read(transactionRepositoryProvider)
+                              .syncWithRemote();
+                        } on Object catch (_) {
+                          // Fail silently or show toast
+                        }
+                      },
+                      child: RepaintBoundary(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          itemCount: transactions.length,
+                          itemExtent: 72,
+                          itemBuilder: (context, index) {
+                            final tx = transactions[index];
+                            final category = categoryMap[tx.categoryId];
+                            return Dismissible(
+                              key: Key(tx.id),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
                                 ),
-                              );
-                            },
-                            child: _TransactionTile(
-                              transaction: tx,
-                              category: category,
-                              currencySymbol: currencySymbol,
-                            ),
-                          );
-                        },
+                                decoration: const BoxDecoration(
+                                  color: AppColors.error,
+                                ),
+                                child: const Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              confirmDismiss: (direction) =>
+                                  _showDeleteConfirmation(context, ref, tx),
+                              onDismissed: (direction) {
+                                ref
+                                    .read(
+                                      transactionControllerProvider.notifier,
+                                    )
+                                    .deleteTransaction(tx.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(l10n.transactionDeleted),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                              child: _TransactionTile(
+                                transaction: tx,
+                                category: category,
+                                currencySymbol: currencySymbol,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  loading: () => const _LoadingState(),
-                  error: (e, s) => _ErrorState(
-                    message: l10n.failedLoadCategories,
-                    onRetry: () => ref.refresh(categoryMapProvider),
-                  ),
-                );
-              },
-              loading: () => const _LoadingState(),
-              error: (error, stack) => _ErrorState(
-                message: error.toString(),
-                onRetry: () =>
-                    ref.read(transactionControllerProvider.notifier).refresh(),
+                    loading: () =>
+                        const _LoadingState(key: ValueKey('loading_cats')),
+                    error: (e, s) => _ErrorState(
+                      key: const ValueKey('error_cats'),
+                      message: l10n.failedLoadCategories,
+                      onRetry: () => ref.refresh(categoryMapProvider),
+                    ),
+                  );
+                },
+                loading: () =>
+                    const _LoadingState(key: ValueKey('loading_txs')),
+                error: (error, stack) => _ErrorState(
+                  key: const ValueKey('error_txs'),
+                  message: error.toString(),
+                  onRetry: () => ref
+                      .read(transactionControllerProvider.notifier)
+                      .refresh(),
+                ),
               ),
             ),
           ),
@@ -302,7 +332,7 @@ class _TransactionTile extends StatelessWidget {
 }
 
 class _LoadingState extends StatelessWidget {
-  const _LoadingState();
+  const _LoadingState({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -349,7 +379,7 @@ class _LoadingState extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.onAction});
+  const _EmptyState({super.key, required this.onAction});
 
   final VoidCallback onAction;
 
@@ -395,7 +425,7 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message, required this.onRetry});
+  const _ErrorState({super.key, required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;

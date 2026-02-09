@@ -171,6 +171,7 @@ class _DivergingBarChartState extends State<DivergingBarChart>
                         barWidth: barSettings.width,
                         barSpacing: barSettings.spacing,
                         showGrid: widget.showGrid,
+                        locale: AppLocalizations.of(context)?.localeName,
                       ),
                     ),
                   );
@@ -238,7 +239,10 @@ class _DivergingBarChartState extends State<DivergingBarChart>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  DateFormat('MMMM d, yyyy').format(point.date),
+                  DateFormat(
+                    'MMMM d, yyyy',
+                    AppLocalizations.of(context)?.localeName,
+                  ).format(point.date),
                   style: AppTypography.labelSmall.copyWith(
                     color: AppColors.grey500,
                     fontSize: 10,
@@ -342,6 +346,7 @@ class _DivergingBarChartPainter extends CustomPainter {
     required this.barWidth,
     required this.barSpacing,
     required this.showGrid,
+    this.locale,
   });
 
   final List<ChartPoint> data;
@@ -355,6 +360,7 @@ class _DivergingBarChartPainter extends CustomPainter {
   final double barWidth;
   final double barSpacing;
   final bool showGrid;
+  final String? locale;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -401,7 +407,7 @@ class _DivergingBarChartPainter extends CustomPainter {
     );
 
     // 4. Draw Bars
-    final dateFormat = _getDateFormat(period);
+    final dateFormat = _getDateFormat(period, locale);
 
     for (var i = 0; i < data.length; i++) {
       final p = data[i];
@@ -462,16 +468,16 @@ class _DivergingBarChartPainter extends CustomPainter {
     return true;
   }
 
-  DateFormat _getDateFormat(ChartPeriod period) {
+  DateFormat _getDateFormat(ChartPeriod period, String? locale) {
     switch (period) {
       case ChartPeriod.daily:
-        return DateFormat('E');
+        return DateFormat('E', locale);
       case ChartPeriod.weekly:
-        return DateFormat('MMM d');
+        return DateFormat('MMM d', locale);
       case ChartPeriod.monthly:
-        return DateFormat('MMM');
+        return DateFormat('MMM', locale);
       case ChartPeriod.yearly:
-        return DateFormat('yyyy');
+        return DateFormat('yyyy', locale);
     }
   }
 

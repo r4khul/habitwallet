@@ -139,8 +139,18 @@
   "couldNotLoadAnalytics": "Could not load analytics",
   "netSavings": "Net Savings",
   "netDeficit": "Net Deficit",
+  "totalSpent": "Total Spent",
+  "net": "Net",
   "savingsRateMsg": "You're saving {rate}% of income",
   "spendingExceedsIncome": "Spending exceeds income",
+  "details": "Details",
+  "status": "Status",
+  "completed": "Completed",
+  "time": "Time",
+  "note": "Note",
+  "transactionNotFound": "Transaction Not Found",
+  "movedOrDeleted": "It may have been deleted or moved.",
+  "goBack": "Go Back",
   "notificationTitle": "Daily Check-in 📝",
   "notificationBody": "Don't forget to track your income or expenses today!"
 }

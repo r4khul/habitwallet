@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
 
@@ -102,6 +103,7 @@ class _CategoryDonutChartState extends State<CategoryDonutChart>
                   totalExpense: widget.totalExpense,
                   isDark: isDark,
                   currencySymbol: widget.currencySymbol,
+                  totalSpentLabel: AppLocalizations.of(context)!.totalSpent,
                 ),
               ),
             );
@@ -150,6 +152,7 @@ class _DonutPainter extends CustomPainter {
     required this.totalExpense,
     required this.isDark,
     required this.currencySymbol,
+    required this.totalSpentLabel,
   });
 
   final List<CategorySpend> data;
@@ -158,6 +161,7 @@ class _DonutPainter extends CustomPainter {
   final double totalExpense;
   final bool isDark;
   final String currencySymbol;
+  final String totalSpentLabel;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -211,7 +215,7 @@ class _DonutPainter extends CustomPainter {
   void _drawCenterText(Canvas canvas, Offset center, double total) {
     final labelPainter = TextPainter(
       text: TextSpan(
-        text: 'Total Spent',
+        text: totalSpentLabel,
         style: TextStyle(
           fontFamily: AppTypography.fontFamily,
           fontSize: 10,

@@ -422,12 +422,43 @@ class AppLocalizationsTa extends AppLocalizations {
   String get netDeficit => 'நிகரப் பற்றாக்குறை';
 
   @override
+  String get totalSpent => 'மொத்த செலவு';
+
+  @override
+  String get net => 'நிகர';
+
+  @override
   String savingsRateMsg(Object rate) {
     return 'நீங்கள் வருமானத்தில் $rate% சேமிக்கிறீர்கள்';
   }
 
   @override
   String get spendingExceedsIncome => 'செலவு வருமானத்தை மிஞ்சுகிறது';
+
+  @override
+  String get details => 'விவரங்கள்';
+
+  @override
+  String get status => 'நிலை';
+
+  @override
+  String get completed => 'முடிந்தது';
+
+  @override
+  String get time => 'நேரம்';
+
+  @override
+  String get note => 'குறிப்பு';
+
+  @override
+  String get transactionNotFound => 'பரிவர்த்தனை கிடைக்கவில்லை';
+
+  @override
+  String get movedOrDeleted =>
+      'இது நீக்கப்பட்டிருக்கலாம் அல்லது மாற்றப்பட்டிருக்கலாம்.';
+
+  @override
+  String get goBack => 'பின் செல்';
 
   @override
   String get notificationTitle => 'தினசரி சரிபார்ப்பு 📝';

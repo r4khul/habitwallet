@@ -92,6 +92,7 @@ class _CategoryTile extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                     ),
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
                 if (category.editedLocally) ...[

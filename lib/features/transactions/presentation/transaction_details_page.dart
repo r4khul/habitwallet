@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:open_filex/open_filex.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -25,14 +26,14 @@ class TransactionDetailsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Details'),
+        title: Text(AppLocalizations.of(context)!.details),
         actions: [
           transactionAsync.whenOrNull(
                 data: (tx) => tx != null
                     ? IconButton(
                         onPressed: () => context.push('/edit-tx/$id'),
                         icon: const Icon(Icons.edit_outlined),
-                        tooltip: 'Edit Transaction',
+                        tooltip: AppLocalizations.of(context)!.editTransaction,
                       )
                     : null,
               ) ??
@@ -102,7 +103,7 @@ class _DetailsView extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Semantics(
                   label:
-                      '${transaction.isIncome ? 'Income' : 'Expense'}: ${transaction.formattedAbsoluteAmount}',
+                      '${transaction.isIncome ? AppLocalizations.of(context)!.income : AppLocalizations.of(context)!.expense}: ${transaction.formattedAbsoluteAmount}',
                   child: Text(
                     '${transaction.displaySign}${FormattingUtils.formatFullCurrency(transaction.absoluteAmount, symbol: currencySymbol)}',
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
@@ -124,23 +125,23 @@ class _DetailsView extends ConsumerWidget {
 
           // Details List
           _DetailRow(
-            label: 'Status',
-            value: 'Completed',
+            label: AppLocalizations.of(context)!.status,
+            value: AppLocalizations.of(context)!.completed,
             icon: Icons.check_circle_outline,
           ),
           _DetailRow(
-            label: 'Date',
+            label: AppLocalizations.of(context)!.date,
             value: transaction.displayDate,
             icon: Icons.calendar_today_outlined,
           ),
           _DetailRow(
-            label: 'Time',
+            label: AppLocalizations.of(context)!.time,
             value: transaction.displayTime,
             icon: Icons.access_time_rounded,
           ),
           if (transaction.note != null && transaction.note!.isNotEmpty)
             _DetailRow(
-              label: 'Note',
+              label: AppLocalizations.of(context)!.note,
               value: transaction.note!,
               icon: Icons.notes_rounded,
             ),
@@ -150,7 +151,7 @@ class _DetailsView extends ConsumerWidget {
             const Divider(),
             const SizedBox(height: 16),
             Text(
-              'Attachments',
+              AppLocalizations.of(context)!.attachments,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppColors.grey500,
                 fontWeight: FontWeight.bold,
@@ -215,7 +216,7 @@ class _DetailsView extends ConsumerWidget {
                 color: AppColors.error,
               ),
               label: Text(
-                'Delete Transaction',
+                AppLocalizations.of(context)!.deleteTransaction,
                 style: Theme.of(
                   context,
                 ).textTheme.labelLarge?.copyWith(color: AppColors.error),
@@ -234,14 +235,16 @@ class _DetailsView extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Transaction?'),
-        content: const Text(
-          'This action cannot be undone. Are you sure you want to delete this transaction?',
+        title: Text(
+          AppLocalizations.of(context)!.deleteTransactionConfirmTitle,
+        ),
+        content: Text(
+          AppLocalizations.of(context)!.deleteTransactionConfirmMessage,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
@@ -249,7 +252,7 @@ class _DetailsView extends ConsumerWidget {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -264,8 +267,8 @@ class _DetailsView extends ConsumerWidget {
         if (context.mounted) {
           // Success Feedback
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Transaction deleted successfully'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.transactionDeleted),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -292,7 +295,9 @@ class _DetailsView extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Could not open file: ${result.message}'),
+              content: Text(
+                '${AppLocalizations.of(context)!.couldNotOpenFile}: ${result.message}',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -336,12 +341,15 @@ class _DetailRow extends StatelessWidget {
               context,
             ).textTheme.bodyLarge?.copyWith(color: AppColors.grey600),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           Expanded(
+            flex: 2,
             child: Text(
               value,
               textAlign: TextAlign.right,
               style: Theme.of(context).textTheme.titleMedium,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
           ),
         ],
@@ -366,18 +374,18 @@ class _NotFoundState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Transaction Not Found',
+            AppLocalizations.of(context)!.transactionNotFound,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
           Text(
-            'It may have been deleted or moved.',
+            AppLocalizations.of(context)!.movedOrDeleted,
             style: TextStyle(color: AppColors.grey500),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () => context.pop(),
-            child: const Text('Go Back'),
+            child: Text(AppLocalizations.of(context)!.goBack),
           ),
         ],
       ),

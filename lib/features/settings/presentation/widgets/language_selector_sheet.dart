@@ -161,6 +161,8 @@ class _LanguageTile extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: isSelected ? AppColors.primary : null,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -170,6 +172,8 @@ class _LanguageTile extends StatelessWidget {
                         alpha: 0.7,
                       ),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

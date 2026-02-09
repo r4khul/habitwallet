@@ -860,6 +860,18 @@ abstract class AppLocalizations {
   /// **'Net Deficit'**
   String get netDeficit;
 
+  /// No description provided for @totalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spent'**
+  String get totalSpent;
+
+  /// No description provided for @net.
+  ///
+  /// In en, this message translates to:
+  /// **'Net'**
+  String get net;
+
   /// No description provided for @savingsRateMsg.
   ///
   /// In en, this message translates to:
@@ -871,6 +883,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spending exceeds income'**
   String get spendingExceedsIncome;
+
+  /// No description provided for @details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @transactionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Not Found'**
+  String get transactionNotFound;
+
+  /// No description provided for @movedOrDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'It may have been deleted or moved.'**
+  String get movedOrDeleted;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
 
   /// No description provided for @notificationTitle.
   ///
