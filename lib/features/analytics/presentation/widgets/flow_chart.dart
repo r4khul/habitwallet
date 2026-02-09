@@ -2,10 +2,10 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 import '../../domain/financial_data_models.dart';
 
