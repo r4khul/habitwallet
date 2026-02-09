@@ -130,15 +130,15 @@ class NotificationService {
 
       // Special logic for TODAY
       if (isToday) {
-        // If time passed
-        if (scheduledDate.isBefore(now)) {
-          if (isDebug) {
-            // DEBUG: Schedule for now + 60 seconds
-            scheduledDate = now.add(const Duration(seconds: 5));
-          } else {
-            // RELEASE: Missed the slot, move to tomorrow (or just skip loop iteration as tomorrow is covered by i=1)
-            continue;
-          }
+        if (isDebug) {
+          // In debug mode, schedule for 5 seconds from now to verify it works
+          scheduledDate = now.add(const Duration(seconds: 5));
+          debugPrint(
+            'NotificationService: Debug mode - scheduling for today in 5 seconds: $scheduledDate',
+          );
+        } else if (scheduledDate.isBefore(now)) {
+          // RELEASE: If 8 PM has passed, skip today
+          continue;
         }
       }
 

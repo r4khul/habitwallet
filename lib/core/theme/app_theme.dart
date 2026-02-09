@@ -12,6 +12,21 @@ class AppTheme {
   static const double _borderRadius = 16.0;
   static const double _buttonBorderRadius = 12.0;
 
+  /// Helper to get consistent SystemUiOverlayStyle
+  static SystemUiOverlayStyle getOverlayStyle({required bool isDark}) {
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
+    );
+  }
+
   /// Light Theme Definition
   static ThemeData get lightTheme {
     return ThemeData(
@@ -43,11 +58,11 @@ class AppTheme {
           side: BorderSide(color: AppColors.lightBorder),
         ),
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        systemOverlayStyle: getOverlayStyle(isDark: false),
         iconTheme: IconThemeData(color: Colors.black, size: 24),
         titleTextStyle: TextStyle(
           fontFamily: AppTypography.fontFamily,
@@ -116,12 +131,12 @@ class AppTheme {
           side: BorderSide(color: AppColors.darkBorder),
         ),
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle: getOverlayStyle(isDark: true),
         iconTheme: IconThemeData(color: Colors.white, size: 24),
         titleTextStyle: TextStyle(
           fontFamily: AppTypography.fontFamily,

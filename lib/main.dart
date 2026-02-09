@@ -88,9 +88,7 @@ class _HabitWalletAppState extends ConsumerState<HabitWalletApp>
             _platformBrightness == Brightness.dark);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: isDarkMode
-          ? SystemUiOverlayStyle.light
-          : SystemUiOverlayStyle.dark,
+      value: AppTheme.getOverlayStyle(isDark: isDarkMode),
       child: MaterialApp.router(
         title: 'Habit Wallet',
         debugShowCheckedModeBanner: false,

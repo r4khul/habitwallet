@@ -11,20 +11,9 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
   Future<List<CategoryEntity>> fetchAll() async {
     final response = await _dio.get<List<dynamic>>('/categories');
     final data = response.data ?? [];
-    return data.map((item) {
-      if (item is Map<String, dynamic>) {
-        return CategoryEntity.fromJson(item);
-      }
-      // Fallback for old simple list format if still in use by server
-      final name = item.toString();
-      return CategoryEntity(
-        id: name,
-        name: name,
-        icon: 'category', // Default icon
-        color: 0xFF9E9E9E, // Default grey color
-        updatedAt: DateTime.now(),
-      );
-    }).toList();
+    return data
+        .map((item) => CategoryEntity.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   @override

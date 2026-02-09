@@ -36,11 +36,20 @@ class NotificationController extends _$NotificationController {
     final transactionsAsync = ref.read(transactionControllerProvider);
 
     // Don't schedule if transactions are still loading initially
-    if (transactionsAsync.isLoading && !transactionsAsync.hasValue) return;
+    if (transactionsAsync.isLoading && !transactionsAsync.hasValue) {
+      debugPrint(
+        'NotificationController: Transactions still loading, skipping schedule update',
+      );
+      return;
+    }
     final datesToSkip = <DateTime>{};
 
     if (transactionsAsync.hasValue) {
-      for (final tx in transactionsAsync.value!) {
+      final txs = transactionsAsync.value!;
+      debugPrint(
+        'NotificationController: Found ${txs.length} transactions, checking for dates to skip',
+      );
+      for (final tx in txs) {
         // Normalize to date only for comparison
         final date = DateTime(
           tx.timestamp.year,
@@ -51,6 +60,9 @@ class NotificationController extends _$NotificationController {
       }
     }
 
+    debugPrint(
+      'NotificationController: Scheduling reminders, skipping ${datesToSkip.length} dates',
+    );
     // Schedule the notifications for the next 14 days
     // Individual days will be skipped if they are in datesToSkip
     await service.scheduleDailyReminder(

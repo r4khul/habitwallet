@@ -6,6 +6,7 @@ import 'package:habitwallet/core/util/formatting_utils.dart';
 
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/util/theme_extension.dart';
 import '../../../features/settings/presentation/providers/currency_provider.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
@@ -422,9 +423,7 @@ class _AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: context.isDarkMode
-          ? SystemUiOverlayStyle.light
-          : SystemUiOverlayStyle.dark,
+      value: AppTheme.getOverlayStyle(isDark: context.isDarkMode),
       child: Drawer(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         child: SafeArea(

@@ -2,7 +2,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/category_repository_provider.dart';
 import '../../domain/category_entity.dart';
-import '../../domain/category_repository.dart';
 
 part 'category_providers.g.dart';
 
@@ -20,67 +19,14 @@ class CategoryController extends _$CategoryController {
         try {
           await repository.syncWithRemote();
         } on Object catch (_) {
-          // If sync fails (e.g. no internet), we'll fallback to seeding
-        }
-
-        // Final check after sync
-        final updatedCategories = await repository.getAll();
-        if (updatedCategories.isEmpty) {
-          await _seed(repository);
+          // If sync fails (e.g. no internet), we stay as a blank slate
         }
       }
     } on Object catch (_) {
-      // If DB is initially unhealthy, seeding might fail too,
-      // but we try to continue to watchAll which might recover
-      // if it was just a transient migration/open error.
+      // Basic protection against DB init issues
     }
 
     yield* repository.watchAll();
-  }
-
-  Future<void> _seed(CategoryRepository repository) async {
-    final defaults = [
-      CategoryEntity(
-        id: 'food',
-        name: 'Food',
-        icon: 'food',
-        color: 0xFFF44336,
-      ), // Red
-      CategoryEntity(
-        id: 'transport',
-        name: 'Transport',
-        icon: 'transport',
-        color: 0xFF2196F3,
-      ), // Blue
-      CategoryEntity(
-        id: 'shopping',
-        name: 'Shopping',
-        icon: 'shopping',
-        color: 0xFF9C27B0,
-      ), // Purple
-      CategoryEntity(
-        id: 'entertainment',
-        name: 'Entertainment',
-        icon: 'entertainment',
-        color: 0xFFFF9800,
-      ), // Orange
-      CategoryEntity(
-        id: 'health',
-        name: 'Health',
-        icon: 'health',
-        color: 0xFF4CAF50,
-      ), // Green
-      CategoryEntity(
-        id: 'salary',
-        name: 'Salary',
-        icon: 'salary',
-        color: 0xFF00BCD4,
-      ), // Cyan
-    ];
-
-    for (final cat in defaults) {
-      await repository.upsert(cat);
-    }
   }
 
   void refresh() {
