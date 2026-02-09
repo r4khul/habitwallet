@@ -422,19 +422,10 @@ class _FlowChartPainter extends CustomPainter {
           topRight: Radius.circular(config.cornerRadius),
         );
 
-        final gradient = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            incomeColor.withValues(alpha: opacity),
-            incomeColor.withValues(alpha: opacity * 0.7),
-          ],
-        );
-
         canvas.drawRRect(
           rrect,
           Paint()
-            ..shader = gradient.createShader(rect)
+            ..color = incomeColor.withValues(alpha: opacity)
             ..style = PaintingStyle.fill,
         );
       }
@@ -448,19 +439,10 @@ class _FlowChartPainter extends CustomPainter {
           bottomRight: Radius.circular(config.cornerRadius),
         );
 
-        final gradient = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            expenseColor.withValues(alpha: opacity * 0.7),
-            expenseColor.withValues(alpha: opacity),
-          ],
-        );
-
         canvas.drawRRect(
           rrect,
           Paint()
-            ..shader = gradient.createShader(rect)
+            ..color = expenseColor.withValues(alpha: opacity)
             ..style = PaintingStyle.fill,
         );
       }

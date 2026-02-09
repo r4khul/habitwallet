@@ -463,4 +463,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationBody =>
       'Don\'t forget to track your income or expenses today!';
+
+  @override
+  String get noCategoriesFound => 'No categories found';
 }

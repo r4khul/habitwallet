@@ -466,4 +466,7 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get notificationBody =>
       'இன்று உங்கள் வருமானம் அல்லது செலவுகளை பதிவு செய்ய மறக்காதீர்கள்!';
+
+  @override
+  String get noCategoriesFound => 'No categories found';
 }

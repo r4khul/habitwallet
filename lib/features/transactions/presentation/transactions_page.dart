@@ -139,10 +139,14 @@ class TransactionsPage extends ConsumerWidget {
                                       transactionControllerProvider.notifier,
                                     )
                                     .deleteTransaction(tx.id);
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).hideCurrentSnackBar();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(l10n.transactionDeleted),
                                     behavior: SnackBarBehavior.floating,
+                                    duration: const Duration(seconds: 1),
                                   ),
                                 );
                               },
@@ -481,7 +485,7 @@ class _AppDrawer extends ConsumerWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppTheme.getOverlayStyle(isDark: context.isDarkMode),
       child: Drawer(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).canvasColor,
         child: SafeArea(
           child: Column(
             children: [
@@ -670,17 +674,9 @@ class _AppDrawer extends ConsumerWidget {
                                         child: Container(
                                           height: 8,
                                           decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: isOverTarget
-                                                  ? [
-                                                      AppColors.success,
-                                                      const Color(0xFF81C784),
-                                                    ]
-                                                  : [
-                                                      AppColors.primary,
-                                                      const Color(0xFF64B5F6),
-                                                    ],
-                                            ),
+                                            color: isOverTarget
+                                                ? AppColors.success
+                                                : AppColors.primary,
                                             borderRadius: BorderRadius.circular(
                                               4,
                                             ),

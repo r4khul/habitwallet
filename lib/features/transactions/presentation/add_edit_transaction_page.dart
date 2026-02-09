@@ -227,11 +227,65 @@ class _AddEditTransactionPageState
               ),
               const SizedBox(height: 8),
               categoriesAsync.when(
-                data: (categories) => _CategorySelector(
-                  categories: categories,
-                  selectedId: _selectedCategoryId,
-                  onSelected: (id) => setState(() => _selectedCategoryId = id),
-                ),
+                data: (categories) {
+                  if (categories.isEmpty) {
+                    return InkWell(
+                      onTap: () => context.push('/categories'),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 20,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                l10n.noCategoriesFound,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
+                            Text(
+                              l10n.createCategory,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  return _CategorySelector(
+                    categories: categories,
+                    selectedId: _selectedCategoryId,
+                    onSelected: (id) =>
+                        setState(() => _selectedCategoryId = id),
+                  );
+                },
                 loading: () => const LinearProgressIndicator(),
                 error: (e, s) => Text('${l10n.errorLoadingCategories}: $e'),
               ),

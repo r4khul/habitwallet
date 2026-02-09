@@ -7,6 +7,7 @@ import 'package:habitwallet/core/util/theme_extension.dart';
 import 'package:habitwallet/features/settings/domain/language.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
 import 'package:habitwallet/features/settings/presentation/providers/notification_provider.dart';
+import 'package:habitwallet/features/settings/presentation/widgets/backend_url_sheet.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/currency_selector_sheet.dart';
 import 'package:habitwallet/features/settings/presentation/widgets/language_selector_sheet.dart';
 import 'package:habitwallet/l10n/app_localizations.dart';
@@ -213,37 +214,15 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showBaseUrlDialog(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController(
-      text: ref.read(baseUrlControllerProvider),
-    );
-    showDialog<void>(
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.configureBackendUrl),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: 'https://api.example.com',
-            labelText: l10n.backendUrl,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(baseUrlControllerProvider.notifier)
-                  .setUrl(controller.text.trim());
-              Navigator.pop(context);
-            },
-            child: Text(l10n.save),
-          ),
-        ],
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
+      builder: (context) => const BackendUrlSheet(),
     );
   }
 }

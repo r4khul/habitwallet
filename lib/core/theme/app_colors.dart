@@ -11,8 +11,8 @@ abstract class AppColors {
 
   // Dark Theme (AMOLED)
   static const Color darkBackground = Color(0xFF000000); // Pure Black
-  static const Color darkSurface = Color(0xFF0A0A0A); // Near Black Surface
-  static const Color darkCard = Color(0xFF141414); // Dark Card Component
+  static const Color darkSurface = Color(0xFF121212); // Near Black Surface
+  static const Color darkCard = Color(0xFF1E1E1E); // Dark Card Component
   static const Color darkBorder = Color(0xFF1F1F1F); // Subtle Dark Border
   static const Color darkDivider = Color(0xFF1F1F1F);
 

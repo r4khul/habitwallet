@@ -152,5 +152,6 @@
   "movedOrDeleted": "It may have been deleted or moved.",
   "goBack": "Go Back",
   "notificationTitle": "Daily Check-in 📝",
-  "notificationBody": "Don't forget to track your income or expenses today!"
+  "notificationBody": "Don't forget to track your income or expenses today!",
+  "noCategoriesFound": "No categories found"
 }

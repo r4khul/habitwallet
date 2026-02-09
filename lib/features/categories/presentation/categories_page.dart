@@ -423,7 +423,8 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.category?.name ?? '');
-    _selectedIcon = widget.category?.icon ?? CategoryAssets.icons.keys.first;
+    _selectedIcon =
+        widget.category?.icon ?? CategoryAssets.selectableIcons.keys.first;
     _selectedColor = widget.category != null
         ? Color(widget.category!.color)
         : CategoryAssets.palette.first;
@@ -476,7 +477,7 @@ class _CategoryFormState extends ConsumerState<_CategoryForm> {
               height: 50,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: CategoryAssets.icons.entries.map((entry) {
+                children: CategoryAssets.selectableIcons.entries.map((entry) {
                   final isSelected = _selectedIcon == entry.key;
                   return Semantics(
                     label: 'Select ${entry.key} icon',

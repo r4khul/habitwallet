@@ -13,27 +13,31 @@ class CategoryAssets {
     Color(0xFF64748B), // Slate
   ];
 
-  static const Map<String, IconData> icons = {
+  static const Map<String, IconData> selectableIcons = {
     'food': Icons.restaurant_rounded,
-    'restaurant': Icons.restaurant_rounded,
     'shopping': Icons.shopping_bag_rounded,
-    'shopping_bag': Icons.shopping_bag_rounded,
     'transport': Icons.directions_car_rounded,
-    'directions_car': Icons.directions_car_rounded,
     'salary': Icons.payments_rounded,
-    'payments': Icons.payments_rounded,
     'bills': Icons.receipt_long_rounded,
-    'receipt_long': Icons.receipt_long_rounded,
     'entertainment': Icons.movie_rounded,
-    'movie': Icons.movie_rounded,
     'health': Icons.medical_services_rounded,
-    'medical_services': Icons.medical_services_rounded,
     'education': Icons.school_rounded,
-    'school': Icons.school_rounded,
     'savings': Icons.savings_rounded,
     'travel': Icons.flight_rounded,
-    'flight': Icons.flight_rounded,
     'other': Icons.category_rounded,
+  };
+
+  static final Map<String, IconData> icons = {
+    ...selectableIcons,
+    'restaurant': Icons.restaurant_rounded,
+    'shopping_bag': Icons.shopping_bag_rounded,
+    'directions_car': Icons.directions_car_rounded,
+    'payments': Icons.payments_rounded,
+    'receipt_long': Icons.receipt_long_rounded,
+    'movie': Icons.movie_rounded,
+    'medical_services': Icons.medical_services_rounded,
+    'school': Icons.school_rounded,
+    'flight': Icons.flight_rounded,
     'category': Icons.category_rounded,
   };
 

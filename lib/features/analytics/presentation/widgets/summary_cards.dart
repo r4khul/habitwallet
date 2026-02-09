@@ -154,14 +154,7 @@ class NetSavingsCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            primaryColor.withValues(alpha: 0.12),
-            primaryColor.withValues(alpha: 0.05),
-          ],
-        ),
+        color: primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
       ),

@@ -109,11 +109,12 @@ class AppTheme {
         primary: AppColors.primary,
         onPrimary: Colors.white,
         secondary: AppColors.primary,
-        surface: AppColors.darkSurface,
+
         error: AppColors.error,
         outline: AppColors.darkBorder,
       ),
       scaffoldBackgroundColor: AppColors.darkBackground,
+      canvasColor: AppColors.darkSurface,
       primaryColor: AppColors.primary,
       cardColor: AppColors.darkCard,
       fontFamily: AppTypography.fontFamily,

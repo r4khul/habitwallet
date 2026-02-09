@@ -943,6 +943,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t forget to track your income or expenses today!'**
   String get notificationBody;
+
+  /// No description provided for @noCategoriesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories found'**
+  String get noCategoriesFound;
 }
 
 class _AppLocalizationsDelegate

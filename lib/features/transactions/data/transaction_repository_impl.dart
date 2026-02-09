@@ -84,11 +84,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Stream<TransactionEntity?> watchById(String id) {
-    // Note: This stream won't react to attachment changes.
-    // In a real app, you'd combine it with an attachment stream.
-    return _transactionDao
-        .watchById(id)
-        .map((row) => row != null ? _toEntity(row) : null);
+    return _transactionDao.watchById(id).asyncMap((row) async {
+      if (row == null) return null;
+      final attachments = await _attachmentDao.getByTransactionId(id);
+      return _toEntity(
+        row,
+      ).copyWith(attachments: attachments.map(_toAttachmentEntity).toList());
+    });
   }
 
   @override
