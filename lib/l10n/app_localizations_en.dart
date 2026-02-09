@@ -21,6 +21,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currency => 'Currency';
 
   @override
+  String get selectCurrency => 'Select Currency';
+
+  @override
   String get theme => 'Theme';
 
   @override
@@ -308,4 +311,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about => 'About';
+
+  @override
+  String get editTransaction => 'Edit Transaction';
+
+  @override
+  String get newTransaction => 'New Transaction';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get noteOptional => 'Note (Optional)';
+
+  @override
+  String get descriptionHint => 'Add a description...';
+
+  @override
+  String get attachments => 'Attachments';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get addTransaction => 'Add Transaction';
+
+  @override
+  String get pleaseSelectCategory => 'Please select a category';
+
+  @override
+  String get errorLoadingCategories => 'Error loading categories';
+
+  @override
+  String get couldNotOpenFile => 'Could not open file';
+
+  @override
+  String get deleteTransaction => 'Delete Transaction';
+
+  @override
+  String get deleteTransactionConfirmTitle => 'Delete Transaction?';
+
+  @override
+  String get deleteTransactionConfirmMessage =>
+      'This action cannot be undone. Are you sure you want to delete this transaction?';
+
+  @override
+  String get transactionDeleted => 'Transaction deleted';
+
+  @override
+  String get failedLoadCategories => 'Failed to load categories';
+
+  @override
+  String get somethingWentWrong => 'Something went wrong';
+
+  @override
+  String get savingsTarget => 'Savings Target';
+
+  @override
+  String get surplus => 'Surplus';
+
+  @override
+  String get goal => 'Goal';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get lightMode => 'Light Mode';
+
+  @override
+  String get user => 'User';
+
+  @override
+  String get noTransactionsYet => 'No Transactions Yet';
+
+  @override
+  String get startTrackingDescription =>
+      'Start tracking your expenses and see where your money goes.';
+
+  @override
+  String get selectCategory => 'Select Category';
+
+  @override
+  String get moneyFlow => 'Money Flow';
+
+  @override
+  String get scrollable => 'Scrollable';
+
+  @override
+  String get whereYourMoneyGoes => 'Where Your Money Goes';
+
+  @override
+  String get analyzingFinances => 'Analyzing your finances...';
+
+  @override
+  String get couldNotLoadAnalytics => 'Could not load analytics';
+
+  @override
+  String get netSavings => 'Net Savings';
+
+  @override
+  String get netDeficit => 'Net Deficit';
+
+  @override
+  String savingsRateMsg(Object rate) {
+    return 'You\'re saving $rate% of income';
+  }
+
+  @override
+  String get spendingExceedsIncome => 'Spending exceeds income';
+
+  @override
+  String get notificationTitle => 'Daily Check-in 📝';
+
+  @override
+  String get notificationBody =>
+      'Don\'t forget to track your income or expenses today!';
 }

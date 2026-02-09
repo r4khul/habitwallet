@@ -144,6 +144,8 @@ class _UnifiedCategoryBreakdownState extends State<UnifiedCategoryBreakdown> {
                                       ? FontWeight.w700
                                       : FontWeight.w600,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 8),
                               ClipRRect(

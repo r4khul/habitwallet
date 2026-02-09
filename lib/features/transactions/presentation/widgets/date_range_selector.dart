@@ -161,6 +161,8 @@ class _FilterChip extends StatelessWidget {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 fontSize: 13,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
@@ -185,9 +187,10 @@ class _CustomRangeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = filter.isCustom;
 
-    var label = 'Custom Range';
+    final l10n = AppLocalizations.of(context)!;
+    var label = l10n.customRange;
     if (isSelected) {
-      final df = DateFormat('d MMM');
+      final df = DateFormat('d MMM', l10n.localeName);
       label = '${df.format(filter.start)} - ${df.format(filter.end)}';
     }
 
@@ -236,6 +239,8 @@ class _CustomRangeChip extends StatelessWidget {
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   fontSize: 13,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

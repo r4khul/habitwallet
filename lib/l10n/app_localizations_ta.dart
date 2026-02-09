@@ -21,6 +21,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get currency => 'நாணயம்';
 
   @override
+  String get selectCurrency => 'நாணயத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
   String get theme => 'தீம்';
 
   @override
@@ -310,4 +313,126 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get about => 'பற்றி';
+
+  @override
+  String get editTransaction => 'பரிவர்த்தனையைத் திருத்தவும்';
+
+  @override
+  String get newTransaction => 'புதிய பரிவர்த்தனை';
+
+  @override
+  String get amount => 'தொகை';
+
+  @override
+  String get category => 'வகை';
+
+  @override
+  String get date => 'தேதி';
+
+  @override
+  String get noteOptional => 'குறிப்பு (விருப்பமானது)';
+
+  @override
+  String get descriptionHint => 'விளக்கத்தைச் சேர்க்கவும்...';
+
+  @override
+  String get attachments => 'இணைப்புகள்';
+
+  @override
+  String get add => 'சேர்';
+
+  @override
+  String get addTransaction => 'பரிவர்த்தனையைச் சேர்';
+
+  @override
+  String get pleaseSelectCategory => 'தயவுசெய்து ஒரு வகையைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get errorLoadingCategories => 'வகைகளை ஏற்றுவதில் பிழை';
+
+  @override
+  String get couldNotOpenFile => 'கோப்பைத் திறக்க முடியவில்லை';
+
+  @override
+  String get deleteTransaction => 'பரிவர்த்தனையை நீக்கு';
+
+  @override
+  String get deleteTransactionConfirmTitle => 'பரிவர்த்தனையை நீக்கவா?';
+
+  @override
+  String get deleteTransactionConfirmMessage =>
+      'இந்தச் செயலை மாற்ற முடியாது. இந்தப் பரிவர்த்தனையை நீக்க விரும்புகிறீர்களா?';
+
+  @override
+  String get transactionDeleted => 'பரிவர்த்தனை நீக்கப்பட்டது';
+
+  @override
+  String get failedLoadCategories => 'வகைகளை ஏற்றுவதில் தோல்வி';
+
+  @override
+  String get somethingWentWrong => 'ஏதோ தவறு நடந்துவிட்டது';
+
+  @override
+  String get savingsTarget => 'சேமிப்பு இலக்கு';
+
+  @override
+  String get surplus => 'உபரி';
+
+  @override
+  String get goal => 'இலக்கு';
+
+  @override
+  String get darkMode => 'இருண்ட பயன்முறை';
+
+  @override
+  String get lightMode => 'ஒளி பயன்முறை';
+
+  @override
+  String get user => 'பயனர்';
+
+  @override
+  String get noTransactionsYet => 'இன்னும் பரிவர்த்தனைகள் இல்லை';
+
+  @override
+  String get startTrackingDescription =>
+      'உங்கள் செலவுகளைக் கண்காணிக்கத் தொடங்குங்கள் மற்றும் உங்கள் பணம் எங்கு செல்கிறது என்பதைப் பாருங்கள்.';
+
+  @override
+  String get selectCategory => 'வகையைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get moneyFlow => 'பணப்புழக்கம்';
+
+  @override
+  String get scrollable => 'உருட்டக்கூடியது';
+
+  @override
+  String get whereYourMoneyGoes => 'உங்கள் பணம் எங்கே போகிறது';
+
+  @override
+  String get analyzingFinances => 'உங்கள் நிதியை பகுப்பாய்வு செய்கிறது...';
+
+  @override
+  String get couldNotLoadAnalytics => 'பகுப்பாய்வுகளை ஏற்ற முடியவில்லை';
+
+  @override
+  String get netSavings => 'நிகரச் சேமிப்பு';
+
+  @override
+  String get netDeficit => 'நிகரப் பற்றாக்குறை';
+
+  @override
+  String savingsRateMsg(Object rate) {
+    return 'நீங்கள் வருமானத்தில் $rate% சேமிக்கிறீர்கள்';
+  }
+
+  @override
+  String get spendingExceedsIncome => 'செலவு வருமானத்தை மிஞ்சுகிறது';
+
+  @override
+  String get notificationTitle => 'தினசரி சரிபார்ப்பு 📝';
+
+  @override
+  String get notificationBody =>
+      'இன்று உங்கள் வருமானம் அல்லது செலவுகளை பதிவு செய்ய மறக்காதீர்கள்!';
 }

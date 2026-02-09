@@ -175,7 +175,10 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
                   onTap: () => context.push('/analytics'),
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 18,
+                      horizontal: 24,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -185,14 +188,19 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
                           size: 20,
                         ),
                         const SizedBox(width: 12),
-                        Text(
-                          l10n.viewFinancialOverview,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: Text(
+                            l10n.viewFinancialOverview,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         const Icon(
                           Icons.arrow_forward_rounded,
                           color: Colors.white,

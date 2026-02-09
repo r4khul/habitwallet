@@ -116,8 +116,8 @@ class TransactionsPage extends ConsumerWidget {
                                   .read(transactionControllerProvider.notifier)
                                   .deleteTransaction(tx.id);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Transaction deleted'),
+                                SnackBar(
+                                  content: Text(l10n.transactionDeleted),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -134,7 +134,7 @@ class TransactionsPage extends ConsumerWidget {
                   ),
                   loading: () => const _LoadingState(),
                   error: (e, s) => _ErrorState(
-                    message: 'Failed to load categories',
+                    message: l10n.failedLoadCategories,
                     onRetry: () => ref.refresh(categoryMapProvider),
                   ),
                 );
@@ -151,7 +151,7 @@ class TransactionsPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openAddTransaction(context),
-        tooltip: 'Add Transaction',
+        tooltip: l10n.addTransaction,
         child: const Icon(Icons.add_rounded, size: 28),
       ),
     );
@@ -166,17 +166,16 @@ class TransactionsPage extends ConsumerWidget {
     WidgetRef ref,
     TransactionEntity transaction,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Transaction?'),
-        content: const Text(
-          'This action cannot be undone. Are you sure you want to delete this transaction?',
-        ),
+        title: Text(l10n.deleteTransactionConfirmTitle),
+        content: Text(l10n.deleteTransactionConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
@@ -184,7 +183,7 @@ class TransactionsPage extends ConsumerWidget {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -205,6 +204,7 @@ class _TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final amountColor = transaction.isIncome
         ? AppColors.success
         : AppColors.error;
@@ -247,10 +247,12 @@ class _TransactionTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text(
-                        transaction.displayDate,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.grey500,
+                      Flexible(
+                        child: Text(
+                          transaction.displayDate,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.grey500),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (transaction.editedLocally) ...[
@@ -265,7 +267,7 @@ class _TransactionTile extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'EDITED',
+                            l10n.edited,
                             style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(
                                   color: AppColors.primary,
@@ -353,6 +355,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -364,14 +367,15 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'No Transactions Yet',
+            l10n.noTransactionsYet,
+            textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 48),
             child: Text(
-              'Start tracking your expenses and see where your money goes.',
+              l10n.startTrackingDescription,
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
@@ -382,7 +386,7 @@ class _EmptyState extends StatelessWidget {
           OutlinedButton(
             onPressed: onAction,
             style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-            child: const Text('Add Transaction'),
+            child: Text(l10n.addTransaction),
           ),
         ],
       ),
@@ -398,6 +402,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -411,7 +416,8 @@ class _ErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Something went wrong',
+              l10n.somethingWentWrong,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
@@ -426,7 +432,7 @@ class _ErrorState extends StatelessWidget {
             ElevatedButton(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(minimumSize: const Size(160, 50)),
-              child: const Text('Try Again'),
+              child: Text(l10n.tryAgain),
             ),
           ],
         ),
@@ -488,7 +494,7 @@ class _AppDrawer extends ConsumerWidget {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          profileAsync.value?.name ?? 'User',
+                                          profileAsync.value?.name ?? l10n.user,
                                           style: Theme.of(
                                             context,
                                           ).textTheme.titleLarge,
@@ -507,17 +513,19 @@ class _AppDrawer extends ConsumerWidget {
                                         ),
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
-                                        tooltip: 'Edit Profile',
+                                        tooltip: l10n.editProfile,
                                       ),
                                     ],
                                   ),
                                   Text(
-                                    'Savings Target',
+                                    l10n.savingsTarget,
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
                                           color: AppColors.grey500,
                                           fontWeight: FontWeight.w500,
                                         ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
@@ -546,38 +554,45 @@ class _AppDrawer extends ConsumerWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            FormattingUtils.formatCompact(
-                                              current,
-                                              symbol: currencySymbol,
-                                            ),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelLarge
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: isOverTarget
-                                                      ? AppColors.success
-                                                      : AppColors.primary,
-                                                ),
-                                          ),
-                                          if (isOverTarget)
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
                                             Text(
-                                              'Surplus: ${FormattingUtils.formatCompact(current - goal, symbol: currencySymbol)}',
+                                              FormattingUtils.formatCompact(
+                                                current,
+                                                symbol: currencySymbol,
+                                              ),
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .labelSmall
+                                                  .labelLarge
                                                   ?.copyWith(
-                                                    color: AppColors.success,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: isOverTarget
+                                                        ? AppColors.success
+                                                        : AppColors.primary,
                                                   ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                        ],
+                                            if (isOverTarget)
+                                              Text(
+                                                '${l10n.surplus}: ${FormattingUtils.formatCompact(current - goal, symbol: currencySymbol)}',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: AppColors.success,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 10,
+                                                    ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                       Row(
                                         children: [
@@ -654,7 +669,7 @@ class _AppDrawer extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Goal: ${FormattingUtils.formatCompact(goal, symbol: currencySymbol)}',
+                                    '${l10n.goal}: ${FormattingUtils.formatCompact(goal, symbol: currencySymbol)}',
                                     style: Theme.of(context)
                                         .textTheme
                                         .labelSmall
@@ -754,6 +769,8 @@ class _DrawerItem extends StatelessWidget {
           color: color ?? Theme.of(context).textTheme.bodyLarge?.color,
           fontWeight: FontWeight.w500,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -764,6 +781,7 @@ class _ThemeToggle extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final themeMode = ref.watch(themeControllerProvider);
     final isDark = themeMode == ThemeMode.dark;
 
@@ -775,7 +793,7 @@ class _ThemeToggle extends ConsumerWidget {
         size: 24,
       ),
       title: Text(
-        '${isDark ? 'Dark' : 'Light'} Mode',
+        isDark ? l10n.darkMode : l10n.lightMode,
         style: Theme.of(
           context,
         ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),

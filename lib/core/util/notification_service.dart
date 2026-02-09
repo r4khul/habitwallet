@@ -95,6 +95,8 @@ class NotificationService {
     required TimeOfDay
     time, // This will be ignored in favor of hardcoded 8 PM, keeping sig for compatibility or refactor
     required Set<DateTime> datesToSkip,
+    required String title,
+    required String body,
     int daysAhead = 14,
     bool isDebug = false, // Pass this from the controller
   }) async {
@@ -144,8 +146,8 @@ class NotificationService {
 
       await _notifications.zonedSchedule(
         id: notificationId,
-        title: 'Daily Check-in 📝',
-        body: "Don't forget to track your income or expenses today!",
+        title: title,
+        body: body,
         scheduledDate: scheduledDate,
         notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(

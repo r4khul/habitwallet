@@ -43,13 +43,14 @@ class LanguageSelectorSheet extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Row(
               children: [
-                Text(
-                  l10n.selectLanguage,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    l10n.selectLanguage,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.close_rounded),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:uuid/uuid.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../features/settings/presentation/providers/currency_provider.dart';
@@ -67,10 +68,11 @@ class _AddEditTransactionPageState
 
   Future<void> _save() async {
     if (_formKey.currentState?.validate() ?? false) {
+      final l10n = AppLocalizations.of(context)!;
       if (_selectedCategoryId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a category')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectCategory)));
         return;
       }
 
@@ -135,9 +137,10 @@ class _AddEditTransactionPageState
       final result = await OpenFilex.open(path);
       if (result.type != ResultType.done) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Could not open file: ${result.message}'),
+              content: Text('${l10n.couldNotOpenFile}: ${result.message}'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -162,9 +165,11 @@ class _AddEditTransactionPageState
     final currencyAsync = ref.watch(currencyControllerProvider);
     final currencySymbol = currencyAsync.value?.symbol ?? '\$';
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Transaction' : 'New Transaction'),
+        title: Text(isEditing ? l10n.editTransaction : l10n.newTransaction),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -177,14 +182,14 @@ class _AddEditTransactionPageState
               Row(
                 children: [
                   _TypeButton(
-                    label: 'Expense',
+                    label: l10n.expense,
                     isSelected: !_isIncome,
                     color: AppColors.error,
                     onTap: () => setState(() => _isIncome = false),
                   ),
                   const SizedBox(width: 12),
                   _TypeButton(
-                    label: 'Income',
+                    label: l10n.income,
                     isSelected: _isIncome,
                     color: AppColors.success,
                     onTap: () => setState(() => _isIncome = true),
@@ -193,7 +198,7 @@ class _AddEditTransactionPageState
               ),
               const SizedBox(height: 32),
 
-              Text('Amount', style: Theme.of(context).textTheme.labelLarge),
+              Text(l10n.amount, style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amountController,
@@ -209,14 +214,17 @@ class _AddEditTransactionPageState
                   fontWeight: FontWeight.w700,
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Required';
-                  if (double.tryParse(value) == null) return 'Invalid number';
+                  if (value == null || value.isEmpty) return l10n.required;
+                  if (double.tryParse(value) == null) return l10n.error;
                   return null;
                 },
               ),
               const SizedBox(height: 24),
 
-              Text('Category', style: Theme.of(context).textTheme.labelLarge),
+              Text(
+                l10n.category,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
               const SizedBox(height: 8),
               categoriesAsync.when(
                 data: (categories) => _CategorySelector(
@@ -225,11 +233,11 @@ class _AddEditTransactionPageState
                   onSelected: (id) => setState(() => _selectedCategoryId = id),
                 ),
                 loading: () => const LinearProgressIndicator(),
-                error: (e, s) => Text('Error loading categories: $e'),
+                error: (e, s) => Text('${l10n.errorLoadingCategories}: $e'),
               ),
               const SizedBox(height: 24),
 
-              Text('Date', style: Theme.of(context).textTheme.labelLarge),
+              Text(l10n.date, style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
               InkWell(
                 onTap: () async {
@@ -257,9 +265,12 @@ class _AddEditTransactionPageState
                     children: [
                       const Icon(Icons.calendar_today_rounded, size: 20),
                       const SizedBox(width: 12),
-                      Text(
-                        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                        style: Theme.of(context).textTheme.bodyLarge,
+                      Expanded(
+                        child: Text(
+                          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -268,15 +279,13 @@ class _AddEditTransactionPageState
               const SizedBox(height: 24),
 
               Text(
-                'Note (Optional)',
+                l10n.noteOptional,
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _noteController,
-                decoration: const InputDecoration(
-                  hintText: 'Add a description...',
-                ),
+                decoration: InputDecoration(hintText: l10n.descriptionHint),
                 maxLines: 3,
               ),
               const SizedBox(height: 24),
@@ -285,14 +294,17 @@ class _AddEditTransactionPageState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Attachments',
-                    style: Theme.of(context).textTheme.labelLarge,
+                  Expanded(
+                    child: Text(
+                      l10n.attachments,
+                      style: Theme.of(context).textTheme.labelLarge,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   TextButton.icon(
                     onPressed: _pickFile,
                     icon: const Icon(Icons.attach_file, size: 18),
-                    label: const Text('Add'),
+                    label: Text(l10n.add),
                   ),
                 ],
               ),
@@ -336,7 +348,7 @@ class _AddEditTransactionPageState
 
               ElevatedButton(
                 onPressed: _save,
-                child: Text(isEditing ? 'Save Changes' : 'Add Transaction'),
+                child: Text(isEditing ? l10n.saveChanges : l10n.addTransaction),
               ),
             ],
           ),
@@ -382,15 +394,24 @@ class _CategorySelector extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: 12),
-              Text(selected.name, style: Theme.of(context).textTheme.bodyLarge),
-            ] else
-              Semantics(
-                label: 'Category selector',
+              Expanded(
                 child: Text(
-                  'Select Category',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),
+                  selected.name,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ] else
+              Expanded(
+                child: Semantics(
+                  label: 'Category selector',
+                  child: Text(
+                    AppLocalizations.of(context)!.selectCategory,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: AppColors.grey500),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             const Spacer(),

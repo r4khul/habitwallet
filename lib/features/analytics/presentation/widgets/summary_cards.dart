@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/core/theme/app_typography.dart';
 import 'package:habitwallet/core/util/formatting_utils.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 
 /// Summary card widget for displaying financial metrics.
 ///
@@ -177,25 +178,35 @@ class NetSavingsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isPositive ? 'Net Savings' : 'Net Deficit',
-                    style: AppTypography.labelLarge.copyWith(
-                      color: isDark ? AppColors.grey300 : AppColors.grey700,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isPositive
+                          ? AppLocalizations.of(context)!.netSavings
+                          : AppLocalizations.of(context)!.netDeficit,
+                      style: AppTypography.labelLarge.copyWith(
+                        color: isDark ? AppColors.grey300 : AppColors.grey700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    isPositive
-                        ? 'You\'re saving ${savingsRate.toStringAsFixed(0)}% of income'
-                        : 'Spending exceeds income',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: isDark ? AppColors.grey500 : AppColors.grey500,
+                    const SizedBox(height: 2),
+                    Text(
+                      isPositive
+                          ? AppLocalizations.of(
+                              context,
+                            )!.savingsRateMsg(savingsRate.toStringAsFixed(0))
+                          : AppLocalizations.of(context)!.spendingExceedsIncome,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: isDark ? AppColors.grey500 : AppColors.grey500,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

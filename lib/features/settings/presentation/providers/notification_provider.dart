@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:habitwallet/core/providers/locale_provider.dart';
 import 'package:habitwallet/core/util/notification_service.dart';
 import 'package:habitwallet/features/settings/data/notification_repository.dart';
 import 'package:habitwallet/features/settings/domain/notification_settings.dart';
 import 'package:habitwallet/features/transactions/presentation/providers/transaction_providers.dart';
+import 'package:habitwallet/l10n/app_localizations.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notification_provider.g.dart';
@@ -19,6 +21,13 @@ class NotificationController extends _$NotificationController {
     ref.listen(transactionControllerProvider, (previous, next) {
       _updateSchedule();
     }, fireImmediately: true);
+
+    // Listen to locale changes to update notification language
+    ref.listen(localeControllerProvider, (previous, next) {
+      if (previous != next) {
+        _updateSchedule();
+      }
+    });
 
     return settings;
   }
@@ -63,11 +72,18 @@ class NotificationController extends _$NotificationController {
     debugPrint(
       'NotificationController: Scheduling reminders, skipping ${datesToSkip.length} dates',
     );
+
+    // Get the localized strings
+    final locale = ref.read(localeControllerProvider);
+    final l10n = await AppLocalizations.delegate.load(locale);
+
     // Schedule the notifications for the next 14 days
     // Individual days will be skipped if they are in datesToSkip
     await service.scheduleDailyReminder(
       time: settings.reminderTime,
       datesToSkip: datesToSkip,
+      title: l10n.notificationTitle,
+      body: l10n.notificationBody,
       isDebug: kDebugMode,
     );
   }

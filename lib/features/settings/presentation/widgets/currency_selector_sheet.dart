@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:habitwallet/core/theme/app_colors.dart';
 import 'package:habitwallet/features/settings/presentation/providers/currency_provider.dart';
 
+import 'package:habitwallet/l10n/app_localizations.dart';
+
 import '../../domain/currency.dart';
 
 /// A sleek, modern currency selector sheet with animations and glassmorphic feel.
@@ -14,6 +16,7 @@ class CurrencySelectorSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentCurrencyAsync = ref.watch(currencyControllerProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     // Filter list logic could go here if search is added,
     // but for now we just show all "famous" ones.
@@ -45,13 +48,14 @@ class CurrencySelectorSheet extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Row(
               children: [
-                Text(
-                  'Select Currency',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    l10n.selectCurrency,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.close_rounded),

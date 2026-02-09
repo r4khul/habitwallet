@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Currency'**
   String get currency;
 
+  /// No description provided for @selectCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Currency'**
+  String get selectCurrency;
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:
@@ -643,6 +649,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get about;
+
+  /// No description provided for @editTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Transaction'**
+  String get editTransaction;
+
+  /// No description provided for @newTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'New Transaction'**
+  String get newTransaction;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @noteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (Optional)'**
+  String get noteOptional;
+
+  /// No description provided for @descriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a description...'**
+  String get descriptionHint;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @addTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Transaction'**
+  String get addTransaction;
+
+  /// No description provided for @pleaseSelectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a category'**
+  String get pleaseSelectCategory;
+
+  /// No description provided for @errorLoadingCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading categories'**
+  String get errorLoadingCategories;
+
+  /// No description provided for @couldNotOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open file'**
+  String get couldNotOpenFile;
+
+  /// No description provided for @deleteTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Transaction'**
+  String get deleteTransaction;
+
+  /// No description provided for @deleteTransactionConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Transaction?'**
+  String get deleteTransactionConfirmTitle;
+
+  /// No description provided for @deleteTransactionConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. Are you sure you want to delete this transaction?'**
+  String get deleteTransactionConfirmMessage;
+
+  /// No description provided for @transactionDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction deleted'**
+  String get transactionDeleted;
+
+  /// No description provided for @failedLoadCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load categories'**
+  String get failedLoadCategories;
+
+  /// No description provided for @somethingWentWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get somethingWentWrong;
+
+  /// No description provided for @savingsTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings Target'**
+  String get savingsTarget;
+
+  /// No description provided for @surplus.
+  ///
+  /// In en, this message translates to:
+  /// **'Surplus'**
+  String get surplus;
+
+  /// No description provided for @goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get goal;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Mode'**
+  String get lightMode;
+
+  /// No description provided for @user.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get user;
+
+  /// No description provided for @noTransactionsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Transactions Yet'**
+  String get noTransactionsYet;
+
+  /// No description provided for @startTrackingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Start tracking your expenses and see where your money goes.'**
+  String get startTrackingDescription;
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategory;
+
+  /// No description provided for @moneyFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Money Flow'**
+  String get moneyFlow;
+
+  /// No description provided for @scrollable.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrollable'**
+  String get scrollable;
+
+  /// No description provided for @whereYourMoneyGoes.
+  ///
+  /// In en, this message translates to:
+  /// **'Where Your Money Goes'**
+  String get whereYourMoneyGoes;
+
+  /// No description provided for @analyzingFinances.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing your finances...'**
+  String get analyzingFinances;
+
+  /// No description provided for @couldNotLoadAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load analytics'**
+  String get couldNotLoadAnalytics;
+
+  /// No description provided for @netSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Savings'**
+  String get netSavings;
+
+  /// No description provided for @netDeficit.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Deficit'**
+  String get netDeficit;
+
+  /// No description provided for @savingsRateMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re saving {rate}% of income'**
+  String savingsRateMsg(Object rate);
+
+  /// No description provided for @spendingExceedsIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending exceeds income'**
+  String get spendingExceedsIncome;
+
+  /// No description provided for @notificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Check-in 📝'**
+  String get notificationTitle;
+
+  /// No description provided for @notificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t forget to track your income or expenses today!'**
+  String get notificationBody;
 }
 
 class _AppLocalizationsDelegate
