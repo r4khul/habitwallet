@@ -6,6 +6,9 @@
 
 ![Flutter CI](https://github.com/r4khul/habitwallet/actions/workflows/flutter-ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/Coverage-80.5%25-brightgreen)
+![Downloads](https://img.shields.io/github/downloads/r4khul/habitwallet/latest/total?logo=android&logoColor=white&label=Downloads&color=3DDC84&style=flat)
+![GitHub stars](https://img.shields.io/github/stars/r4khul/habitwallet?logo=github&style=flat-square)
+
 
 > 📊 **Test Coverage**: 69 tests passing • [View detailed coverage report](docs/TEST_COVERAGE.md)
 
