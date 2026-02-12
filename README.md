@@ -420,7 +420,7 @@ The app uses schema version 3. If you encounter database errors after updates:
 
 Copyright (c) 2026 Rakhul Prakash. All rights reserved.
 
-This source code is provided for evaluation purposes only. See the [LICENSE](LICENSE) file for full terms and conditions.
+See the [LICENSE](LICENSE) file for full terms and conditions.
 
 ## Contact
 
