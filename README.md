@@ -9,7 +9,6 @@
 ![Downloads](https://img.shields.io/github/downloads/r4khul/habitwallet/latest/total?logo=android&logoColor=white&label=Downloads&color=3DDC84&style=flat)
 ![GitHub stars](https://img.shields.io/github/stars/r4khul/habitwallet?logo=github&style=flat-square)
 
-
 > 📊 **Test Coverage**: 69 tests passing • [View detailed coverage report](docs/TEST_COVERAGE.md)
 
 A comprehensive finance management application built with Flutter. This application provides offline-first financial transaction tracking with background synchronization capabilities, bilingual support (English and Tamil), and a modern, responsive user interface.
@@ -418,9 +417,7 @@ The app uses schema version 3. If you encounter database errors after updates:
 
 ## License
 
-Copyright (c) 2026 Rakhul Prakash. All rights reserved.
-
-See the [LICENSE](LICENSE) file for full terms and conditions.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
